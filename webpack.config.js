@@ -9,7 +9,7 @@ module.exports = (env, argv) => {
   return {
     mode,
     devtool,
-    entry: './src/index.ts',
+    entry: './src/app.ts',
     module: {
       rules: [
         {
@@ -36,7 +36,7 @@ module.exports = (env, argv) => {
         favicon: path.resolve(__dirname, 'src/assets/favicon.ico'),
         filename: 'index.html',
       }),
-      // new EslintPlugin({ extensions: ['ts'] }), // запускает проверку линтера при сборке
+      new EslintPlugin({ extensions: ['ts'] }),
     ],
     output: {
       filename: 'bundle.js',
