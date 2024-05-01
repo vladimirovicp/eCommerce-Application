@@ -37,7 +37,7 @@ module.exports = (env, argv) => {
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, 'src/index.html'),
-        favicon: path.resolve(__dirname, 'src/assets/favicon.ico'),
+        favicon: path.resolve(__dirname, 'src/assets/img/favicon.ico'),
         filename: 'index.html',
       }),
       new EslintPlugin({ extensions: ['ts'] }),
