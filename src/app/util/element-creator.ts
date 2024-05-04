@@ -1,12 +1,6 @@
 import { ElementParams } from './types';
 
-abstract class ElementCreator<T extends HTMLElement = HTMLElement> {
-  /*
-  Для использования класса можно будет потом писать
-  export class InputField extends ElementTemplate<HTMLInputElement>
-  или, если не нужны особые аттрибуты
-  export class Element extends ElementTemplate
-  */
+class ElementCreator<T extends HTMLElement = HTMLElement> {
   protected element: T;
 
   constructor(params: ElementParams) {
@@ -20,21 +14,22 @@ abstract class ElementCreator<T extends HTMLElement = HTMLElement> {
     return this.element;
   }
 
-  // Нужен ли он тут?
   setCallback(callback: ((event: Event | undefined) => void) | undefined): void {
     if (typeof callback === 'function') {
-      this.element.addEventListener('click', (event) => callback(event));
+      this.element.addEventListener('click', callback);
     }
   }
 
-  addInnerElements(children: Array<HTMLElement>): void {
+  addInnerElements(children: Array<T>): void {
+    const fragment = new DocumentFragment();
     children.forEach((child) => {
       if (child instanceof ElementCreator) {
-        this.element.append(child.getElement());
+        fragment.append(child.getElement());
       } else {
-        this.element.append(child);
+        fragment.append(child);
       }
     });
+    this.element.append(fragment);
   }
 
   private setCssClasses(cssClasses: Array<string> | undefined): void {
