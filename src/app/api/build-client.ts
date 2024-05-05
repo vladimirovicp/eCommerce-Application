@@ -1,33 +1,31 @@
 import { ClientBuilder, AuthMiddlewareOptions, HttpMiddlewareOptions } from '@commercetools/sdk-client-v2';
 
 import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
-
-const projectKey = 'bikesphere';
-const scopes = ['manage_project:bikesphere manage_api_clients:bikesphere view_api_clients:bikesphere'];
+import { CT_PROJECT_KEY, CT_CLIENT_ID, CT_CLIENT_SECRET, CT_SCOPE, CT_AUTH_HOST, CT_API_HOST } from './credentials';
 
 const authMiddlewareOptions: AuthMiddlewareOptions = {
-  host: 'https://auth.europe-west1.gcp.commercetools.com',
-  projectKey,
+  host: CT_AUTH_HOST,
+  projectKey: CT_PROJECT_KEY,
   credentials: {
-    clientId: 'buLqiCS61nnuStctidjFLtUV',
-    clientSecret: 'WOqWqYSOi5qIypYh9eUC9_5ffq2J9DGR',
+    clientId: CT_CLIENT_ID,
+    clientSecret: CT_CLIENT_SECRET,
   },
-  scopes,
+  scopes: CT_SCOPE,
   fetch,
 };
 
 const httpMiddlewareOptions: HttpMiddlewareOptions = {
-  host: 'https://api.europe-west1.gcp.commercetools.com',
+  host: CT_API_HOST,
   fetch,
 };
 
 const ctpClient = new ClientBuilder()
-  .withProjectKey(projectKey)
+  .withProjectKey(CT_PROJECT_KEY)
   .withClientCredentialsFlow(authMiddlewareOptions)
   .withHttpMiddleware(httpMiddlewareOptions)
   .withLoggerMiddleware()
   .build();
 
-const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
+const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
 
 export default apiRoot;
