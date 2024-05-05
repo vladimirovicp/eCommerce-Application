@@ -20,7 +20,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     }
   }
 
-  addInnerElements(children: Array<T>): void {
+  addInnerElements(children: Array<T | HTMLElement>): void {
     const fragment = new DocumentFragment();
     children.forEach((child) => {
       if (child instanceof ElementCreator) {
