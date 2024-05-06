@@ -8,6 +8,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     this.setCssClasses(params.classNames);
     this.setTextContent(params.textContent);
     this.setCallback(params.callback);
+    this.setAttributes(params.attributes);
   }
 
   getElement(): HTMLElement {
@@ -20,7 +21,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     }
   }
 
-  addInnerElements(children: Array<T | HTMLElement>): void {
+  addInnerElements(children: Array<T | ElementCreator>): void {
     const fragment = new DocumentFragment();
     children.forEach((child) => {
       if (child instanceof ElementCreator) {
@@ -41,6 +42,15 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
   private setTextContent(text: string | undefined): void {
     if (text !== undefined) {
       this.element.textContent = text;
+    }
+  }
+
+  private setAttributes(attributes: { [key: string]: string } | undefined): void {
+    if (attributes !== undefined) {
+      const keys = Object.keys(attributes);
+      keys.forEach((key) => {
+        this.element.setAttribute(key, attributes[key]);
+      });
     }
   }
 }
