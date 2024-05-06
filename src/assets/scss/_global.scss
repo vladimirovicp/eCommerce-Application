@@ -1,0 +1,339 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Roboto', sans-serif;
+    line-height: 2.5;
+    font-size: 1.1vw;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-style: normal;
+    font-weight: bold;
+    color: #000;
+    background: #FFF;
+    line-height: 1.5;
+    letter-spacing: 0.048rem;
+    min-width: 320px;
+    font-size: 0.875rem;
+    &._lock{
+        overflow: hidden;
+        overflow-y: hidden;
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+    }
+}
+
+a{
+    color: #000;
+    text-decoration: none;
+    transition: color .4s ease-in-out;
+
+    &:hover{
+        color: #FFA800
+    }
+
+    &.underline{
+        &:after {
+            width: 100%;
+            content: '';
+            position: absolute;
+            background-color: #000;
+            height: 2px;
+            left: 0;
+            bottom: 0;
+            transition: background-color .4s ease-in-out;
+        }
+
+        &:hover{
+            &:after {
+                background-color: #FFA800;
+            }
+        }
+    }
+
+
+}
+
+p{
+    margin: 0 0 1rem 0;
+}
+
+ul, li{
+    list-style: none;
+}
+
+.container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 2rem;
+}
+
+.main{
+    min-height: calc(100vh - 11.7rem);
+}
+
+.img-full{
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.form{
+    &__title{
+
+        margin-bottom: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: normal;
+        &-logo{
+            width: 2.18rem;
+            height: 1.125rem;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        &-text{
+            color:#fff;
+            text-transform: uppercase;
+        }
+    }
+
+    &__message{
+        color: #FF2E00;
+        margin-bottom: .5rem;
+    }
+
+    &__field{
+        margin-bottom: 1.5rem;
+        input[type="text"],
+        input:not([type]),
+        input[type="email"], 
+        input[type="password"],
+        input[type="date"]{
+            width: 100%;
+            height: 3.5rem;
+            border-radius:10rem;
+            color: #fff;
+            background-color: transparent;
+            box-sizing:border-box;
+            padding: 0 1.2rem;
+            outline-style: solid;
+            outline-offset: 0;
+            outline-width: 0;
+            //transition: all .7s;
+            &:focus-visible{
+                border-color: #fff;
+            }
+        }
+
+        input[type="button"]{
+            border-radius:10rem;
+            width: 100%;
+            height: 3.5rem;
+            
+            border: .3rem solid #8E8A81;
+            background-color: #8E8A81;
+            
+            
+            transition: background-color .7s;
+            font-weight: 600;
+
+            &:not([disabled]){
+                cursor: pointer;
+                border-color: #FDAD11;
+                background-color: #F1CF8E;
+                &:hover{
+                    background-color: #FDAD11;
+                }
+            } 
+        }
+
+        &-eye{
+            position: relative;
+
+            .eye{
+                cursor: pointer;
+                width: 3.5rem;
+                height: 3.5rem;
+                position: absolute;
+                background-image: url(../img/svg/eye-show-solid.svg);
+                background-repeat: no-repeat;
+                background-position: center;
+                top:0;
+                right: 0;
+            }
+
+            input[type="text"] + .eye, input:not([type]) + .eye{
+                background-image: url(../img/svg/eye-close-line.svg);
+            }
+
+
+        }
+
+        &-error{
+            input[type="text"], 
+            input[type="email"], 
+            input[type="password"]{
+                border: .3rem solid #FF2E00;
+            }
+        }
+
+        span{
+            display: block;
+            padding: .5rem;
+            color: #FF2E00; 
+        }
+    }
+
+    &__fields{
+        &-title{
+            font-size: 1.2rem;
+            padding-bottom: 1rem;
+        }
+        &-sub-title{
+            font-size: 1rem;
+            padding-bottom: 0.5rem;
+
+        }
+    }
+
+    &__link{
+        text-align: center;
+        a{
+            color: #F1CF8E;
+            transition: all .7s;
+            text-decoration: underline;
+            
+            &:hover{
+                font-size: 1.05rem;
+            }
+        }
+        
+    }
+}
+
+.field__country{
+    select{
+        width: 100%;
+        height: 3.5rem;
+        border-radius: 10rem;
+        background-color: transparent;
+        box-sizing: border-box;
+        color: rgb(118, 118, 118);
+        padding: 0 1.2rem;
+        appearance: none;
+        option {
+            background-color: #1C1403;
+            color: #fff;
+        }
+
+        &.active{
+            color: #fff;
+        }
+    }
+        
+}
+
+
+
+
+
+@media(max-width: 64em){
+    html{
+        font-size: 2vw;
+    }
+    .main{
+        min-height: calc(100vh - 9rem - 4.5rem);
+    }
+}
+
+@media(max-width: 48em){
+    html{
+        font-size: 5vw;
+    }
+
+    .main{
+        min-height: calc(100vh - 7.5rem);
+    }
+
+    .form{
+        font-size: 0.4rem;
+        &__title{
+            margin-bottom:0.5rem 
+        }
+
+        &__field{
+            margin-bottom: 0.5rem;
+            input[type="text"], 
+            input:not([type]),
+            input[type="email"], 
+            input[type="password"],
+            input[type="date"]
+            {
+                height: 2rem;
+                border-width: .1rem 
+            }
+
+            input[type="button"]{
+                height: 1.5rem;
+                border-width: .1rem 
+            }
+
+            &-eye{
+                .eye{
+                    width: 2rem;
+                    height: 2rem;
+                }
+            }
+        }
+
+        &__link{
+            margin-top: 1rem;
+            font-size: .6rem;
+            a{
+                &:hover{
+                    font-size: .7rem;
+                }
+            }
+        }
+    }
+
+    .field__country{
+        select{
+            width: 100%;
+            height: 2rem;
+            padding: 0 1.2rem;
+            option{
+                padding: 10px 0;
+            }
+        }
+            
+    }
+}
+
+@media(max-width: 20em){
+    html{
+        font-size: 16px;
+    }
+}
+
+
+@media(min-width: 90em){
+    html{
+        font-size: 16px;
+    }
+
+    .container {
+        width: 90rem;
+        margin: 0 auto;
+    }
+}
