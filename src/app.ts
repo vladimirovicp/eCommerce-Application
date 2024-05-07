@@ -1,5 +1,6 @@
 import FooterView from './app/components/footer/footer';
 import './assets/scss/_global.scss';
+import NotFound from './app/pages/404/NotFound';
 
 class App {
   constructor() {
@@ -17,3 +18,6 @@ class App {
 
 // eslint-disable-next-line
 const app = new App();
+
+const notFound = new NotFound();
+notFound.render();
