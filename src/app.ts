@@ -1,5 +1,4 @@
 import './assets/scss/_global.scss';
-import './assets/scss/_header.scss';
 import Home from './app/pages/home';
 import Catalog from './app/pages/catalog';
 import About from './app/pages/about';
