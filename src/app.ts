@@ -1,6 +1,7 @@
 import FooterView from './app/components/footer/footer';
 import './assets/scss/_global.scss';
-import NotFound from './app/pages/404/NotFound';
+// import NotFound from './app/pages/404/NotFound';
+import HeaderView from './app/components/header/header';
 
 class App {
   constructor() {
@@ -8,16 +9,16 @@ class App {
   }
 
   private createView(): void {
-    // const headerView = new HeaderView();
+    const header = new HeaderView().getHtmlElement();
     // const mainView = new MainView();
     const footer = new FooterView().getHtmlElement();
 
-    document.body.appendChild(footer);
+    document.body.append(header, footer);
   }
 }
 
 // eslint-disable-next-line
 const app = new App();
 
-const notFound = new NotFound();
-notFound.render();
+// const notFound = new NotFound();
+// notFound.render();
