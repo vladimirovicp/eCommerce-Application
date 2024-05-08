@@ -99,7 +99,7 @@ class LoginPage extends View {
 
     const input = new InputCreator({
       type: 'email',
-      attributes: { placeholder: 'Enter your password' },
+      attributes: { placeholder: 'Enter your password', required: 'true' },
     });
 
     const error = new ElementCreator({
@@ -125,7 +125,7 @@ class LoginPage extends View {
     const input = new InputCreator({
       type: 'password',
       classNames: ['password'],
-      attributes: { placeholder: 'Enter your password' },
+      attributes: { placeholder: 'Enter your password', required: 'true' },
     });
 
     const btnEye = new ElementCreator({
