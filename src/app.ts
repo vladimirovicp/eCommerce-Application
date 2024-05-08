@@ -2,7 +2,8 @@ import FooterView from './app/components/footer/footer';
 import './assets/scss/_global.scss';
 // import NotFound from './app/pages/404/NotFound';
 import HeaderView from './app/components/header/header';
-import Home from './app/pages/home';
+// import Home from './app/pages/home';
+import Login from './app/pages/login';
 
 class App {
   constructor() {
@@ -11,7 +12,8 @@ class App {
 
   private createView(): void {
     const header = new HeaderView().getHtmlElement();
-    const main = new Home().getHtmlElement();
+    // const main = new Home().getHtmlElement();
+    const main = new Login().getHtmlElement();
     const footer = new FooterView().getHtmlElement();
 
     document.body.append(header, main, footer);
