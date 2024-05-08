@@ -2,7 +2,7 @@ import '../../../assets/scss/page/home.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 
-export default class HomePage extends View {
+export default class CartPage extends View {
   constructor() {
     const params = {
       tag: 'div',
@@ -15,7 +15,7 @@ export default class HomePage extends View {
   setContent(): void {
     const text = new ElementCreator({
       tag: 'p',
-      textContent: 'Home page',
+      textContent: 'Cart page',
     });
     this.viewElementCreator.addInnerElements([text]);
   }

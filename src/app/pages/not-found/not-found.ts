@@ -19,7 +19,7 @@ const ScssStyles = {
 
 const NOT_FOUND_TEXT = 'Page is not found';
 
-export default class NotFound extends View {
+export default class NotFoundPage extends View {
   constructor() {
     const params = {
       tag: 'div',

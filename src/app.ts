@@ -5,8 +5,15 @@ import FooterView from './app/components/footer/footer';
 import Router from './app/router/router';
 import { Pages } from './app/router/pages';
 import { Route } from './app/router/router-types';
-import NotFound from './app/pages/404/NotFound';
-import Home from './app/pages/home/home';
+import NotFoundPage from './app/pages/not-found/not-found';
+import HomePage from './app/pages/home/home';
+import CatalogPage from './app/pages/catalog/catalog';
+import AboutPage from './app/pages/about/about';
+import LoginPage from './app/pages/login/login';
+import RegistrationPage from './app/pages/registration/registration';
+import ProfilePage from './app/pages/profile/profile';
+import CartPage from './app/pages/cart/cart';
+import View from './app/common/view';
 
 class App {
   private header: HeaderView;
@@ -29,58 +36,73 @@ class App {
     document.body.append(this.header.getHtmlElement(), this.main.getHtmlElement(), footer);
   }
 
+  /* eslint-disable max-lines-per-function */
   private createRoutes(): Array<Route> {
     return [
       {
         path: `${Pages.NOT_FOUND}`,
         callback: (): void => {
-          this.main.updateStyleClasses('not-found-page');
-          this.main.setContent(new NotFound());
+          this.updateMain(new NotFoundPage(), 'not-found-page');
         },
       },
       {
         path: '',
         callback: (): void => {
-          this.main.updateStyleClasses('hero');
-          this.main.setContent(new Home());
+          this.updateMain(new HomePage(), 'hero');
         },
       },
       {
         path: `${Pages.HOME}`,
         callback: (): void => {
-          this.main.updateStyleClasses('hero');
-          this.main.setContent(new Home());
+          this.updateMain(new HomePage(), 'hero');
+        },
+      },
+      {
+        path: `${Pages.CATALOG}`,
+        callback: (): void => {
+          this.updateMain(new CatalogPage(), 'not-found-page');
+        },
+      },
+      {
+        path: `${Pages.ABOUT}`,
+        callback: (): void => {
+          this.updateMain(new AboutPage(), 'not-found-page');
+        },
+      },
+      {
+        path: `${Pages.LOGIN}`,
+        callback: (): void => {
+          this.updateMain(new LoginPage(), 'not-found-page');
+        },
+      },
+      {
+        path: `${Pages.REGISTRATION}`,
+        callback: (): void => {
+          this.updateMain(new RegistrationPage(), 'not-found-page');
+        },
+      },
+      {
+        path: `${Pages.PROFILE}`,
+        callback: (): void => {
+          this.updateMain(new ProfilePage(), 'not-found-page');
+        },
+      },
+      {
+        path: `${Pages.CART}`,
+        callback: (): void => {
+          this.updateMain(new CartPage(), 'not-found-page');
         },
       },
     ];
+  }
+
+  updateMain(page: View, scssClass?: string): void {
+    if (scssClass) {
+      this.main.updateStyleClasses(scssClass);
+    }
+    this.main.setContent(page);
   }
 }
 
 // eslint-disable-next-line
 const app = new App();
-
-/* 
-      {
-        path: `${Pages.LOGIN}`,
-        callback: () => {},
-      },
-      {
-        path: `${Pages.REGISTRATION}`,
-        callback: () => {},
-      },
-      {
-        path: `${Pages.CATALOGUE}`,
-        callback: () => {},
-      },
-      {
-        path: `${Pages.PROFILE}`,
-        callback: () => {},
-      },
-      {
-        path: `${Pages.ABOUT}`,
-        callback: () => {},
-      },
-      {
-        path: `${Pages.CART}`,
-        callback: () => {},
-}, */

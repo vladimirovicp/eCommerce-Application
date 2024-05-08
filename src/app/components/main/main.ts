@@ -1,3 +1,4 @@
+import '../../../assets/scss/_global.scss';
 import View from '../../common/view';
 
 export default class MainView extends View {
