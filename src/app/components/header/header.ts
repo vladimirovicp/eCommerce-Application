@@ -11,7 +11,7 @@ import { Pages } from '../../router/pages';
 
 export default class HeaderView extends View {
   private router: Router;
-
+  
   private navigationLinksParams = [
     {
       classNames: ['header__nav-link', 'active'],
