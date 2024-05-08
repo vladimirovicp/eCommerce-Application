@@ -20,6 +20,12 @@ export interface LinkParams {
   imageData?: LinkImageData;
 }
 
+export interface InputParams {
+  classNames?: Array<string>;
+  attributes?: { [key: string]: string };
+  type: string;
+}
+
 export interface LinkImageData {
   imageClassNames?: string;
   containerClassNames?: string;
