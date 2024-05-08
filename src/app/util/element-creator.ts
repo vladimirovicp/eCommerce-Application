@@ -11,7 +11,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     this.setAttributes(params.attributes);
   }
 
-  getElement(): HTMLElement {
+  getElement(): T {
     return this.element;
   }
 
@@ -21,7 +21,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     }
   }
 
-  addInnerElements(children: Array<T | ElementCreator>): void {
+  addInnerElements(children: Array<HTMLElement | ElementCreator>): void {
     const fragment = new DocumentFragment();
     children.forEach((child) => {
       if (child instanceof ElementCreator) {
