@@ -10,24 +10,15 @@ const imageSrc = {
 class Home extends View {
   constructor() {
     const params = {
-      tag: 'main',
-      classNames: ['main', 'home-page'],
+      tag: 'section',
+      classNames: ['hero'],
     };
     super(params);
     this.setContent();
   }
 
   public setContent(): void {
-    this.viewElementCreator.addInnerElements([this.createHero()]);
-  }
-
-  private createHero(): ElementCreator<HTMLElement> {
-    const hero = new ElementCreator({
-      tag: 'section',
-      classNames: ['hero'],
-    });
-    hero.addInnerElements([this.createHeroBg(), this.createHeroContainer()]);
-    return hero;
+    this.viewElementCreator.addInnerElements([this.createHeroBg(), this.createHeroContainer()]);
   }
 
   private createHeroBg(): ElementCreator<HTMLElement> {

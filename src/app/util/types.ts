@@ -1,5 +1,5 @@
 export interface ElementParams {
-  tag: string;
+  tag?: string;
   classNames?: Array<string>;
   textContent?: string;
   callback?: (event?: Event) => void;
