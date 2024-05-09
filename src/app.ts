@@ -9,7 +9,7 @@ import NotFoundPage from './app/pages/not-found/not-found';
 import HomePage from './app/pages/home';
 import CatalogPage from './app/pages/catalog/catalog';
 import AboutPage from './app/pages/about/about';
-import LoginPage from './app/pages/login/login';
+import LoginPage from './app/pages/login/index';
 import RegistrationPage from './app/pages/registration/registration';
 import ProfilePage from './app/pages/profile/profile';
 import CartPage from './app/pages/cart/cart';

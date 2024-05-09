@@ -3,12 +3,16 @@ import ElementCreator from '../../util/element-creator';
 import InputCreator from '../../util/input-creator';
 import logoSrc from '../../../assets/img/svg/logo.svg';
 import '../../../assets/scss/page/login.scss';
+import mailValid from '../../util/validation-fuction';
+import FormCreator from '../../util/form-creator';
 
 const imageSrc = {
   LOGO: `${logoSrc}`,
 };
 
 class LoginPage extends View {
+  private loginFormCreator!: FormCreator;
+
   constructor() {
     const params = {
       tag: 'main',
@@ -81,17 +85,17 @@ class LoginPage extends View {
     return formTitle;
   }
 
-  createForm(): ElementCreator<HTMLElement> {
-    const form = new ElementCreator({
-      tag: 'form',
+  createForm(): FormCreator {
+    this.loginFormCreator = new FormCreator({
       classNames: ['form__login'],
       attributes: { action: '#' },
     });
-    form.addInnerElements([this.createFieldEmail(), this.createFieldPassword(), this.createButton()]);
-    return form;
+
+    this.loginFormCreator.addInnerElements([this.createFieldEmail(), this.createFieldPassword(), this.createButton()]);
+    return this.loginFormCreator;
   }
 
-  createFieldEmail(): ElementCreator<HTMLElement> {
+  private createFieldEmail(): ElementCreator<HTMLElement> {
     const fieldEmail = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -106,6 +110,9 @@ class LoginPage extends View {
       tag: 'span',
     });
 
+    input.addValidation(mailValid, error.getElement());
+    this.loginFormCreator.addValidationField(input);
+    console.log(fieldEmail);
     fieldEmail.addInnerElements([input, error]);
 
     return fieldEmail;
@@ -138,6 +145,9 @@ class LoginPage extends View {
       classNames: ['password'],
     });
 
+    this.loginFormCreator.addValidationField(input);
+    input.addValidation(mailValid, error.getElement());
+
     fieldEye.addInnerElements([input, btnEye]);
     fieldPassword.addInnerElements([fieldEye, error]);
 
@@ -152,10 +162,11 @@ class LoginPage extends View {
 
     const input = new InputCreator({
       type: 'button',
-      attributes: { value: 'Login' },
+      attributes: { value: 'Login', disabled: 'true' },
     });
 
     fieldBtn.addInnerElements([input]);
+    this.loginFormCreator.addSubmitButton(input.getElement());
     return fieldBtn;
   }
 
