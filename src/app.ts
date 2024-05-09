@@ -45,10 +45,16 @@ class App {
           this.updateMain(new NotFoundPage(), 'not-found-page');
         },
       },
+      // {
+      //   path: '',
+      //   callback: (): void => {
+      //     this.updateMain(new HomePage(), 'home-page');
+      //   },
+      // },
       {
         path: '',
         callback: (): void => {
-          this.updateMain(new HomePage(), 'home-page');
+          this.updateMain(new RegistrationPage(), 'register-page');
         },
       },
       {
@@ -78,7 +84,7 @@ class App {
       {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
-          this.updateMain(new RegistrationPage(), 'not-found-page');
+          this.updateMain(new RegistrationPage(), 'register-page');
         },
       },
       {
