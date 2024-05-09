@@ -11,7 +11,7 @@ class Home extends View {
   constructor() {
     const params = {
       tag: 'main',
-      classNames: ['main', 'home-pape'],
+      classNames: ['main', 'home-page'],
     };
     super(params);
     this.setContent();
