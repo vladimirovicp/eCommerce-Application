@@ -17,11 +17,11 @@ class Home extends View {
     this.setContent();
   }
 
-  setContent(): void {
+  public setContent(): void {
     this.viewElementCreator.addInnerElements([this.createHero()]);
   }
 
-  createHero(): ElementCreator<HTMLElement> {
+  private createHero(): ElementCreator<HTMLElement> {
     const hero = new ElementCreator({
       tag: 'sectoion',
       classNames: ['hero'],
@@ -30,7 +30,7 @@ class Home extends View {
     return hero;
   }
 
-  createHeroBg(): ElementCreator<HTMLElement> {
+  private createHeroBg(): ElementCreator<HTMLElement> {
     const heroBg = new ElementCreator({
       tag: 'div',
       classNames: ['hero__bg'],
@@ -48,7 +48,7 @@ class Home extends View {
     return heroBg;
   }
 
-  createHeroContainer(): ElementCreator<HTMLElement> {
+  private createHeroContainer(): ElementCreator<HTMLElement> {
     const container = new ElementCreator({
       tag: 'div',
       classNames: ['container'],
