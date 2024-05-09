@@ -6,23 +6,36 @@ import basket from '../../../assets/img/svg/basket.svg';
 import ListCreator from '../../util/list-creator';
 import LinkCreator from '../../util/link-creator';
 import { LinkParams } from '../../util/types';
+import Router from '../../router/router';
+import { Pages } from '../../router/pages';
 
 export default class HeaderView extends View {
+  private router: Router;
+  
   private navigationLinksParams = [
     {
       classNames: ['header__nav-link', 'active'],
       textContent: 'HOME',
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.HOME}`);
+      },
     },
     {
       classNames: ['header__nav-link'],
       textContent: 'CATALOG',
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.CATALOG}`);
+      },
     },
     {
       classNames: ['header__nav-link'],
       textContent: 'ABOUT US',
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.ABOUT}`);
+      },
     },
   ];
 
@@ -30,12 +43,18 @@ export default class HeaderView extends View {
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'login',
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.LOGIN}`);
+      },
     },
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'register',
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.REGISTRATION}`);
+      },
     },
     {
       classNames: ['header__links-link'],
@@ -49,12 +68,13 @@ export default class HeaderView extends View {
     },
   ];
 
-  constructor() {
+  constructor(router: Router) {
     const params = {
       tag: 'header',
       classNames: ['header'],
     };
     super(params);
+    this.router = router;
     this.configureView();
   }
 
