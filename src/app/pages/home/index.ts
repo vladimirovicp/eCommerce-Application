@@ -23,7 +23,7 @@ class Home extends View {
 
   private createHero(): ElementCreator<HTMLElement> {
     const hero = new ElementCreator({
-      tag: 'sectoion',
+      tag: 'section',
       classNames: ['hero'],
     });
     hero.addInnerElements([this.createHeroBg(), this.createHeroContainer()]);
