@@ -3,7 +3,7 @@ import ElementCreator from '../../util/element-creator';
 import InputCreator from '../../util/input-creator';
 import logoSrc from '../../../assets/img/svg/logo.svg';
 import '../../../assets/scss/page/login.scss';
-import mailValid from '../../util/validation-fuction';
+import { emailValidation, passwordValidation } from '../../util/validation-fuction';
 import FormCreator from '../../util/form-creator';
 
 const imageSrc = {
@@ -11,7 +11,7 @@ const imageSrc = {
 };
 
 class LoginPage extends View {
-  private loginFormCreator!: FormCreator;
+  private loginFormCreator: FormCreator;
 
   constructor() {
     const params = {
@@ -19,14 +19,15 @@ class LoginPage extends View {
       classNames: ['main', 'login-page'],
     };
     super(params);
+    this.loginFormCreator = this.createForm();
     this.setContent();
   }
 
-  setContent(): void {
+  private setContent(): void {
     this.viewElementCreator.addInnerElements([this.createContainer()]);
   }
 
-  createContainer(): ElementCreator<HTMLElement> {
+  private createContainer(): ElementCreator<HTMLElement> {
     const container = new ElementCreator({
       tag: 'div',
       classNames: ['container'],
@@ -35,7 +36,7 @@ class LoginPage extends View {
     return container;
   }
 
-  createLoginBox(): ElementCreator<HTMLElement> {
+  private createLoginBox(): ElementCreator<HTMLElement> {
     const loginBox = new ElementCreator({
       tag: 'div',
       classNames: ['form', 'login__box'],
@@ -46,7 +47,7 @@ class LoginPage extends View {
     return loginBox;
   }
 
-  createFormTitle(): ElementCreator<HTMLElement> {
+  private createFormTitle(): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__title'],
@@ -76,7 +77,7 @@ class LoginPage extends View {
     return formTitle;
   }
 
-  createMessage(): ElementCreator<HTMLElement> {
+  private createMessage(): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__message'],
@@ -85,7 +86,7 @@ class LoginPage extends View {
     return formTitle;
   }
 
-  createForm(): FormCreator {
+  private createForm(): FormCreator {
     this.loginFormCreator = new FormCreator({
       classNames: ['form__login'],
       attributes: { action: '#' },
@@ -103,22 +104,21 @@ class LoginPage extends View {
 
     const input = new InputCreator({
       type: 'email',
-      attributes: { placeholder: 'Enter your password', required: 'true' },
+      attributes: { placeholder: 'Enter your email address', required: 'true' },
     });
 
     const error = new ElementCreator({
       tag: 'span',
     });
 
-    input.addValidation(mailValid, error.getElement());
+    input.addValidation(emailValidation, error.getElement());
     this.loginFormCreator.addValidationField(input);
-    console.log(fieldEmail);
     fieldEmail.addInnerElements([input, error]);
 
     return fieldEmail;
   }
 
-  createFieldPassword(): ElementCreator<HTMLElement> {
+  private createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__password'],
@@ -146,7 +146,7 @@ class LoginPage extends View {
     });
 
     this.loginFormCreator.addValidationField(input);
-    input.addValidation(mailValid, error.getElement());
+    input.addValidation(passwordValidation, error.getElement());
 
     fieldEye.addInnerElements([input, btnEye]);
     fieldPassword.addInnerElements([fieldEye, error]);
@@ -154,7 +154,7 @@ class LoginPage extends View {
     return fieldPassword;
   }
 
-  createButton(): ElementCreator<HTMLElement> {
+  private createButton(): ElementCreator<HTMLElement> {
     const fieldBtn = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'form__button'],
@@ -170,7 +170,7 @@ class LoginPage extends View {
     return fieldBtn;
   }
 
-  createLink(): ElementCreator<HTMLElement> {
+  private createLink(): ElementCreator<HTMLElement> {
     const linkBox = new ElementCreator({
       tag: 'div',
       classNames: ['form__link'],
