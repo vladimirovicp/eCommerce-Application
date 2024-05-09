@@ -6,7 +6,7 @@ import Router from './app/router/router';
 import { Pages } from './app/router/pages';
 import { Route } from './app/router/router-types';
 import NotFoundPage from './app/pages/not-found/not-found';
-import HomePage from './app/pages/home/home';
+import HomePage from './app/pages/home';
 import CatalogPage from './app/pages/catalog/catalog';
 import AboutPage from './app/pages/about/about';
 import LoginPage from './app/pages/login/login';
@@ -48,13 +48,13 @@ class App {
       {
         path: '',
         callback: (): void => {
-          this.updateMain(new HomePage(), 'hero');
+          this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: `${Pages.HOME}`,
         callback: (): void => {
-          this.updateMain(new HomePage(), 'hero');
+          this.updateMain(new HomePage(), 'home-page');
         },
       },
       {

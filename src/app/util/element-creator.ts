@@ -4,7 +4,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
   protected element: T;
 
   constructor(params: ElementParams) {
-    this.element = <T>document.createElement(params.tag);
+    this.element = <T>document.createElement(params.tag !== undefined ? params.tag : 'div');
     this.setCssClasses(params.classNames);
     this.setTextContent(params.textContent);
     this.setCallback(params.callback);
