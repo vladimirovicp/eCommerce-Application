@@ -5,6 +5,7 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
 
   constructor(params: ElementParams) {
     this.element = <T>document.createElement(params.tag !== undefined ? params.tag : 'div');
+    this.setId(params.id);
     this.setCssClasses(params.classNames);
     this.setTextContent(params.textContent);
     this.setCallback(params.callback, params.eventType);
@@ -49,6 +50,12 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
       }
     });
     this.element.append(fragment);
+  }
+
+  private setId(id: string | undefined): void {
+    if (id !== undefined) {
+      this.element.id = id;
+    }
   }
 
   private setCssClasses(cssClasses: Array<string> | undefined): void {
