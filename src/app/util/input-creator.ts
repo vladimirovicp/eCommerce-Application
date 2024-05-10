@@ -10,7 +10,7 @@ class InputCreator extends ElementCreator<HTMLInputElement> {
     this.setType(params.type);
   }
 
-  private setType(type: string): void {
+  public setType(type: string): void {
     this.element.setAttribute('type', type);
   }
 
