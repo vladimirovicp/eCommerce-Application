@@ -21,13 +21,13 @@ export default class RegistrationPage extends View {
     this.setContent();
   }
 
-  setContent(): void {
+  public setContent(): void {
     const box = new ElementCreator({ classNames: ['form', 'register__box'] });
     box.addInnerElements([this.createFormTitle(), this.createMessage(), this.createForm(), this.createLink()]);
     this.viewElementCreator.addInnerElements([box]);
   }
 
-  createFormTitle(): ElementCreator<HTMLElement> {
+  private createFormTitle(): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__title'],
@@ -57,7 +57,7 @@ export default class RegistrationPage extends View {
     return formTitle;
   }
 
-  createMessage(): ElementCreator<HTMLElement> {
+  private createMessage(): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__message'],
@@ -66,7 +66,7 @@ export default class RegistrationPage extends View {
     return formTitle;
   }
 
-  createForm(): ElementCreator<HTMLElement> {
+  private createForm(): ElementCreator<HTMLElement> {
     const form = new ElementCreator({
       tag: 'form',
       classNames: ['form__register'],
@@ -89,21 +89,21 @@ export default class RegistrationPage extends View {
     return form;
   }
 
-  createFieldsTitle(text: string): ElementCreator<HTMLElement> {
+  private createFieldsTitle(text: string): ElementCreator<HTMLElement> {
     return new ElementCreator({
       textContent: text,
       classNames: ['form__fields-title'],
     });
   }
 
-  createFieldsSubTitle(text: string): ElementCreator<HTMLElement> {
+  private createFieldsSubTitle(text: string): ElementCreator<HTMLElement> {
     return new ElementCreator({
       textContent: text,
       classNames: ['form__fields-sub-title'],
     });
   }
 
-  createFields(
+  private createFields(
     fieldOne: ElementCreator<HTMLElement>,
     fieldTwo: ElementCreator<HTMLElement>
   ): ElementCreator<HTMLElement> {
@@ -116,7 +116,7 @@ export default class RegistrationPage extends View {
     return fields;
   }
 
-  createFieldEmail(): ElementCreator<HTMLElement> {
+  private createFieldEmail(): ElementCreator<HTMLElement> {
     const fieldEmail = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -136,7 +136,7 @@ export default class RegistrationPage extends View {
     return fieldEmail;
   }
 
-  createFirstName(): ElementCreator<HTMLElement> {
+  private createFirstName(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -156,7 +156,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createLastName(): ElementCreator<HTMLElement> {
+  private createLastName(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -176,7 +176,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createbirthDate(): ElementCreator<HTMLElement> {
+  private createbirthDate(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__birth-date'],
@@ -198,7 +198,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createbirthCountry(): ElementCreator<HTMLElement> {
+  private createbirthCountry(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__country'],
@@ -236,7 +236,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createCity(): ElementCreator<HTMLElement> {
+  private createCity(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -256,7 +256,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createStreet(): ElementCreator<HTMLElement> {
+  private createStreet(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -276,7 +276,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createPostalCode(): ElementCreator<HTMLElement> {
+  private createPostalCode(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -296,7 +296,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createAddress(): ElementCreator<HTMLElement> {
+  private createAddress(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -312,7 +312,7 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  createFieldPassword(): ElementCreator<HTMLElement> {
+  private createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__password'],
@@ -353,7 +353,7 @@ export default class RegistrationPage extends View {
     return fieldPassword;
   }
 
-  createButton(): ElementCreator<HTMLElement> {
+  private createButton(): ElementCreator<HTMLElement> {
     const fieldBtn = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'form__button'],
@@ -368,7 +368,7 @@ export default class RegistrationPage extends View {
     return fieldBtn;
   }
 
-  createLink(): ElementCreator<HTMLElement> {
+  private createLink(): ElementCreator<HTMLElement> {
     const linkBox = new ElementCreator({
       tag: 'div',
       classNames: ['form__link'],
