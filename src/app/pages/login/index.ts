@@ -11,24 +11,15 @@ const imageSrc = {
 class LoginPage extends View {
   constructor() {
     const params = {
-      tag: 'main',
-      classNames: ['main', 'login-page'],
+      tag: 'div',
+      classNames: ['container'],
     };
     super(params);
     this.setContent();
   }
 
   setContent(): void {
-    this.viewElementCreator.addInnerElements([this.createContainer()]);
-  }
-
-  createContainer(): ElementCreator<HTMLElement> {
-    const container = new ElementCreator({
-      tag: 'div',
-      classNames: ['container'],
-    });
-    container.addInnerElements([this.createLoginBox()]);
-    return container;
+    this.viewElementCreator.addInnerElements([this.createLoginBox()]);
   }
 
   createLoginBox(): ElementCreator<HTMLElement> {

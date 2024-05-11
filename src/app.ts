@@ -5,14 +5,14 @@ import FooterView from './app/components/footer/footer';
 import Router from './app/router/router';
 import { Pages } from './app/router/pages';
 import { Route } from './app/router/router-types';
-import NotFoundPage from './app/pages/not-found/not-found';
+import NotFoundPage from './app/pages/not-found';
 import HomePage from './app/pages/home';
-import CatalogPage from './app/pages/catalog/catalog';
-import AboutPage from './app/pages/about/about';
-import LoginPage from './app/pages/login/login';
-import RegistrationPage from './app/pages/registration/registration';
-import ProfilePage from './app/pages/profile/profile';
-import CartPage from './app/pages/cart/cart';
+import CatalogPage from './app/pages/catalog';
+import AboutPage from './app/pages/about';
+import LoginPage from './app/pages/login';
+import RegistrationPage from './app/pages/registration';
+import ProfilePage from './app/pages/profile';
+import CartPage from './app/pages/cart';
 import View from './app/common/view';
 
 class App {
@@ -72,7 +72,7 @@ class App {
       {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
-          this.updateMain(new LoginPage(), 'not-found-page');
+          this.updateMain(new LoginPage(), 'login-page');
         },
       },
       {

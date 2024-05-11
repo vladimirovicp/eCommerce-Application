@@ -16,7 +16,6 @@ export default class HeaderView extends View {
     {
       classNames: ['header__nav-link', 'active'],
       textContent: 'HOME',
-      // attributes: { href: '/' },
       callback: (): void => {
         this.router.navigate(`${Pages.HOME}`);
       },
@@ -24,7 +23,6 @@ export default class HeaderView extends View {
     {
       classNames: ['header__nav-link'],
       textContent: 'CATALOG',
-      // attributes: { href: '/' },
       callback: (): void => {
         this.router.navigate(`${Pages.CATALOG}`);
       },
@@ -32,7 +30,6 @@ export default class HeaderView extends View {
     {
       classNames: ['header__nav-link'],
       textContent: 'ABOUT US',
-      // attributes: { href: '/' },
       callback: (): void => {
         this.router.navigate(`${Pages.ABOUT}`);
       },
@@ -43,7 +40,6 @@ export default class HeaderView extends View {
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'login',
-      // attributes: { href: '/' },
       callback: (): void => {
         this.router.navigate(`${Pages.LOGIN}`);
       },
@@ -51,14 +47,16 @@ export default class HeaderView extends View {
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'register',
-      // attributes: { href: '/' },
       callback: (): void => {
         this.router.navigate(`${Pages.REGISTRATION}`);
       },
     },
     {
       classNames: ['header__links-link'],
-      attributes: { href: '/' },
+      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.CART}`);
+      },
       imageData: {
         imageClassNames: 'img-full',
         containerClassNames: 'header__basket-img',
