@@ -129,6 +129,14 @@ class LoginPage extends View {
     const btnEye = new ElementCreator({
       tag: 'div',
       classNames: ['eye'],
+      callback: function eyeSwitch(): void {
+        const currentType = input.getElement().getAttribute('type');
+        if (currentType === 'password') {
+          input.setType('text');
+        } else {
+          input.setType('password');
+        }
+      },
     });
 
     const error = new ElementCreator({

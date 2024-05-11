@@ -5,9 +5,12 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
 
   constructor(params: ElementParams) {
     this.element = <T>document.createElement(params.tag !== undefined ? params.tag : 'div');
+    this.setId(params.id);
     this.setCssClasses(params.classNames);
     this.setTextContent(params.textContent);
-    this.setCallback(params.callback);
+    this.setCallback(params.callback, params.eventType);
+    this.setCallbackFocus(params.callbackFocus);
+    this.setCallbackBlur(params.callbackBlur);
     this.setAttributes(params.attributes);
   }
 
@@ -15,9 +18,25 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     return this.element;
   }
 
-  setCallback(callback: ((event: Event | undefined) => void) | undefined): void {
+  setCallback(callback: ((event: Event | undefined) => void) | undefined, eventType: string | undefined): void {
     if (typeof callback === 'function') {
-      this.element.addEventListener('click', callback);
+      if (eventType) {
+        this.element.addEventListener(eventType, callback);
+      } else {
+        this.element.addEventListener('click', callback);
+      }
+    }
+  }
+
+  setCallbackFocus(callback: ((event: Event | undefined) => void) | undefined): void {
+    if (typeof callback === 'function') {
+      this.element.addEventListener('focus', callback);
+    }
+  }
+
+  setCallbackBlur(callback: ((event: Event | undefined) => void) | undefined): void {
+    if (typeof callback === 'function') {
+      this.element.addEventListener('blur', callback);
     }
   }
 
@@ -31,6 +50,12 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
       }
     });
     this.element.append(fragment);
+  }
+
+  private setId(id: string | undefined): void {
+    if (id !== undefined) {
+      this.element.id = id;
+    }
   }
 
   private setCssClasses(cssClasses: Array<string> | undefined): void {
