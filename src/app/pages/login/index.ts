@@ -19,11 +19,14 @@ class LoginPage extends View {
       classNames: ['container'],
     };
     super(params);
-    this.loginFormCreator = this.createForm();
+    this.loginFormCreator = new FormCreator({
+      classNames: ['form__login'],
+      attributes: { action: '#' },
+    });
     this.setContent();
   }
 
-  setContent(): void {
+  private setContent(): void {
     this.viewElementCreator.addInnerElements([this.createLoginBox()]);
   }
 
@@ -78,11 +81,6 @@ class LoginPage extends View {
   }
 
   private createForm(): FormCreator {
-    this.loginFormCreator = new FormCreator({
-      classNames: ['form__login'],
-      attributes: { action: '#' },
-    });
-
     this.loginFormCreator.addInnerElements([this.createFieldEmail(), this.createFieldPassword(), this.createButton()]);
     return this.loginFormCreator;
   }
@@ -98,18 +96,12 @@ class LoginPage extends View {
       attributes: { placeholder: 'Enter your email address', required: 'true' },
     });
 
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    input.addValidation(emailValidation, error.getElement());
-    this.loginFormCreator.addValidationField(input);
+    const error = this.addValidationErrorHandling(input, emailValidation);
     fieldEmail.addInnerElements([input, error]);
 
     return fieldEmail;
   }
 
-  /* eslint-disable max-lines-per-function */
   private createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',
@@ -140,18 +132,26 @@ class LoginPage extends View {
       },
     });
 
-    const error = new ElementCreator({
-      tag: 'span',
-      classNames: ['password'],
-    });
-
-    this.loginFormCreator.addValidationField(input);
-    input.addValidation(passwordValidation, error.getElement());
+    const error = this.addValidationErrorHandling(input, passwordValidation);
 
     fieldEye.addInnerElements([input, btnEye]);
     fieldPassword.addInnerElements([fieldEye, error]);
 
     return fieldPassword;
+  }
+
+  private addValidationErrorHandling(
+    inputCreator: InputCreator,
+    validationFunction: (value: string) => { isValid: boolean; errorMessage: string }
+  ): ElementCreator<HTMLSpanElement> {
+    const errorCreator = new ElementCreator({
+      tag: 'span',
+    });
+
+    inputCreator.addValidation(validationFunction, errorCreator.getElement());
+    this.loginFormCreator.addValidationField(inputCreator);
+
+    return errorCreator;
   }
 
   private createButton(): ElementCreator<HTMLElement> {

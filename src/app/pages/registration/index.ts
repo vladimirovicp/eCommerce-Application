@@ -6,18 +6,32 @@ import logoSrc from '../../../assets/img/svg/logo.svg';
 import '../../../assets/scss/page/register.scss';
 import { typeTextToDate, typeDateToText } from '../../util/converter-input';
 import countryData from '../../util/data';
+import FormCreator from '../../util/form-creator';
+import {
+  addressValidation,
+  birthDateValidation,
+  emailValidation,
+  nameValidation,
+  passwordValidation,
+} from '../../util/validation-fuction';
 
 const imageSrc = {
   LOGO: `${logoSrc}`,
 };
 
 export default class RegistrationPage extends View {
+  private registrationFormCreator: FormCreator;
+
   constructor() {
     const params = {
       tag: 'div',
       classNames: ['container'],
     };
     super(params);
+    this.registrationFormCreator = new FormCreator({
+      classNames: ['form__register'],
+      attributes: { action: '#' },
+    });
     this.setContent();
   }
 
@@ -66,27 +80,23 @@ export default class RegistrationPage extends View {
     return formTitle;
   }
 
-  private createForm(): ElementCreator<HTMLElement> {
-    const form = new ElementCreator({
-      tag: 'form',
-      classNames: ['form__register'],
-      attributes: { action: '#' },
-    });
-    form.addInnerElements([
+  private createForm(): FormCreator {
+    this.registrationFormCreator.addInnerElements([
       this.createFieldsTitle('Personal info'),
       this.createFieldEmail(),
       this.createFields(this.createFirstName(), this.createLastName()),
       this.createbirthDate(),
       this.createFieldsTitle('Address'),
       this.createFieldsSubTitle('Shipping adress'),
-      this.createFields(this.createbirthCountry(), this.createCity()),
+      this.createFields(this.createCountry(), this.createCity()),
       this.createFields(this.createPostalCode(), this.createStreet()),
-      this.createAddress(),
+      this.createCheckboxAddress(),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
       this.createButton(),
     ]);
-    return form;
+
+    return this.registrationFormCreator;
   }
 
   private createFieldsTitle(text: string): ElementCreator<HTMLElement> {
@@ -124,12 +134,15 @@ export default class RegistrationPage extends View {
 
     const input = new InputCreator({
       type: 'email',
-      attributes: { placeholder: 'Enter your password', required: 'true' },
+      attributes: { placeholder: 'Enter your e-mail', required: 'true' },
     });
 
     const error = new ElementCreator({
       tag: 'span',
     });
+
+    input.addValidation(emailValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
 
     fieldEmail.addInnerElements([input, error]);
 
@@ -151,6 +164,9 @@ export default class RegistrationPage extends View {
       tag: 'span',
     });
 
+    input.addValidation(nameValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
+
     field.addInnerElements([input, error]);
 
     return field;
@@ -170,6 +186,9 @@ export default class RegistrationPage extends View {
     const error = new ElementCreator({
       tag: 'span',
     });
+
+    input.addValidation(nameValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
 
     field.addInnerElements([input, error]);
 
@@ -193,12 +212,16 @@ export default class RegistrationPage extends View {
       tag: 'span',
     });
 
+    input.addValidation(birthDateValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
+
     field.addInnerElements([input, error]);
 
     return field;
   }
 
-  private createbirthCountry(): ElementCreator<HTMLElement> {
+  /* eslint-disable max-lines-per-function */
+  private createCountry(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__country'],
@@ -213,17 +236,30 @@ export default class RegistrationPage extends View {
       attributes: { selected: 'true', disabled: 'true', hidden: 'true' },
       textContent: 'Country',
     });
-    select.addInnerElements([defaultOption]);
 
+    select.addInnerElements([defaultOption]);
     countryData.forEach((el) => {
       const option = new ElementCreator({
         tag: 'option',
         attributes: { value: el.code },
         textContent: el.name,
       });
-
       select.addInnerElements([option]);
     });
+
+    select.getElement().addEventListener(
+      'change',
+      () => {
+        const addressFields = document.querySelectorAll('.address-field');
+        addressFields.forEach((addressField) => {
+          if (addressField instanceof HTMLInputElement) {
+            const inputfield = addressField;
+            inputfield.disabled = false;
+          }
+        });
+      },
+      { once: true }
+    );
 
     // countryData
 
@@ -232,7 +268,6 @@ export default class RegistrationPage extends View {
     });
 
     field.addInnerElements([select, error]);
-
     return field;
   }
 
@@ -244,12 +279,16 @@ export default class RegistrationPage extends View {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'city', required: 'true' },
+      attributes: { placeholder: 'city', required: 'true', disabled: 'true' },
+      classNames: ['address-field'],
     });
 
     const error = new ElementCreator({
       tag: 'span',
     });
+
+    input.addValidation(addressValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
 
     field.addInnerElements([input, error]);
 
@@ -264,12 +303,16 @@ export default class RegistrationPage extends View {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'street', required: 'true' },
+      attributes: { placeholder: 'street', required: 'true', disabled: 'true' },
+      classNames: ['address-field'],
     });
 
     const error = new ElementCreator({
       tag: 'span',
     });
+
+    input.addValidation(addressValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
 
     field.addInnerElements([input, error]);
 
@@ -284,19 +327,23 @@ export default class RegistrationPage extends View {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'postal code', required: 'true' },
+      attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
+      classNames: ['address-field'],
     });
 
     const error = new ElementCreator({
       tag: 'span',
     });
 
+    input.addValidation(addressValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
+
     field.addInnerElements([input, error]);
 
     return field;
   }
 
-  private createAddress(): ElementCreator<HTMLElement> {
+  private createCheckboxAddress(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -342,15 +389,14 @@ export default class RegistrationPage extends View {
         }
       },
     });
-
     const error = new ElementCreator({
       tag: 'span',
       classNames: ['password'],
     });
-
+    input.addValidation(passwordValidation, error.getElement());
+    this.registrationFormCreator.addValidationField(input);
     fieldEye.addInnerElements([input, btnEye]);
     fieldPassword.addInnerElements([fieldEye, error]);
-
     return fieldPassword;
   }
 
@@ -362,8 +408,10 @@ export default class RegistrationPage extends View {
 
     const input = new InputCreator({
       type: 'button',
-      attributes: { value: 'Register' },
+      attributes: { value: 'Register', disabled: 'true' },
     });
+
+    this.registrationFormCreator.addSubmitButton(input.getElement());
 
     fieldBtn.addInnerElements([input]);
     return fieldBtn;
