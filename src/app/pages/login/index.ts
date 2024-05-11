@@ -15,25 +15,16 @@ class LoginPage extends View {
 
   constructor() {
     const params = {
-      tag: 'main',
-      classNames: ['main', 'login-page'],
+      tag: 'div',
+      classNames: ['container'],
     };
     super(params);
     this.loginFormCreator = this.createForm();
     this.setContent();
   }
 
-  private setContent(): void {
-    this.viewElementCreator.addInnerElements([this.createContainer()]);
-  }
-
-  private createContainer(): ElementCreator<HTMLElement> {
-    const container = new ElementCreator({
-      tag: 'div',
-      classNames: ['container'],
-    });
-    container.addInnerElements([this.createLoginBox()]);
-    return container;
+  setContent(): void {
+    this.viewElementCreator.addInnerElements([this.createLoginBox()]);
   }
 
   private createLoginBox(): ElementCreator<HTMLElement> {
