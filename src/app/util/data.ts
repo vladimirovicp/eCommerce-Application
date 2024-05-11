@@ -1,5 +1,10 @@
 import { ListCountry } from './types';
 
+export const validationSettings = {
+  minRegistrationAge: 13,
+  minLengthPassword: 8,
+};
+
 const countryData: ListCountry[] = [
   { code: 'AX', name: 'AALAND ISLANDS' },
   { code: 'AF', name: 'AFGHANISTAN' },
