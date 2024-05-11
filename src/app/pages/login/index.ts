@@ -109,6 +109,7 @@ class LoginPage extends View {
     return fieldEmail;
   }
 
+  /* eslint-disable max-lines-per-function */
   private createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',

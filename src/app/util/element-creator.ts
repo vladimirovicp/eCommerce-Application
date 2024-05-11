@@ -9,8 +9,6 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     this.setCssClasses(params.classNames);
     this.setTextContent(params.textContent);
     this.setCallback(params.callback, params.eventType);
-    this.setCallbackFocus(params.callbackFocus);
-    this.setCallbackBlur(params.callbackBlur);
     this.setAttributes(params.attributes);
   }
 
@@ -25,18 +23,6 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
       } else {
         this.element.addEventListener('click', callback);
       }
-    }
-  }
-
-  setCallbackFocus(callback: ((event: Event | undefined) => void) | undefined): void {
-    if (typeof callback === 'function') {
-      this.element.addEventListener('focus', callback);
-    }
-  }
-
-  setCallbackBlur(callback: ((event: Event | undefined) => void) | undefined): void {
-    if (typeof callback === 'function') {
-      this.element.addEventListener('blur', callback);
     }
   }
 

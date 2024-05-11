@@ -57,6 +57,18 @@ class InputCreator extends ElementCreator<HTMLInputElement> {
       }
     });
   }
+
+  setCallbackFocus(callback: ((event: Event | undefined) => void) | undefined): void {
+    if (typeof callback === 'function') {
+      this.element.addEventListener('focus', callback);
+    }
+  }
+
+  setCallbackBlur(callback: ((event: Event | undefined) => void) | undefined): void {
+    if (typeof callback === 'function') {
+      this.element.addEventListener('blur', callback);
+    }
+  }
 }
 
 export default InputCreator;
