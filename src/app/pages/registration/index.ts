@@ -1,4 +1,5 @@
 import '../../../assets/scss/page/home.scss';
+import './index.scss';
 import View from '../../common/view';
 import InputCreator from '../../util/input-creator';
 import ElementCreator from '../../util/element-creator';
@@ -255,7 +256,7 @@ export default class RegistrationPage extends View {
     select.getElement().addEventListener(
       'change',
       () => {
-        const addressFields = document.querySelectorAll('.address-field');
+        const addressFields = document.querySelectorAll('.address-field__shipping');
         addressFields.forEach((addressField) => {
           if (addressField instanceof HTMLInputElement) {
             const inputfield = addressField;
@@ -283,7 +284,7 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'city', required: 'true', disabled: 'true' },
-      classNames: ['address-field'],
+      classNames: ['address-field__shipping'],
     });
 
     const error = new ElementCreator({
@@ -307,7 +308,7 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'street', required: 'true', disabled: 'true' },
-      classNames: ['address-field'],
+      classNames: ['address-field__shipping'],
     });
 
     const error = new ElementCreator({
@@ -331,7 +332,7 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
-      classNames: ['address-field'],
+      classNames: ['address-field__shipping'],
     });
 
     const error = new ElementCreator({
@@ -355,6 +356,8 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'checkbox',
       id: 'check-address__shipping',
+      attributes: { disabled: 'true' },
+      classNames: ['address-field__shipping'],
     });
 
     const label = input.createLabel('Set as default address', 'check-address__shipping');
@@ -372,9 +375,16 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'checkbox',
       id: 'check-address__shipping-billing',
+      attributes: { disabled: 'true' },
+      classNames: ['address-field__shipping'],
     });
 
-    const label = input.createLabel('set shipping address as billing address', 'check-address__shipping-billing');
+    input.getElement().addEventListener('click', () => {
+      // нужно написать реакцию на установку галки, скопировать поля в billing
+      // и не забыть закрыть возможность править (поможет readonly для input)
+    });
+
+    const label = input.createLabel('Set shipping address as billing address', 'check-address__shipping-billing');
     field.addInnerElements([input, label]);
 
     return field;
@@ -509,6 +519,8 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'checkbox',
       id: 'check-address__billing',
+      attributes: { disabled: 'true' },
+      classNames: ['address-field__billing'],
     });
 
     const label = input.createLabel('Set as default address', 'check-address__billing');
