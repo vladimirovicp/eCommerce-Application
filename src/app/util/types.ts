@@ -1,10 +1,9 @@
 export interface ElementParams {
   tag?: string;
+  id?: string;
   classNames?: Array<string>;
   textContent?: string;
   callback?: (event?: Event) => void;
-  callbackFocus?: (event?: Event) => void;
-  callbackBlur?: (event?: Event) => void;
   eventType?: string;
   attributes?: { [key: string]: string };
 }
@@ -25,6 +24,7 @@ export interface LinkParams {
 
 export interface InputParams {
   classNames?: Array<string>;
+  id?: string;
   callback?: (event?: Event) => void;
   callbackFocus?: (event?: Event) => void;
   callbackBlur?: (event?: Event) => void;
@@ -38,4 +38,9 @@ export interface LinkImageData {
   containerClassNames?: string;
   src: string;
   alt: string;
+}
+
+export interface ListCountry {
+  code: string;
+  name: string;
 }
