@@ -202,7 +202,7 @@ export default class RegistrationPage extends View {
     });
 
     const input = new InputCreator({
-      type: 'date',
+      type: 'text',
       attributes: { placeholder: 'Birth date', required: 'true' },
       callbackFocus: typeTextToDate,
       callbackBlur: typeDateToText,
