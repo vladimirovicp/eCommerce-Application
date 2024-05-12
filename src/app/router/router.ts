@@ -1,5 +1,6 @@
-import { Pages, PRODUCT_ID } from './pages';
-import { Route, SearchBarState } from './router-types';
+// import { Pages, PRODUCT_ID } from './pages';
+import { Pages } from './pages';
+import { PagePath, Route } from './router-types';
 
 export default class Router {
   routes: Array<Route>;
@@ -10,33 +11,45 @@ export default class Router {
       const path = this.getCurrentPath();
       this.navigate(path);
     });
-    window.addEventListener('popstate', this.handlePathChange.bind(this));
-    window.addEventListener('hashchange', this.handlePathChange.bind(this));
-  }
-
-  navigate(url: string): void {
-    const parsedPath = this.parseUrl(url);
-    const pathToFind = parsedPath.productId === '' ? parsedPath.path : `${parsedPath.path}/${PRODUCT_ID}`;
-    const route = this.routes.find((item) => item.path === pathToFind);
-    if (!route) {
-      const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
-      if (routeNotFound) {
-        this.navigate(routeNotFound.path);
+    window.addEventListener('popstate', () => {
+      const path = window.location.pathname.slice(1);
+      const route = this.routes.find((item) => item.path === path);
+      if (route === undefined) {
+        const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
+        if (routeNotFound !== undefined) {
+          routeNotFound.callback();
+        }
+      } else {
+        route.callback();
       }
-      return;
-    }
-    route.callback(parsedPath.productId);
+    });
+    // window.addEventListener('popstate', this.handlePathChange.bind(this));
+    // window.addEventListener('hashchange', this.handlePathChange.bind(this));
   }
 
-  private parseUrl(url: string): SearchBarState {
-    const resultPath: SearchBarState = {
-      path: '',
-    };
-
-    const parsedPath = url.split('/');
-    if (parsedPath !== undefined) {
-      [resultPath.path = '', resultPath.productId = ''] = parsedPath;
+  navigate(path: string): void {
+    const parsedPath = this.parseUrl(path);
+    const pathToFind =
+      parsedPath.productId === undefined ? parsedPath.pageName : `${parsedPath.pageName}/${parsedPath.productId}`;
+    const route = this.routes.find((item) => item.path === pathToFind);
+    if (route === undefined) {
+      const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
+      if (routeNotFound !== undefined) {
+        routeNotFound.callback();
+      }
+    } else {
+      // route.callback(parsedPath.productId);
+      window.history.pushState({}, '', `/${route.path}`);
+      route.callback();
     }
+  }
+
+  private parseUrl(path: string): PagePath {
+    const resultPath: PagePath = {
+      pageName: '',
+    };
+    const parsedPath = path.split('/');
+    [resultPath.pageName, resultPath.productId] = parsedPath;
     return resultPath;
   }
 
@@ -47,7 +60,8 @@ export default class Router {
     return window.location.pathname.slice(1);
   }
 
-  private handlePathChange(): void {
-    this.navigate(this.getCurrentPath());
-  }
+  /* private handlePathChange(): void {
+    const currentPath = this.getCurrentPath();
+    this.navigate(currentPath);
+  } */
 }
