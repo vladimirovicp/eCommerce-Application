@@ -54,7 +54,7 @@ class App {
       {
         path: '',
         callback: (): void => {
-          this.updateMain(new RegistrationPage(), 'register-page');
+          this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
