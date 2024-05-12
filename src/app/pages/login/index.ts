@@ -11,19 +11,21 @@ const imageSrc = {
 };
 
 class LoginPage extends View {
-  private loginFormCreator: FormCreator;
+  protected formCreator: FormCreator;
 
-  constructor() {
+  constructor(setLoginContent = true) {
     const params = {
       tag: 'div',
       classNames: ['container'],
     };
     super(params);
-    this.loginFormCreator = new FormCreator({
+    this.formCreator = new FormCreator({
       classNames: ['form__login'],
       attributes: { action: '#' },
     });
-    this.setContent();
+    if (setLoginContent) {
+      this.setContent();
+    }
   }
 
   private setContent(): void {
@@ -36,12 +38,17 @@ class LoginPage extends View {
       classNames: ['form', 'login__box'],
     });
 
-    loginBox.addInnerElements([this.createFormTitle(), this.createMessage(), this.createForm(), this.createLink()]);
+    loginBox.addInnerElements([
+      this.createFormTitle('Login'),
+      this.createMessage(),
+      this.createForm(),
+      this.createLink('Register'),
+    ]);
 
     return loginBox;
   }
 
-  private createFormTitle(): ElementCreator<HTMLElement> {
+  protected createFormTitle(textContent: string): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__title'],
@@ -64,14 +71,14 @@ class LoginPage extends View {
     const text = new ElementCreator({
       tag: 'span',
       classNames: ['form__title-text'],
-      textContent: 'Login',
+      textContent,
     });
 
     formTitle.addInnerElements([logo, text]);
     return formTitle;
   }
 
-  private createMessage(): ElementCreator<HTMLElement> {
+  protected createMessage(): ElementCreator<HTMLElement> {
     const formTitle = new ElementCreator({
       tag: 'div',
       classNames: ['form__message'],
@@ -80,12 +87,16 @@ class LoginPage extends View {
     return formTitle;
   }
 
-  private createForm(): FormCreator {
-    this.loginFormCreator.addInnerElements([this.createFieldEmail(), this.createFieldPassword(), this.createButton()]);
-    return this.loginFormCreator;
+  protected createForm(): FormCreator {
+    this.formCreator.addInnerElements([
+      this.createFieldEmail(),
+      this.createFieldPassword(),
+      this.createButton('Login'),
+    ]);
+    return this.formCreator;
   }
 
-  private createFieldEmail(): ElementCreator<HTMLElement> {
+  protected createFieldEmail(): ElementCreator<HTMLElement> {
     const fieldEmail = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -102,7 +113,7 @@ class LoginPage extends View {
     return fieldEmail;
   }
 
-  private createFieldPassword(): ElementCreator<HTMLElement> {
+  protected createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__password'],
@@ -140,7 +151,7 @@ class LoginPage extends View {
     return fieldPassword;
   }
 
-  private addValidationErrorHandling(
+  protected addValidationErrorHandling(
     inputCreator: InputCreator,
     validationFunction: (value: string) => { isValid: boolean; errorMessage: string }
   ): ElementCreator<HTMLSpanElement> {
@@ -149,12 +160,12 @@ class LoginPage extends View {
     });
 
     inputCreator.addValidation(validationFunction, errorCreator.getElement());
-    this.loginFormCreator.addValidationField(inputCreator);
+    this.formCreator.addValidationField(inputCreator);
 
     return errorCreator;
   }
 
-  private createButton(): ElementCreator<HTMLElement> {
+  protected createButton(textContent: string): ElementCreator<HTMLElement> {
     const fieldBtn = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'form__button'],
@@ -162,15 +173,15 @@ class LoginPage extends View {
 
     const input = new InputCreator({
       type: 'button',
-      attributes: { value: 'Login', disabled: 'true' },
+      attributes: { value: textContent, disabled: 'true' },
     });
 
     fieldBtn.addInnerElements([input]);
-    this.loginFormCreator.addSubmitButton(input.getElement());
+    this.formCreator.addSubmitButton(input.getElement());
     return fieldBtn;
   }
 
-  private createLink(): ElementCreator<HTMLElement> {
+  protected createLink(textContent: string): ElementCreator<HTMLElement> {
     const linkBox = new ElementCreator({
       tag: 'div',
       classNames: ['form__link'],
@@ -178,8 +189,8 @@ class LoginPage extends View {
 
     const link = new ElementCreator({
       tag: 'a',
-      attributes: { href: '/register' },
-      textContent: 'Register',
+      // attributes: { href: '/register' },
+      textContent,
     });
 
     linkBox.addInnerElements([link]);
