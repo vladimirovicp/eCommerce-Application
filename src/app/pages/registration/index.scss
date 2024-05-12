@@ -1,0 +1,8 @@
+.form__field{
+    input[type="checkbox"]{
+        margin-right: .5rem;
+    }
+    input[type="checkbox"]:disabled + label {
+        color: gray;
+    }
+}

@@ -10,6 +10,8 @@ class InputCreator extends ElementCreator<HTMLInputElement> {
     super({ ...params, tag: 'input' });
     this.isValid = false;
     this.isValidChangeEvent = new Event('isValidChange');
+    this.setCallbackFocus(params.callbackFocus);
+    this.setCallbackBlur(params.callbackBlur);
     this.setType(params.type);
   }
 
