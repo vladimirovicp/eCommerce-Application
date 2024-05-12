@@ -168,7 +168,7 @@ export default class RegistrationPage extends LoginPage {
 
     const select = new ElementCreator({
       tag: 'select',
-      attributes: { name: `country${name.charAt(0).toUpperCase()}${name.slice(1)}` },
+      attributes: { name: `${name}Country` },
     });
 
     const defaultOption = new ElementCreator({
@@ -218,7 +218,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: {
-        name: `city${name.charAt(0).toUpperCase()}${name.slice(1)}`,
+        name: `${name}City`,
         placeholder: 'city',
         required: 'true',
         disabled: 'true',
@@ -249,7 +249,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: {
-        name: `street${name.charAt(0).toUpperCase()}${name.slice(1)}`,
+        name: `${name}Street`,
         placeholder: 'street',
         required: 'true',
         disabled: 'true',
@@ -279,7 +279,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: {
-        name: `postalCode${name.charAt(0).toUpperCase()}${name.slice(1)}`,
+        name: `${name}PostalCode`,
         placeholder: 'postal code',
         required: 'true',
         disabled: 'true',
