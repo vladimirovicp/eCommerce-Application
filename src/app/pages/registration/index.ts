@@ -8,6 +8,7 @@ import '../../../assets/scss/page/register.scss';
 import { typeTextToDate, typeDateToText } from '../../util/converter-input';
 import countryData from '../../util/data';
 import FormCreator from '../../util/form-creator';
+// import Router from '../../router/router';
 import {
   addressValidation,
   birthDateValidation,
@@ -33,6 +34,7 @@ export default class RegistrationPage extends View {
       classNames: ['form__register'],
       attributes: { action: '#' },
     });
+
     this.setContent();
   }
 
@@ -88,15 +90,13 @@ export default class RegistrationPage extends View {
       this.createFields(this.createFirstName(), this.createLastName()),
       this.createbirthDate(),
       this.createFieldsTitle('Address'),
-      this.createFieldsSubTitle('Shipping adress'),
-      this.createFields(this.createCountryShipping(), this.createCityShipping()),
-      this.createFields(this.createPostalCodeShipping(), this.createStreetShipping()),
-      this.createCheckboxAddressShipping(),
-      this.createCheckboxAddressShippingBilling(),
       this.createFieldsSubTitle('Billing address'),
       this.createFields(this.createCountryBilling(), this.createCityBilling()),
       this.createFields(this.createPostalCodeBilling(), this.createStreetBilling()),
-      this.createCheckboxAddressBilling(),
+      this.createCheckboxAddressShipping(),
+      this.createFieldsSubTitle('Shipping adress'),
+      this.createFields(this.createCountryShipping(), this.createCityShipping()),
+      this.createFields(this.createPostalCodeShipping(), this.createStreetShipping()),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
       this.createButton(),
@@ -332,7 +332,7 @@ export default class RegistrationPage extends View {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
-      classNames: ['address-field__shipping'],
+      classNames: ['address-field__billing'],
     });
 
     const error = new ElementCreator({
@@ -357,34 +357,10 @@ export default class RegistrationPage extends View {
       type: 'checkbox',
       id: 'check-address__shipping',
       attributes: { disabled: 'true' },
-      classNames: ['address-field__shipping'],
+      classNames: ['address-field__billing'],
     });
 
-    const label = input.createLabel('Set as default address', 'check-address__shipping');
-    field.addInnerElements([input, label]);
-
-    return field;
-  }
-
-  private createCheckboxAddressShippingBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'checkbox',
-      id: 'check-address__shipping-billing',
-      attributes: { disabled: 'true' },
-      classNames: ['address-field__shipping'],
-    });
-
-    input.getElement().addEventListener('click', () => {
-      // нужно написать реакцию на установку галки, скопировать поля в billing
-      // и не забыть закрыть возможность править (поможет readonly для input)
-    });
-
-    const label = input.createLabel('Set shipping address as billing address', 'check-address__shipping-billing');
+    const label = input.createLabel('Use as a default shipping address', 'check-address__shipping');
     field.addInnerElements([input, label]);
 
     return field;
@@ -510,25 +486,6 @@ export default class RegistrationPage extends View {
     return field;
   }
 
-  private createCheckboxAddressBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'checkbox',
-      id: 'check-address__billing',
-      attributes: { disabled: 'true' },
-      classNames: ['address-field__billing'],
-    });
-
-    const label = input.createLabel('Set as default address', 'check-address__billing');
-    field.addInnerElements([input, label]);
-
-    return field;
-  }
-
   private createFieldPassword(): ElementCreator<HTMLElement> {
     const fieldPassword = new ElementCreator({
       tag: 'div',
@@ -594,7 +551,7 @@ export default class RegistrationPage extends View {
 
     const link = new ElementCreator({
       tag: 'a',
-      attributes: { href: '#login' },
+      // attributes: { href: '#login' },
       textContent: 'LogIn',
     });
 
