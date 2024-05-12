@@ -104,7 +104,7 @@ class LoginPage extends View {
 
     const input = new InputCreator({
       type: 'email',
-      attributes: { placeholder: 'Enter your email address', required: 'true' },
+      attributes: { placeholder: 'Enter your email address', name: 'email', required: 'true' },
     });
 
     const error = this.addValidationErrorHandling(input, emailValidation);
@@ -127,7 +127,7 @@ class LoginPage extends View {
     const input = new InputCreator({
       type: 'password',
       classNames: ['password'],
-      attributes: { placeholder: 'Enter your password', required: 'true' },
+      attributes: { name: 'password', placeholder: 'Enter your password', required: 'true' },
     });
 
     const btnEye = new ElementCreator({
@@ -174,6 +174,18 @@ class LoginPage extends View {
     const input = new InputCreator({
       type: 'button',
       attributes: { value: textContent, disabled: 'true' },
+      callback: function saveForm(): void {
+        const form = document.querySelector('form') as HTMLFormElement;
+        if (form) {
+          const formData = new FormData(form);
+          const formDataObject: { [key: string]: string } = {};
+          formData.forEach((value, key: string) => {
+            formDataObject[key] = value as string;
+          });
+
+          console.log(formDataObject);
+        }
+      },
     });
 
     fieldBtn.addInnerElements([input]);

@@ -91,7 +91,7 @@ export default class RegistrationPage extends LoginPage {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'First name', required: 'true' },
+      attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
     });
 
     // const error = new ElementCreator({
@@ -115,7 +115,7 @@ export default class RegistrationPage extends LoginPage {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'Last name', required: 'true' },
+      attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
     });
 
     // const error = new ElementCreator({
@@ -139,7 +139,7 @@ export default class RegistrationPage extends LoginPage {
 
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'Birth date', required: 'true' },
+      attributes: { name: 'birthDate', placeholder: 'Birth date', required: 'true' },
       callbackFocus: typeTextToDate,
       callbackBlur: typeDateToText,
     });
@@ -164,13 +164,20 @@ export default class RegistrationPage extends LoginPage {
       classNames: ['form__field', 'field__country'],
     });
 
+    const name = `${dependentFieldsClassName.replace('address-field__', '')}`;
+
     const select = new ElementCreator({
       tag: 'select',
+      attributes: { name: `${name}Country` },
     });
 
     const defaultOption = new ElementCreator({
       tag: 'option',
-      attributes: { selected: 'true', disabled: 'true', hidden: 'true' },
+      attributes: {
+        selected: 'true',
+        disabled: 'true',
+        hidden: 'true',
+      },
       textContent: 'Country',
     });
 
@@ -207,10 +214,15 @@ export default class RegistrationPage extends LoginPage {
       tag: 'div',
       classNames: ['form__field'],
     });
-
+    const name = `${inputClassName.replace('address-field__', '')}`;
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'city', required: 'true', disabled: 'true' },
+      attributes: {
+        name: `${name}City`,
+        placeholder: 'city',
+        required: 'true',
+        disabled: 'true',
+      },
       classNames: [inputClassName],
     });
 
@@ -232,9 +244,16 @@ export default class RegistrationPage extends LoginPage {
       classNames: ['form__field'],
     });
 
+    const name = `${inputClassName.replace('address-field__', '')}`;
+
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'street', required: 'true', disabled: 'true' },
+      attributes: {
+        name: `${name}Street`,
+        placeholder: 'street',
+        required: 'true',
+        disabled: 'true',
+      },
       classNames: [inputClassName],
       // classNames: ['address-field__shipping'],
     });
@@ -256,10 +275,15 @@ export default class RegistrationPage extends LoginPage {
       tag: 'div',
       classNames: ['form__field'],
     });
-
+    const name = `${inputClassName.replace('address-field__', '')}`;
     const input = new InputCreator({
       type: 'text',
-      attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
+      attributes: {
+        name: `${name}PostalCode`,
+        placeholder: 'postal code',
+        required: 'true',
+        disabled: 'true',
+      },
       classNames: [inputClassName],
     });
 
@@ -284,7 +308,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'checkbox',
       id: 'check-address__shipping',
-      attributes: { disabled: 'true' },
+      attributes: { name: 'checkboxAddress', disabled: 'true' },
       classNames: ['address-field__billing'],
     });
 
