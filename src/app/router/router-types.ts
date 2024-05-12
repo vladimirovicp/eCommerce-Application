@@ -3,8 +3,8 @@ export interface Route {
   callback: (id?: string) => void;
 }
 
-export interface SearchBarState {
-  path: string;
+export interface PagePath {
+  pageName: string;
   productId?: string;
   options?: Array<string>;
 }

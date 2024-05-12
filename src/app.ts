@@ -69,6 +69,10 @@ class App {
           this.updateMain(new CatalogPage(), 'not-found-page');
         },
       },
+      /* {
+        path: `${Pages.CATALOG}/${PRODUCT_ID}`,
+        callback: (id?: string): void => {},
+      }, */
       {
         path: `${Pages.ABOUT}`,
         callback: (): void => {
