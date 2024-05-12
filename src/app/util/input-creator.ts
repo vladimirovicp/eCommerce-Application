@@ -52,7 +52,6 @@ class InputCreator extends ElementCreator<HTMLInputElement> {
         errorElement.textContent = '';
         errorElement.style.display = 'none';
         this.isValid = true;
-        this.element.dispatchEvent(this.isValidChangeEvent);
       }
       if (this.isValid !== wasValid) {
         this.element.dispatchEvent(this.isValidChangeEvent);
