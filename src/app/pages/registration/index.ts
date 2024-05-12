@@ -42,12 +42,12 @@ export default class RegistrationPage extends LoginPage {
       this.createbirthDate(),
       this.createFieldsTitle('Address'),
       this.createFieldsSubTitle('Billing address'),
-      this.createFields(this.createCountryBilling(), this.createCityBilling()),
-      this.createFields(this.createPostalCodeBilling(), this.createStreetBilling()),
+      this.createFields(this.createCountry('address-field__billing'), this.createCity('address-field__billing')),
+      this.createFields(this.createPostalCode('address-field__billing'), this.createStreet('address-field__billing')),
       this.createCheckboxAddressShipping(),
-      this.createFieldsSubTitle('Shipping adress'),
-      this.createFields(this.createCountryShipping(), this.createCityShipping()),
-      this.createFields(this.createPostalCodeShipping(), this.createStreetShipping()),
+      this.createFieldsSubTitle('Shipping address'),
+      this.createFields(this.createCountry('address-field__shipping'), this.createCity('address-field__shipping')),
+      this.createFields(this.createPostalCode('address-field__shipping'), this.createStreet('address-field__shipping')),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
       this.createButton('Register'),
@@ -158,7 +158,7 @@ export default class RegistrationPage extends LoginPage {
   }
 
   /* eslint-disable max-lines-per-function */
-  private createCountryShipping(): ElementCreator<HTMLElement> {
+  private createCountry(dependentFieldsClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'field__country'],
@@ -187,7 +187,7 @@ export default class RegistrationPage extends LoginPage {
     select.getElement().addEventListener(
       'change',
       () => {
-        const addressFields = document.querySelectorAll('.address-field__shipping');
+        const addressFields = document.querySelectorAll(`.${dependentFieldsClassName}`);
         addressFields.forEach((addressField) => {
           if (addressField instanceof HTMLInputElement) {
             const inputfield = addressField;
@@ -198,16 +198,11 @@ export default class RegistrationPage extends LoginPage {
       { once: true }
     );
 
-    // а здесь зачем error? тут пользователь ничего не вводит
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    field.addInnerElements([select, error]);
+    field.addInnerElements([select]);
     return field;
   }
 
-  private createCityShipping(): ElementCreator<HTMLElement> {
+  private createCity(inputClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -216,7 +211,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'city', required: 'true', disabled: 'true' },
-      classNames: ['address-field__shipping'],
+      classNames: [inputClassName],
     });
 
     const error = new ElementCreator({
@@ -231,7 +226,7 @@ export default class RegistrationPage extends LoginPage {
     return field;
   }
 
-  private createStreetShipping(): ElementCreator<HTMLElement> {
+  private createStreet(inputClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -240,7 +235,8 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'street', required: 'true', disabled: 'true' },
-      classNames: ['address-field__shipping'],
+      classNames: [inputClassName],
+      // classNames: ['address-field__shipping'],
     });
 
     const error = new ElementCreator({
@@ -255,7 +251,7 @@ export default class RegistrationPage extends LoginPage {
     return field;
   }
 
-  private createPostalCodeShipping(): ElementCreator<HTMLElement> {
+  private createPostalCode(inputClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -264,7 +260,7 @@ export default class RegistrationPage extends LoginPage {
     const input = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
-      classNames: ['address-field__billing'],
+      classNames: [inputClassName],
     });
 
     const error = new ElementCreator({
@@ -294,126 +290,6 @@ export default class RegistrationPage extends LoginPage {
 
     const label = input.createLabel('Use as a default shipping address', 'check-address__shipping');
     field.addInnerElements([input, label]);
-
-    return field;
-  }
-
-  private createCountryBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'field__country'],
-    });
-
-    const select = new ElementCreator({
-      tag: 'select',
-    });
-
-    const defaultOption = new ElementCreator({
-      tag: 'option',
-      attributes: { selected: 'true', disabled: 'true', hidden: 'true' },
-      textContent: 'Country',
-    });
-
-    select.addInnerElements([defaultOption]);
-    countryData.forEach((el) => {
-      const option = new ElementCreator({
-        tag: 'option',
-        attributes: { value: el.code },
-        textContent: el.name,
-      });
-      select.addInnerElements([option]);
-    });
-
-    select.getElement().addEventListener(
-      'change',
-      () => {
-        const addressFields = document.querySelectorAll('.address-field__billing');
-        addressFields.forEach((addressField) => {
-          if (addressField instanceof HTMLInputElement) {
-            const inputfield = addressField;
-            inputfield.disabled = false;
-          }
-        });
-      },
-      { once: true }
-    );
-
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    field.addInnerElements([select, error]);
-    return field;
-  }
-
-  private createCityBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { placeholder: 'city', required: 'true', disabled: 'true' },
-      classNames: ['address-field__billing'],
-    });
-
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  private createStreetBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { placeholder: 'street', required: 'true', disabled: 'true' },
-      classNames: ['address-field__billing'],
-    });
-
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  private createPostalCodeBilling(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { placeholder: 'postal code', required: 'true', disabled: 'true' },
-      classNames: ['address-field__billing'],
-    });
-
-    const error = new ElementCreator({
-      tag: 'span',
-    });
-
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
-
-    field.addInnerElements([input, error]);
 
     return field;
   }
