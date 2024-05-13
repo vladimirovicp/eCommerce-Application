@@ -321,40 +321,35 @@ export default class RegistrationPage extends LoginPage {
   }
 
   protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
-    if (formData.email && formData.password) {
-      const billingAddress: BaseAddress = {
-        country: formData.billingCountry,
-        streetName: formData.billingStreet,
-        postalCode: formData.billingPostalCode,
-        city: formData.billingCity,
-      };
+    const billingAddress: BaseAddress = {
+      country: formData.billingCountry,
+      streetName: formData.billingStreet,
+      postalCode: formData.billingPostalCode,
+      city: formData.billingCity,
+    };
 
-      const shippingAddress: BaseAddress = {
-        country: formData.shippingCountry,
-        streetName: formData.shippingStreet,
-        postalCode: formData.shippingPostalCode,
-        city: formData.shippingCity,
-      };
+    const shippingAddress: BaseAddress = {
+      country: formData.shippingCountry,
+      streetName: formData.shippingStreet,
+      postalCode: formData.shippingPostalCode,
+      city: formData.shippingCity,
+    };
 
-      const customerDraft: CustomerDraft = {
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        dateOfBirth: formData.birthDate,
-        addresses: [billingAddress, shippingAddress],
-        defaultShippingAddress: 1,
-        authenticationMode: 'Password',
-      };
+    const customerDraft: CustomerDraft = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formData.birthDate,
+      addresses: [billingAddress, shippingAddress],
+      defaultShippingAddress: 1,
+      authenticationMode: 'Password',
+    };
 
-      const isRegistered = await registerNewCustomer(customerDraft);
-      if (isRegistered) {
-        alert('Registration successful!'); // eslint-disable-line
-        // перенаправление на главную страницу, изменение ссылок в header
-      }
-    } else {
-      // модальное окно с ошибкой? а нужен ли тут вообще этот блок?
-      console.error('something went wrong, please try again');
+    const isRegistered = await registerNewCustomer(customerDraft);
+    if (isRegistered) {
+      alert('Registration successful!'); // eslint-disable-line
+      // перенаправление на главную страницу, изменение ссылок в header
     }
   }
 }

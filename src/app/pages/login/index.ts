@@ -194,17 +194,16 @@ class LoginPage extends View {
     return fieldBtn;
   }
 
-  protected handleSubmitForm(formData: { [key: string]: string }): void {
-    if (formData.email && formData.password) {
-      const customerDraft: MyCustomerSignin = {
-        email: formData.email,
-        password: formData.password,
-      };
+  protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
+    const customerDraft: MyCustomerSignin = {
+      email: formData.email,
+      password: formData.password,
+    };
 
-      authorizeCustomer(customerDraft);
-    } else {
-      // модальное окно с ошибкой? а нужен ли тут вообще этот блок?
-      console.error('something went wrong, please try again');
+    const isAuthorized = await authorizeCustomer(customerDraft);
+    if (isAuthorized) {
+      alert('Authorization successful!'); // eslint-disable-line
+      // перенаправление на главную страницу, изменение ссылок в header
     }
   }
 
