@@ -1,3 +1,4 @@
+import { MyCustomerSignin } from '@commercetools/platform-sdk';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 import InputCreator from '../../util/input-creator';
@@ -5,7 +6,7 @@ import logoSrc from '../../../assets/img/svg/logo.svg';
 import '../../../assets/scss/page/login.scss';
 import { emailValidation, passwordValidation } from '../../util/validation-fuction';
 import FormCreator from '../../util/form-creator';
-import { makeAuthorizationCustomerDraft } from '../../api/customers-requests';
+import { authorizeCustomer } from '../../api/customers-requests';
 
 const imageSrc = {
   LOGO: `${logoSrc}`,
@@ -193,9 +194,14 @@ class LoginPage extends View {
     return fieldBtn;
   }
 
-  protected handleSubmitForm(formDataObject: { [key: string]: string }): void {
-    if (formDataObject.email && formDataObject.password) {
-      makeAuthorizationCustomerDraft(formDataObject);
+  protected handleSubmitForm(formData: { [key: string]: string }): void {
+    if (formData.email && formData.password) {
+      const customerDraft: MyCustomerSignin = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      authorizeCustomer(customerDraft);
     } else {
       // модальное окно с ошибкой? а нужен ли тут вообще этот блок?
       console.error('something went wrong, please try again');

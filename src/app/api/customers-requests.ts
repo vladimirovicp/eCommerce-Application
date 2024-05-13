@@ -1,61 +1,36 @@
-import { BaseAddress, CustomerDraft, MyCustomerSignin } from '@commercetools/platform-sdk';
+import { CustomerDraft, MyCustomerSignin } from '@commercetools/platform-sdk';
 import apiRoot from './build-client';
 
-async function registerNewCustomer(customerDraft: CustomerDraft): Promise<void> {
+export async function authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
   try {
-    const response = await apiRoot.customers().post({ body: customerDraft }).execute();
-    console.log('Customer created successfully:', response);
-    // return response;
+    await apiRoot.me().login().post({ body: customerDraft }).execute();
+    // создание сессии клиента
+    return true;
   } catch (error) {
-    console.error('Error creating customer:', error);
-    throw error;
+    const errorMessage =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? error.message
+        : 'Unknown error. Please try again later';
+    alert(`${errorMessage}`); // eslint-disable-line
+    return false;
   }
 }
 
-export function makeRegistrationCustomerDraft(formData: { [key: string]: string }): void {
-  const billingAddress: BaseAddress = {
-    country: formData.billingCountry ?? '',
-    streetName: formData.billingStreet ?? '',
-    postalCode: formData.billingPostalCode ?? '',
-    city: formData.billingCity ?? '',
-  };
-
-  const shippingAddress: BaseAddress = {
-    country: formData.shippingCountry ?? '',
-    streetName: formData.shippingStreet ?? '',
-    postalCode: formData.shippingPostalCode ?? '',
-    city: formData.shippingCity ?? '',
-  };
-
-  const customerDraft: CustomerDraft = {
-    email: formData.email,
-    password: formData.password,
-    firstName: formData.firstName ?? '',
-    lastName: formData.lastName ?? '',
-    dateOfBirth: formData.birthDate ?? '',
-    addresses: [billingAddress, shippingAddress],
-    defaultShippingAddress: 1,
-  };
-
-  registerNewCustomer(customerDraft);
-}
-
-async function authorizeCustomer(customerDraft: MyCustomerSignin): Promise<void> {
+export async function registerNewCustomer(customerDraft: CustomerDraft): Promise<boolean> {
   try {
-    const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
-    console.log('Customer is authorized', response);
-    // return response;
+    await apiRoot.customers().post({ body: customerDraft }).execute();
+    // авторизуем пользователя после регистрации автоматически, хотя это не рекомендуется для безопасности
+    await authorizeCustomer({
+      email: customerDraft.email,
+      password: customerDraft.password!,
+    });
+    return true;
   } catch (error) {
-    console.error('Error creating customer:', error);
-    throw error;
+    const errorMessage =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? error.message
+        : 'Unknown error. Please try again later';
+    alert(`Registration failed: ${errorMessage}`); // eslint-disable-line
+    return false;
   }
-}
-
-export function makeAuthorizationCustomerDraft(formData: { [key: string]: string }): void {
-  const customerDraft: MyCustomerSignin = {
-    email: formData.email,
-    password: formData.password,
-  };
-
-  authorizeCustomer(customerDraft);
 }
