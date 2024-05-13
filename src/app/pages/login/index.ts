@@ -5,6 +5,7 @@ import logoSrc from '../../../assets/img/svg/logo.svg';
 import '../../../assets/scss/page/login.scss';
 import { emailValidation, passwordValidation } from '../../util/validation-fuction';
 import FormCreator from '../../util/form-creator';
+import { makeAuthorizationCustomerDraft } from '../../api/customers-requests';
 
 const imageSrc = {
   LOGO: `${logoSrc}`,
@@ -174,7 +175,7 @@ class LoginPage extends View {
     const input = new InputCreator({
       type: 'button',
       attributes: { value: textContent, disabled: 'true' },
-      callback: function saveForm(): void {
+      callback: (): void => {
         const form = document.querySelector('form') as HTMLFormElement;
         if (form) {
           const formData = new FormData(form);
@@ -182,8 +183,7 @@ class LoginPage extends View {
           formData.forEach((value, key: string) => {
             formDataObject[key] = value as string;
           });
-
-          console.log(formDataObject);
+          this.handleSubmitForm(formDataObject);
         }
       },
     });
@@ -191,6 +191,15 @@ class LoginPage extends View {
     fieldBtn.addInnerElements([input]);
     this.formCreator.addSubmitButton(input.getElement());
     return fieldBtn;
+  }
+
+  protected handleSubmitForm(formDataObject: { [key: string]: string }): void {
+    if (formDataObject.email && formDataObject.password) {
+      makeAuthorizationCustomerDraft(formDataObject);
+    } else {
+      // модальное окно с ошибкой? а нужен ли тут вообще этот блок?
+      console.error('something went wrong, please try again');
+    }
   }
 
   protected createLink(textContent: string): ElementCreator<HTMLElement> {

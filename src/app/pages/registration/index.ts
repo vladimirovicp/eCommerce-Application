@@ -9,6 +9,7 @@ import FormCreator from '../../util/form-creator';
 // import Router from '../../router/router';
 import { addressValidation, birthDateValidation, nameValidation } from '../../util/validation-fuction';
 import LoginPage from '../login';
+import { makeRegistrationCustomerDraft } from '../../api/customers-requests';
 
 export default class RegistrationPage extends LoginPage {
   protected formCreator: FormCreator;
@@ -316,5 +317,15 @@ export default class RegistrationPage extends LoginPage {
     field.addInnerElements([input, label]);
 
     return field;
+  }
+
+  protected handleSubmitForm(formDataObject: { [key: string]: string }): void {
+    if (formDataObject.email && formDataObject.password) {
+      console.log('registration...');
+      makeRegistrationCustomerDraft(formDataObject);
+    } else {
+      // модальное окно с ошибкой? а нужен ли тут вообще этот блок?
+      console.error('something went wrong, please try again');
+    }
   }
 }
