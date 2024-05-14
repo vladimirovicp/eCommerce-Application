@@ -1,3 +1,4 @@
+import { BaseAddress, CustomerDraft } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/home.scss';
 import './index.scss';
 import InputCreator from '../../util/input-creator';
@@ -9,6 +10,7 @@ import FormCreator from '../../util/form-creator';
 // import Router from '../../router/router';
 import { addressValidation, birthDateValidation, nameValidation } from '../../util/validation-fuction';
 import LoginPage from '../login';
+import { registerNewCustomer } from '../../api/customers-requests';
 
 export default class RegistrationPage extends LoginPage {
   protected formCreator: FormCreator;
@@ -316,5 +318,38 @@ export default class RegistrationPage extends LoginPage {
     field.addInnerElements([input, label]);
 
     return field;
+  }
+
+  protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
+    const billingAddress: BaseAddress = {
+      country: formData.billingCountry,
+      streetName: formData.billingStreet,
+      postalCode: formData.billingPostalCode,
+      city: formData.billingCity,
+    };
+
+    const shippingAddress: BaseAddress = {
+      country: formData.shippingCountry,
+      streetName: formData.shippingStreet,
+      postalCode: formData.shippingPostalCode,
+      city: formData.shippingCity,
+    };
+
+    const customerDraft: CustomerDraft = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dateOfBirth: formData.birthDate,
+      addresses: [billingAddress, shippingAddress],
+      defaultShippingAddress: 1,
+      authenticationMode: 'Password',
+    };
+
+    const isRegistered = await registerNewCustomer(customerDraft);
+    if (isRegistered) {
+      alert('Registration successful!'); // eslint-disable-line
+      // перенаправление на главную страницу, изменение ссылок в header
+    }
   }
 }
