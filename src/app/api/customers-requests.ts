@@ -3,9 +3,14 @@ import apiRoot from './build-client';
 
 export async function authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
   try {
-    await apiRoot.me().login().post({ body: customerDraft }).execute();
-    // создание сессии клиента
-    return true;
+    const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
+    if (response && response.statusCode === 200) {
+      const { id } = response.body.customer;
+      localStorage.setItem('userId', id);
+      return true;
+    }
+    alert('Authorization failed. Please try again.'); // eslint-disable-line
+    return false;
   } catch (error) {
     const errorMessage =
       typeof error === 'object' && error !== null && 'message' in error
