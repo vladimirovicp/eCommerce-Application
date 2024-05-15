@@ -15,7 +15,7 @@ describe('InputCreator test', () => {
     };
     inputCreator = new InputCreator(mockInputParams);
 
-    validationFn = jest.fn(); // .mockReturnValue({ isValid: true, errorMessage: '' });
+    validationFn = jest.fn();
     mockErrorSpan = document.createElement('span');
   });
 
@@ -47,13 +47,11 @@ describe('InputCreator test', () => {
   });
 
   it('should clear error message when input becomes valid', () => {
-    // Сначала вызовем невалидное состояние
     validationFn.mockReturnValueOnce({ isValid: false, errorMessage: 'Invalid input' });
     inputCreator.addValidation(validationFn, mockErrorSpan);
     inputCreator.getElement().value = 'invalid-value';
     inputCreator.getElement().dispatchEvent(new Event('input'));
 
-    // Теперь изменение на валидное состояние
     validationFn.mockReturnValueOnce({ isValid: true, errorMessage: '' });
     inputCreator.getElement().value = 'valid-value';
     inputCreator.getElement().dispatchEvent(new Event('input'));
