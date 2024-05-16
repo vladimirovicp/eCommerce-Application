@@ -1,133 +1,133 @@
-.modal{
+.modal {
+  position: fixed;
+  top: 50%;
+  left: -100%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: all 0.5s;
+  z-index: 20;
+  background-color: #1c1403;
+  color: #fff;
+  padding: 3.5rem 1.6rem 1.5rem 1.6rem;
+  border: 1px solid #fff;
 
-    position: fixed;
+  &.active {
     top: 50%;
-    left: -100%;
-    transform: translate(-50%, -50%) scale(0);
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
     transition: all 0.5s;
-    z-index: 20;
-    background-color: #1C1403;
-    color: #fff;
-    padding: 3.5rem 1.6rem 1.5rem 1.6rem;
+  }
 
-    &.active{
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(1);
-        transition: all 0.5s;
+  &-icon {
+    display: block;
+    position: absolute;
+    right: -2.5rem;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 2rem;
+    height: 2rem;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  &__error {
+    padding: 3.5rem 5rem 2.5rem 1.6rem;
+    color: #ff2e00;
+    border: 1px solid #ff2e00;
+    .modal-icon {
+      background-image: url('../img/svg/icon-error.svg');
+    }
+  }
+
+  &__info {
+    padding: 3.5rem 5rem 2.5rem 1.6rem;
+    color: #7ac500;
+    border: 1px solid #7ac500;
+    .modal-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-image: url('../img/svg/icon-normal.svg');
+    }
+  }
+
+  &__content {
+    position: relative;
+  }
+
+  &__close {
+    position: absolute;
+    font-size: 1em;
+    top: 0;
+    right: 0;
+    margin: 0.6rem;
+    cursor: pointer;
+    opacity: 1;
+    transition: 0.3s ease;
+    transition-property: opacity;
+    width: 1rem;
+    height: 1rem;
+    background-image: url(../img/svg/modal-close.svg);
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  &__btn {
+    margin: 0.5rem auto 0;
+
+    border-radius: 10rem;
+    width: 100%;
+    height: 2rem;
+    border: 0.1rem solid #8e8a81;
+    transition: background-color 0.7s;
+    font-weight: 600;
+
+    display: block;
+    cursor: pointer;
+    border-color: #fdad11;
+    background-color: #f1cf8e;
+
+    &-box {
+      margin: 0 auto;
+    }
+  }
+}
+
+@media (max-width: 48em) {
+  .modal {
+    &-icon {
+      display: none;
     }
 
-    &-icon{
-        display: block;
-        position: absolute;
-        right: -2.5rem;
-        top: 50%;
-        transform: translate(0, -50%);
+    &__error,
+    &__info,
+    &__standart {
+      padding: 2.5rem 1rem 1.5rem;
+    }
+
+    &__btn {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (min-width: 90em) {
+  .modal {
+    &-icon {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    &__error {
+      .modal-icon {
         width: 2rem;
         height: 2rem;
-        background-repeat: no-repeat;
-        background-size: cover;
+      }
     }
 
-    &__error{
-        padding: 3.5rem 5rem 2.5rem 1.6rem;
-        color: #FF2E00;
-        .modal-icon{
-            background-image: url('../img/svg/icon-error.svg');
-        }
-    }
-
-    &__info{
-        padding: 3.5rem 5rem 2.5rem 1.6rem;
-        color: #7AC500; ;
-        .modal-icon{
-            width: 2.5rem;
-            height: 2.5rem;
-            background-image: url('../img/svg/icon-normal.svg');
-        }
-    }
-
-    &__content{
-        position: relative;
-    }
-
-    &__close{
-        position: absolute;
-        font-size: 1em;
-        top: 0;
-        right: 0;
-        margin: .6rem;
-        cursor: pointer;
-        opacity: 1;
-        transition: 0.3s ease;
-        transition-property: opacity;
-        width: 1rem;
-        height: 1rem;
-        background-image: url(../img/svg/modal-close.svg);
-        background-size: contain;
-        background-repeat: no-repeat;
-    }
-
-    &__btn{
-        margin: .5rem auto 0;
-
-        border-radius: 10rem;
-        width: 100%;
+    &__info {
+      .modal-icon {
+        width: 2rem;
         height: 2rem;
-        border: 0.1rem solid #8E8A81;
-        transition: background-color 0.7s;
-        font-weight: 600;
-
-        display: block;
-        cursor: pointer;
-        border-color: #FDAD11;
-        background-color: #F1CF8E;
-
-
-        
-        &-box{
-            margin: 0 auto;
-        }
+      }
     }
-}
-
-
-@media(max-width: 48em){
-    .modal{
-        &-icon{
-            display: none;
-        }
-
-        &__error, &__info, &__standart{
-            padding: 2.5rem 1rem 1.5rem; 
-        }
-
-        &__btn{
-            font-size: 1rem;
-        }
-    }
-
-}
-
-@media(min-width: 90em){
-    .modal{
-        &-icon{
-            width: 2rem;
-            height: 2rem;
-        }
-
-        &__error{
-            .modal-icon{
-                width: 2rem;
-                height: 2rem;
-            }
-        }
-
-        &__info{
-            .modal-icon{
-                width: 2rem;
-                height: 2rem;
-            }
-        }
-    }
+  }
 }
