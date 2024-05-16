@@ -7,22 +7,26 @@ import '../../../assets/scss/page/register.scss';
 import { typeTextToDate, typeDateToText } from '../../util/converter-input';
 import countryData from '../../util/data';
 import FormCreator from '../../util/form-creator';
-// import Router from '../../router/router';
 import { addressValidation, birthDateValidation, nameValidation } from '../../util/validation-fuction';
-import LoginPage from '../login';
 import { registerNewCustomer } from '../../api/customers-requests';
+import FormPageCreator from '../../util/form-page-creator';
+import Router from '../../router/router';
+import { Pages } from '../../router/pages';
 
-export default class RegistrationPage extends LoginPage {
+export default class RegistrationPage extends FormPageCreator {
   protected formCreator: FormCreator;
 
-  constructor() {
-    super(false);
+  router: Router;
+
+  constructor(router: Router) {
+    super();
     this.formCreator = new FormCreator({
       classNames: ['form__register'],
-      attributes: { action: '#' },
+      // attributes: { action: '#' },
     });
 
     this.setRegistrationContent();
+    this.router = router;
   }
 
   private setRegistrationContent(): void {
@@ -31,7 +35,7 @@ export default class RegistrationPage extends LoginPage {
       this.createFormTitle('Register'),
       this.createMessage(),
       this.createForm(),
-      this.createLink('LogIn'),
+      this.createLink('LogIn', `${Pages.LOGIN}`),
     ]);
     this.viewElementCreator.addInnerElements([box]);
   }
@@ -96,12 +100,6 @@ export default class RegistrationPage extends LoginPage {
       attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
     });
 
-    // const error = new ElementCreator({
-    //   tag: 'span',
-    // });
-
-    // input.addValidation(nameValidation, error.getElement());
-    // this.formCreator.addValidationField(input);
     const error = this.addValidationErrorHandling(input, nameValidation);
 
     field.addInnerElements([input, error]);
@@ -120,12 +118,6 @@ export default class RegistrationPage extends LoginPage {
       attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
     });
 
-    // const error = new ElementCreator({
-    //   tag: 'span',
-    // });
-
-    // input.addValidation(nameValidation, error.getElement());
-    // this.formCreator.addValidationField(input);
     const error = this.addValidationErrorHandling(input, nameValidation);
 
     field.addInnerElements([input, error]);
@@ -146,12 +138,6 @@ export default class RegistrationPage extends LoginPage {
       callbackBlur: typeDateToText,
     });
 
-    // const error = new ElementCreator({
-    //   tag: 'span',
-    // });
-
-    // input.addValidation(birthDateValidation, error.getElement());
-    // this.formCreator.addValidationField(input);
     const error = this.addValidationErrorHandling(input, birthDateValidation);
 
     field.addInnerElements([input, error]);
@@ -221,7 +207,7 @@ export default class RegistrationPage extends LoginPage {
       type: 'text',
       attributes: {
         name: `${name}City`,
-        placeholder: 'city',
+        placeholder: 'City',
         required: 'true',
         disabled: 'true',
       },
@@ -252,7 +238,7 @@ export default class RegistrationPage extends LoginPage {
       type: 'text',
       attributes: {
         name: `${name}Street`,
-        placeholder: 'street',
+        placeholder: 'Street',
         required: 'true',
         disabled: 'true',
       },
@@ -282,7 +268,7 @@ export default class RegistrationPage extends LoginPage {
       type: 'text',
       attributes: {
         name: `${name}PostalCode`,
-        placeholder: 'postal code',
+        placeholder: 'Postal code',
         required: 'true',
         disabled: 'true',
       },
@@ -317,7 +303,56 @@ export default class RegistrationPage extends LoginPage {
     const label = input.createLabel('Use as a default shipping address', 'check-address__shipping');
     field.addInnerElements([input, label]);
 
+    input.getElement().addEventListener('click', (): void => {
+      if (input.getElement().checked === true) {
+        this.copyAddressValue("select[name='billingCountry']", "select[name='shippingCountry']");
+        this.copyAddressValue("input[name='billingCity']", "input[name='shippingCity']");
+        this.copyAddressValue("input[name='billingPostalCode']", "input[name='shippingPostalCode']");
+        this.copyAddressValue("input[name='billingStreet']", "input[name='shippingStreet']");
+      }
+    });
+
     return field;
+  }
+
+  private copyAddressValue(selectorBilling: string, selectorShipping: string): void {
+    const elemBilling = document.querySelector(selectorBilling);
+    const elemShipping = document.querySelector(selectorShipping);
+    if (
+      elemBilling !== null &&
+      elemShipping !== null &&
+      (elemBilling instanceof HTMLSelectElement || elemBilling instanceof HTMLInputElement) &&
+      (elemShipping instanceof HTMLSelectElement || elemShipping instanceof HTMLInputElement)
+    ) {
+      elemShipping.value = elemBilling.value;
+    }
+  }
+
+  protected createButton(textContent: string): ElementCreator<HTMLElement> {
+    const fieldBtn = new ElementCreator({
+      tag: 'div',
+      classNames: ['form__field', 'form__button'],
+    });
+
+    const input = new InputCreator({
+      type: 'button',
+      attributes: { value: textContent, disabled: 'true' },
+      callback: (): void => {
+        const form = document.querySelector('form');
+        if (form !== null && form instanceof HTMLFormElement) {
+          const formData = new FormData(form);
+          const formDataObject: { [key: string]: string } = {};
+          formData.forEach((value, key: string) => {
+            formDataObject[key] = value as string;
+          });
+          this.handleSubmitForm(formDataObject);
+        }
+      },
+    });
+
+    fieldBtn.addInnerElements([input]);
+    this.formCreator.addSubmitButton(input.getElement());
+    return fieldBtn;
   }
 
   protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
@@ -351,5 +386,23 @@ export default class RegistrationPage extends LoginPage {
       alert('Registration successful!'); // eslint-disable-line
       // перенаправление на главную страницу, изменение ссылок в header
     }
+  }
+
+  protected createLink(textContent: string, page: string): ElementCreator<HTMLElement> {
+    const linkBox = new ElementCreator({
+      tag: 'div',
+      classNames: ['form__link'],
+    });
+
+    const link = new ElementCreator({
+      tag: 'a',
+      textContent,
+      callback: (): void => {
+        this.router.navigate(page);
+      },
+    });
+
+    linkBox.addInnerElements([link]);
+    return linkBox;
   }
 }

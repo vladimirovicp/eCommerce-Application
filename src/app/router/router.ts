@@ -13,18 +13,8 @@ export default class Router {
     });
     window.addEventListener('popstate', () => {
       const path = window.location.pathname.slice(1);
-      const route = this.routes.find((item) => item.path === path);
-      if (route === undefined) {
-        const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
-        if (routeNotFound !== undefined) {
-          routeNotFound.callback();
-        }
-      } else {
-        route.callback();
-      }
+      this.navigateOnload(path);
     });
-    // window.addEventListener('popstate', this.handlePathChange.bind(this));
-    // window.addEventListener('hashchange', this.handlePathChange.bind(this));
   }
 
   navigate(path: string): void {
@@ -44,6 +34,18 @@ export default class Router {
     }
   }
 
+  private navigateOnload(path: string): void {
+    const route = this.routes.find((item) => item.path === path);
+    if (route === undefined) {
+      const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
+      if (routeNotFound !== undefined) {
+        routeNotFound.callback();
+      }
+    } else {
+      route.callback();
+    }
+  }
+
   private parseUrl(path: string): PagePath {
     const resultPath: PagePath = {
       pageName: '',
@@ -59,9 +61,4 @@ export default class Router {
     }
     return window.location.pathname.slice(1);
   }
-
-  /* private handlePathChange(): void {
-    const currentPath = this.getCurrentPath();
-    this.navigate(currentPath);
-  } */
 }
