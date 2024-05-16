@@ -34,7 +34,8 @@
       "plugins": ["jest", "jest-dom"],
       "extends": ["plugin:jest/recommended", "plugin:jest-dom/recommended"],
       "rules": {
-        "max-lines-per-function": ["error", 100]
+        "max-lines-per-function": ["error", 100],
+        "@typescript-eslint/dot-notation": "off"
       }
     }
   ]
