@@ -303,7 +303,29 @@ export default class RegistrationPage extends FormPageCreator {
     const label = input.createLabel('Use as a default shipping address', 'check-address__shipping');
     field.addInnerElements([input, label]);
 
+    input.getElement().addEventListener('click', (): void => {
+      if (input.getElement().checked === true) {
+        this.copyAddressValue("select[name='billingCountry']", "select[name='shippingCountry']");
+        this.copyAddressValue("input[name='billingCity']", "input[name='shippingCity']");
+        this.copyAddressValue("input[name='billingPostalCode']", "input[name='shippingPostalCode']");
+        this.copyAddressValue("input[name='billingStreet']", "input[name='shippingStreet']");
+      }
+    });
+
     return field;
+  }
+
+  private copyAddressValue(selectorBilling: string, selectorShipping: string): void {
+    const elemBilling = document.querySelector(selectorBilling);
+    const elemShipping = document.querySelector(selectorShipping);
+    if (
+      elemBilling !== null &&
+      elemShipping !== null &&
+      (elemBilling instanceof HTMLSelectElement || elemBilling instanceof HTMLInputElement) &&
+      (elemShipping instanceof HTMLSelectElement || elemShipping instanceof HTMLInputElement)
+    ) {
+      elemShipping.value = elemBilling.value;
+    }
   }
 
   protected createButton(textContent: string): ElementCreator<HTMLElement> {

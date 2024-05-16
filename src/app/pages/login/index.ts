@@ -13,15 +13,13 @@ class LoginPage extends FormPageCreator {
 
   router: Router;
 
-  constructor(router: Router, setLoginContent = true) {
+  constructor(router: Router) {
     super();
     this.formCreator = new FormCreator({
       classNames: ['form__login'],
       // attributes: { action: '#' },
     });
-    if (setLoginContent) {
-      this.setContent();
-    }
+    this.setContent();
     this.router = router;
   }
 

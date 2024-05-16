@@ -18,7 +18,7 @@ abstract class FormPageCreator extends View {
       classNames: ['container'],
     };
     super(params);
-    this.formCreator = new FormCreator({ ...params, tag: 'form' });
+    this.formCreator = new FormCreator({ ...params });
   }
 
   protected createFormTitle(textContent: string): ElementCreator<HTMLElement> {
