@@ -1,4 +1,5 @@
 import { CustomerDraft, MyCustomerSignin } from '@commercetools/platform-sdk';
+import modalWindowCreator from '../components/modal-window';
 import apiRoot from './build-client';
 
 export async function authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
@@ -9,14 +10,14 @@ export async function authorizeCustomer(customerDraft: MyCustomerSignin): Promis
       localStorage.setItem('userId', id);
       return true;
     }
-    alert('Authorization failed. Please try again.'); // eslint-disable-line
+    modalWindowCreator.showModalWindow('error', 'Authorization failed. Please try again.');
     return false;
   } catch (error) {
     const errorMessage =
       typeof error === 'object' && error !== null && 'message' in error
         ? error.message
         : 'Unknown error. Please try again later';
-    alert(`${errorMessage}`); // eslint-disable-line
+    modalWindowCreator.showModalWindow('error', `${errorMessage}`);
     return false;
   }
 }
@@ -35,7 +36,7 @@ export async function registerNewCustomer(customerDraft: CustomerDraft): Promise
       typeof error === 'object' && error !== null && 'message' in error
         ? error.message
         : 'Unknown error. Please try again later';
-    alert(`Registration failed: ${errorMessage}`); // eslint-disable-line
+    modalWindowCreator.showModalWindow('error', `Registration failed: ${errorMessage}`);
     return false;
   }
 }

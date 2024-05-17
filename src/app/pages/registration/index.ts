@@ -12,6 +12,7 @@ import { registerNewCustomer } from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
+import modalWindowCreator from '../../components/modal-window';
 
 export default class RegistrationPage extends FormPageCreator {
   protected formCreator: FormCreator;
@@ -400,7 +401,7 @@ export default class RegistrationPage extends FormPageCreator {
 
     const isRegistered = await registerNewCustomer(customerDraft);
     if (isRegistered) {
-      alert('Registration successful!'); // eslint-disable-line
+      modalWindowCreator.showModalWindow('info', 'Registration successful!');
       // перенаправление на главную страницу, изменение ссылок в header
     }
   }

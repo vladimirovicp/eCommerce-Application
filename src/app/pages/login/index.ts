@@ -7,6 +7,7 @@ import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import InputCreator from '../../util/input-creator';
+import modalWindowCreator from '../../components/modal-window';
 
 class LoginPage extends FormPageCreator {
   protected formCreator: FormCreator;
@@ -87,7 +88,7 @@ class LoginPage extends FormPageCreator {
 
     const isAuthorized = await authorizeCustomer(customerDraft);
     if (isAuthorized) {
-      alert('Authorization successful!'); // eslint-disable-line
+      modalWindowCreator.showModalWindow('info', 'Authorization successful!');
       // перенаправление на главную страницу, изменение ссылок в header
     }
   }
