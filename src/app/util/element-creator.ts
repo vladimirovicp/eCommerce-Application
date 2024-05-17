@@ -26,6 +26,12 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
     }
   }
 
+  setTextContent(text: string | undefined): void {
+    if (text !== undefined) {
+      this.element.textContent = text;
+    }
+  }
+
   addInnerElements(children: Array<HTMLElement | ElementCreator>): void {
     const fragment = new DocumentFragment();
     children.forEach((child) => {
@@ -47,12 +53,6 @@ class ElementCreator<T extends HTMLElement = HTMLElement> {
   private setCssClasses(cssClasses: Array<string> | undefined): void {
     if (cssClasses !== undefined) {
       cssClasses.map((cssClass) => this.element.classList.add(cssClass));
-    }
-  }
-
-  private setTextContent(text: string | undefined): void {
-    if (text !== undefined) {
-      this.element.textContent = text;
     }
   }
 

@@ -36,10 +36,11 @@ export default class HeaderView extends View {
     },
   ];
 
-  private linksListParams = [
+  private defaultUserLinkParams = [
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'login',
+      id: 'login-profile-link',
       callback: (): void => {
         this.router.navigate(`${Pages.LOGIN}`);
       },
@@ -47,13 +48,44 @@ export default class HeaderView extends View {
     {
       classNames: ['header__links-link', 'underline'],
       textContent: 'register',
+      id: 'registration-logout-link',
       callback: (): void => {
         this.router.navigate(`${Pages.REGISTRATION}`);
       },
     },
     {
       classNames: ['header__links-link'],
-      // attributes: { href: '/' },
+      callback: (): void => {
+        this.router.navigate(`${Pages.CART}`);
+      },
+      imageData: {
+        imageClassNames: 'img-full',
+        containerClassNames: 'header__basket-img',
+        src: basket,
+        alt: 'Basket',
+      },
+    },
+  ];
+
+  private autorizedUserLinkParams = [
+    {
+      classNames: ['header__links-link', 'underline'],
+      textContent: 'profile',
+      id: 'login-profile-link',
+      callback: (): void => {
+        this.router.navigate(`${Pages.PROFILE}`);
+      },
+    },
+    {
+      classNames: ['header__links-link', 'underline'],
+      textContent: 'logout',
+      id: 'registration-logout-link',
+      callback: (): void => {
+        // this.router.navigate(`${Pages.REGISTRATION}`);
+      },
+    },
+    {
+      classNames: ['header__links-link'],
       callback: (): void => {
         this.router.navigate(`${Pages.CART}`);
       },
@@ -73,13 +105,29 @@ export default class HeaderView extends View {
     };
     super(params);
     this.router = router;
-    this.configureView();
+    this.configureView(this.defaultUserLinkParams);
   }
 
-  private configureView(): void {
+  public isLoggedIn(): void {
+    const header = this.viewElementCreator.getElement();
+    while (header.firstElementChild !== null) {
+      header.firstElementChild.remove();
+    }
+    this.configureView(this.autorizedUserLinkParams);
+  }
+
+  public isLoggedOut(): void {
+    const header = this.viewElementCreator.getElement();
+    while (header.firstElementChild !== null) {
+      header.firstElementChild.remove();
+    }
+    this.configureView(this.defaultUserLinkParams);
+  }
+
+  private configureView(linksParams: LinkParams[]): void {
     const headerLogoElement = this.createHeaderLogo();
     const headerNavMenu = this.createHeaderMenu();
-    const headerLinkList = this.createLinkList();
+    const headerLinkList = this.createLinkList(linksParams);
 
     const headerContentContainer = new ElementCreator<HTMLDivElement>({
       tag: 'div',
@@ -133,12 +181,10 @@ export default class HeaderView extends View {
 
   private createLinks(linksParams: LinkParams[]): HTMLAnchorElement[] {
     const linksElements: HTMLAnchorElement[] = [];
-
     linksParams.forEach((link) => {
       const newLinkCreator = new LinkCreator(link);
       linksElements.push(newLinkCreator.getElement());
     });
-
     return linksElements;
   }
 
@@ -157,15 +203,14 @@ export default class HeaderView extends View {
     return headerLogoElement;
   }
 
-  private createLinkList(): HTMLUListElement {
-    const linkListElements = this.createLinks(this.linksListParams);
+  private createLinkList(linksParams: LinkParams[]): HTMLUListElement {
+    const linkListElements = this.createLinks(linksParams);
 
     const linkListCreator = new ListCreator({
       listItems: linkListElements,
       listClass: ['header__links-list'],
       itemClass: ['header__links-item'],
     });
-
     return linkListCreator.getHtmlElement();
   }
 }
