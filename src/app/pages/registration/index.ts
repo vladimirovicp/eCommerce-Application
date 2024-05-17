@@ -309,10 +309,27 @@ export default class RegistrationPage extends FormPageCreator {
         this.copyAddressValue("input[name='billingCity']", "input[name='shippingCity']");
         this.copyAddressValue("input[name='billingPostalCode']", "input[name='shippingPostalCode']");
         this.copyAddressValue("input[name='billingStreet']", "input[name='shippingStreet']");
+
+        this.isDisabled("select[name='shippingCountry']", true);
+        this.isDisabled("input[name='shippingCity']", true);
+        this.isDisabled("input[name='shippingPostalCode']", true);
+        this.isDisabled("input[name='shippingStreet']", true);
+      } else {
+        this.isDisabled("select[name='shippingCountry']", false);
+        this.isDisabled("input[name='shippingCity']", false);
+        this.isDisabled("input[name='shippingPostalCode']", false);
+        this.isDisabled("input[name='shippingStreet']", false);
       }
     });
 
     return field;
+  }
+
+  private isDisabled(selector: string, status: boolean): void {
+    const element = document.querySelector(selector);
+    if (element !== null && (element instanceof HTMLSelectElement || element instanceof HTMLInputElement)) {
+      element.disabled = status;
+    }
   }
 
   private copyAddressValue(selectorBilling: string, selectorShipping: string): void {
