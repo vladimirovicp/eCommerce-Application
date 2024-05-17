@@ -55,6 +55,13 @@ class App {
         path: `${Pages.HOME}`,
         callback: (): void => {
           this.updateMain(new HomePage(), 'home-page');
+          if (localStorage.userId !== undefined) {
+            console.log(localStorage.userId);
+            this.header.isLoggedIn();
+          } else {
+            console.log(localStorage.userId);
+            this.header.isLoggedOut();
+          }
         },
       },
       {

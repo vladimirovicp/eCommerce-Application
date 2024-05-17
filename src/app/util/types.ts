@@ -20,6 +20,7 @@ export interface LinkParams {
   callback?: (event?: Event) => void;
   attributes?: { [key: string]: string };
   imageData?: LinkImageData;
+  id?: string;
 }
 
 export interface InputParams {

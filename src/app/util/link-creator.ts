@@ -9,6 +9,7 @@ class LinkCreator extends ElementCreator<HTMLAnchorElement> {
       textContent: params.textContent,
       attributes: params.attributes,
       callback: params.callback,
+      id: params.id,
     });
 
     if (params.imageData) this.addImageToLink(params.imageData);
