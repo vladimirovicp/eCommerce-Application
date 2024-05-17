@@ -1,3 +1,4 @@
+import { validationSettings } from './data';
 import { EmailErrors, PasswordErrors, FirstNameErrors, BirthDateErrors, AddressErrors } from './error-messages';
 
 export function emailValidation(value: string): { isValid: boolean; errorMessage: string } {
@@ -21,7 +22,12 @@ export function passwordValidation(value: string): { isValid: boolean; errorMess
   if (/\s/.test(value)) {
     return { isValid: false, errorMessage: PasswordErrors.Whitespace };
   }
-  if (value.length < 8 || !/[a-z]/.test(value) || !/[A-Z]/.test(value) || !/\d/.test(value)) {
+  if (
+    value.length < validationSettings.minLengthPassword ||
+    !/[a-z]/.test(value) ||
+    !/[A-Z]/.test(value) ||
+    !/\d/.test(value)
+  ) {
     return { isValid: false, errorMessage: PasswordErrors.Hint };
   }
   return { isValid: true, errorMessage: '' };
@@ -46,11 +52,13 @@ export function birthDateValidation(value: string): { isValid: boolean; errorMes
 
   const userBirthDate = new Date(value);
   const currentDate = new Date();
-  const minAge = 13;
+  const minAgeYearsAgo = new Date(
+    currentDate.getFullYear() - validationSettings.minRegistrationAge,
+    currentDate.getMonth(),
+    currentDate.getDate()
+  );
 
-  const currentAge = currentDate.getFullYear() - userBirthDate.getFullYear();
-
-  if (currentAge < minAge) {
+  if (userBirthDate > minAgeYearsAgo) {
     return { isValid: false, errorMessage: BirthDateErrors.Invalid };
   }
 
