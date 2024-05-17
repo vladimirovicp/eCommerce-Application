@@ -8,13 +8,16 @@ import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import InputCreator from '../../util/input-creator';
 import modalWindowCreator from '../../components/modal-window';
+import HeaderView from '../../components/header/header';
 
 class LoginPage extends FormPageCreator {
   protected formCreator: FormCreator;
 
+  private header: HeaderView;
+
   router: Router;
 
-  constructor(router: Router) {
+  constructor(router: Router, header: HeaderView) {
     super();
     this.formCreator = new FormCreator({
       classNames: ['form__login'],
@@ -22,6 +25,7 @@ class LoginPage extends FormPageCreator {
     });
     this.setContent();
     this.router = router;
+    this.header = header;
   }
 
   private setContent(): void {
@@ -89,6 +93,8 @@ class LoginPage extends FormPageCreator {
     const isAuthorized = await authorizeCustomer(customerDraft);
     if (isAuthorized) {
       modalWindowCreator.showModalWindow('info', 'Authorization successful!');
+      this.router.navigate(Pages.HOME);
+      this.header.isLoggedIn();
       // перенаправление на главную страницу, изменение ссылок в header
     }
   }

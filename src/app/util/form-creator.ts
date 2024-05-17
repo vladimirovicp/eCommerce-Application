@@ -26,7 +26,7 @@ class FormCreator extends ElementCreator<HTMLFormElement> {
     });
   }
 
-  private checkFormValidity(): void {
+  public checkFormValidity(): void {
     this.isFormValid = this.formFields.every((input) => input.isValid);
     if (this.submitButton) {
       this.submitButton.disabled = !this.isFormValid;
