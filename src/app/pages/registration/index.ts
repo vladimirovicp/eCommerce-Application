@@ -13,21 +13,41 @@ import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../../components/modal-window';
+import HeaderView from '../../components/header/header';
 
 export default class RegistrationPage extends FormPageCreator {
   protected formCreator: FormCreator;
 
-  router: Router;
+  private header: HeaderView;
 
-  constructor(router: Router) {
+  private router: Router;
+
+  private billingAddressFields: (ElementCreator | InputCreator)[];
+
+  private shippingAddressFields: (ElementCreator<HTMLSelectElement> | InputCreator)[];
+
+  private isBillingFieldsValid: boolean;
+
+  private defaultAddressCheckbox: InputCreator;
+
+  constructor(router: Router, header: HeaderView) {
     super();
+    this.billingAddressFields = [];
+    this.shippingAddressFields = [];
+    this.defaultAddressCheckbox = new InputCreator({
+      type: 'checkbox',
+      id: 'check-address__shipping',
+      attributes: { name: 'checkboxAddress', disabled: 'true' },
+      // classNames: ['address-field__billing'],
+    });
+    this.isBillingFieldsValid = false;
     this.formCreator = new FormCreator({
       classNames: ['form__register'],
       // attributes: { action: '#' },
     });
-
     this.setRegistrationContent();
     this.router = router;
+    this.header = header;
   }
 
   private setRegistrationContent(): void {
@@ -146,7 +166,6 @@ export default class RegistrationPage extends FormPageCreator {
     return field;
   }
 
-  /* eslint-disable max-lines-per-function */
   private createCountry(dependentFieldsClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
@@ -154,31 +173,18 @@ export default class RegistrationPage extends FormPageCreator {
     });
 
     const name = `${dependentFieldsClassName.replace('address-field__', '')}`;
-
-    const select = new ElementCreator({
+    const select = new ElementCreator<HTMLSelectElement>({
       tag: 'select',
       attributes: { name: `${name}Country` },
     });
 
-    const defaultOption = new ElementCreator({
-      tag: 'option',
-      attributes: {
-        selected: 'true',
-        disabled: 'true',
-        hidden: 'true',
-      },
-      textContent: 'Country',
-    });
+    if (dependentFieldsClassName === 'address-field__billing') {
+      this.billingAddressFields.push(select);
+    } else {
+      this.shippingAddressFields.push(select);
+    }
 
-    select.addInnerElements([defaultOption]);
-    countryData.forEach((el) => {
-      const option = new ElementCreator({
-        tag: 'option',
-        attributes: { value: el.code },
-        textContent: el.name,
-      });
-      select.addInnerElements([option]);
-    });
+    this.fillSelectWithCountries(select);
 
     select.getElement().addEventListener(
       'change',
@@ -198,6 +204,28 @@ export default class RegistrationPage extends FormPageCreator {
     return field;
   }
 
+  private fillSelectWithCountries(select: ElementCreator<HTMLSelectElement>): void {
+    const defaultOption = new ElementCreator({
+      tag: 'option',
+      attributes: {
+        selected: 'true',
+        disabled: 'true',
+        hidden: 'true',
+      },
+      textContent: 'Country',
+    });
+    select.addInnerElements([defaultOption]);
+
+    countryData.forEach((el) => {
+      const option = new ElementCreator({
+        tag: 'option',
+        attributes: { value: el.code },
+        textContent: el.name,
+      });
+      select.addInnerElements([option]);
+    });
+  }
+
   private createCity(inputClassName: string): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
       tag: 'div',
@@ -215,12 +243,13 @@ export default class RegistrationPage extends FormPageCreator {
       classNames: [inputClassName],
     });
 
-    const error = new ElementCreator({
-      tag: 'span',
-    });
+    if (inputClassName === 'address-field__billing') {
+      this.checkBillingFieldsValidation(input);
+    } else {
+      this.shippingAddressFields.push(input);
+    }
 
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
+    const error = this.addValidationErrorHandling(input, addressValidation);
 
     field.addInnerElements([input, error]);
 
@@ -247,12 +276,13 @@ export default class RegistrationPage extends FormPageCreator {
       // classNames: ['address-field__shipping'],
     });
 
-    const error = new ElementCreator({
-      tag: 'span',
-    });
+    if (inputClassName === 'address-field__billing') {
+      this.checkBillingFieldsValidation(input);
+    } else {
+      this.shippingAddressFields.push(input);
+    }
 
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
+    const error = this.addValidationErrorHandling(input, addressValidation);
 
     field.addInnerElements([input, error]);
 
@@ -276,16 +306,31 @@ export default class RegistrationPage extends FormPageCreator {
       classNames: [inputClassName],
     });
 
-    const error = new ElementCreator({
-      tag: 'span',
-    });
+    if (inputClassName === 'address-field__billing') {
+      this.checkBillingFieldsValidation(input);
+    } else {
+      this.shippingAddressFields.push(input);
+    }
 
-    input.addValidation(addressValidation, error.getElement());
-    this.formCreator.addValidationField(input);
+    const error = this.addValidationErrorHandling(input, addressValidation);
 
     field.addInnerElements([input, error]);
 
     return field;
+  }
+
+  private checkBillingFieldsValidation(inputCreator: InputCreator): void {
+    this.billingAddressFields.push(inputCreator);
+
+    inputCreator.getElement().addEventListener('isValidChange', () => {
+      this.isBillingFieldsValid = this.billingAddressFields.every((input) => {
+        if (input instanceof InputCreator) {
+          return input.isValid;
+        }
+        return true;
+      });
+      this.defaultAddressCheckbox.getElement().disabled = !this.isBillingFieldsValid;
+    });
   }
 
   private createCheckboxAddressShipping(): ElementCreator<HTMLElement> {
@@ -294,55 +339,44 @@ export default class RegistrationPage extends FormPageCreator {
       classNames: ['form__field'],
     });
 
-    const input = new InputCreator({
-      type: 'checkbox',
-      id: 'check-address__shipping',
-      attributes: { name: 'checkboxAddress', disabled: 'true' },
-      classNames: ['address-field__billing'],
-    });
+    const label = this.defaultAddressCheckbox.createLabel(
+      'Use as a default shipping address',
+      'check-address__shipping'
+    );
+    field.addInnerElements([this.defaultAddressCheckbox, label]);
 
-    const label = input.createLabel('Use as a default shipping address', 'check-address__shipping');
-    field.addInnerElements([input, label]);
-
-    input.getElement().addEventListener('click', (): void => {
-      if (input.getElement().checked === true) {
-        this.copyAddressValue("select[name='billingCountry']", "select[name='shippingCountry']");
-        this.copyAddressValue("input[name='billingCity']", "input[name='shippingCity']");
-        this.copyAddressValue("input[name='billingPostalCode']", "input[name='shippingPostalCode']");
-        this.copyAddressValue("input[name='billingStreet']", "input[name='shippingStreet']");
-
-        this.isDisabled("select[name='shippingCountry']", true);
-        this.isDisabled("input[name='shippingCity']", true);
-        this.isDisabled("input[name='shippingPostalCode']", true);
-        this.isDisabled("input[name='shippingStreet']", true);
+    this.defaultAddressCheckbox.getElement().addEventListener('click', (): void => {
+      if (this.defaultAddressCheckbox.getElement().checked === true) {
+        this.billingAddressFields.forEach((billingField, index) => {
+          this.copyAddressValue(billingField, index);
+        });
+        this.shippingAddressFields.forEach((shippingField) => this.toggleDisabled(shippingField, true));
       } else {
-        this.isDisabled("select[name='shippingCountry']", false);
-        this.isDisabled("input[name='shippingCity']", false);
-        this.isDisabled("input[name='shippingPostalCode']", false);
-        this.isDisabled("input[name='shippingStreet']", false);
+        this.shippingAddressFields.forEach((shippingField) => this.toggleDisabled(shippingField, false));
       }
     });
 
     return field;
   }
 
-  private isDisabled(selector: string, status: boolean): void {
-    const element = document.querySelector(selector);
-    if (element !== null && (element instanceof HTMLSelectElement || element instanceof HTMLInputElement)) {
-      element.disabled = status;
-    }
+  private toggleDisabled(fieldCreator: ElementCreator<HTMLSelectElement> | InputCreator, status: boolean): void {
+    const shippingField = fieldCreator.getElement();
+    shippingField.disabled = status;
   }
 
-  private copyAddressValue(selectorBilling: string, selectorShipping: string): void {
-    const elemBilling = document.querySelector(selectorBilling);
-    const elemShipping = document.querySelector(selectorShipping);
+  private copyAddressValue(fieldCreator: ElementCreator, index: number): void {
+    const billingField = fieldCreator.getElement();
+    const shippingField = this.shippingAddressFields[index].getElement();
+    const shippingFieldCreator = this.shippingAddressFields[index];
     if (
-      elemBilling !== null &&
-      elemShipping !== null &&
-      (elemBilling instanceof HTMLSelectElement || elemBilling instanceof HTMLInputElement) &&
-      (elemShipping instanceof HTMLSelectElement || elemShipping instanceof HTMLInputElement)
+      (billingField instanceof HTMLSelectElement || billingField instanceof HTMLInputElement) &&
+      (shippingField instanceof HTMLSelectElement || shippingField instanceof HTMLInputElement)
     ) {
-      elemShipping.value = elemBilling.value;
+      shippingField.value = billingField.value;
+      if (shippingFieldCreator instanceof InputCreator) {
+        shippingFieldCreator.isValid = true;
+        this.formCreator.checkFormValidity();
+      }
     }
   }
 
@@ -358,11 +392,20 @@ export default class RegistrationPage extends FormPageCreator {
       callback: (): void => {
         const form = document.querySelector('form');
         if (form !== null && form instanceof HTMLFormElement) {
+          this.shippingAddressFields.forEach((shippingField) => {
+            const field = shippingField.getElement();
+            if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = false;
+          });
           const formData = new FormData(form);
           const formDataObject: { [key: string]: string } = {};
           formData.forEach((value, key: string) => {
             formDataObject[key] = value as string;
           });
+          this.shippingAddressFields.forEach((shippingField) => {
+            const field = shippingField.getElement();
+            if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = true;
+          });
+          console.log(formData, formDataObject);
           this.handleSubmitForm(formDataObject);
         }
       },
@@ -403,6 +446,8 @@ export default class RegistrationPage extends FormPageCreator {
     if (isRegistered) {
       modalWindowCreator.showModalWindow('info', 'Registration successful!');
       // перенаправление на главную страницу, изменение ссылок в header
+      this.router.navigate(Pages.HOME);
+      this.header.isLoggedIn();
     }
   }
 

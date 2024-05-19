@@ -83,13 +83,13 @@ class App {
       {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
-          this.updateMain(new LoginPage(this.router), 'login-page');
+          this.updateMain(new LoginPage(this.router, this.header), 'login-page');
         },
       },
       {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
-          this.updateMain(new RegistrationPage(this.router), 'register-page');
+          this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
         },
       },
       {

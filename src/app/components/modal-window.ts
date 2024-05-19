@@ -36,7 +36,7 @@ class ModalWindowCreator extends ElementCreator<HTMLDivElement> {
     }
     document.body.classList.add('_lock');
 
-    document.addEventListener('click', this.handleCloseClick);
+    document.addEventListener('click', this.handleCloseClick.bind(this));
   }
 
   public createButton(callback: (event: Event | undefined) => void, textContent: string): void {
@@ -45,7 +45,10 @@ class ModalWindowCreator extends ElementCreator<HTMLDivElement> {
       tag: 'button',
       classNames: ['modal__btn'],
       textContent,
-      callback,
+      callback: (event: Event | undefined): void => {
+        callback(event);
+        this.closeModalWindow();
+      },
     });
     buttonContainer.addInnerElements([button]);
     this.element.append(buttonContainer.getElement());
@@ -54,6 +57,9 @@ class ModalWindowCreator extends ElementCreator<HTMLDivElement> {
   private closeModalWindow(): void {
     this.element.classList.remove('active');
     document.body.classList.remove('_lock');
+    while (this.modalContent.getElement().nextElementSibling) {
+      this.modalContent.getElement().nextElementSibling?.remove();
+    }
     document.removeEventListener('click', this.handleCloseClick);
   }
 
