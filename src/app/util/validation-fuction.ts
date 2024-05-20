@@ -69,6 +69,15 @@ export function addressValidation(value: string): { isValid: boolean; errorMessa
   if (!value.trim()) {
     return { isValid: false, errorMessage: AddressErrors.Required };
   }
+  if (!/^[a-zA-Z]+$/.test(value.trim())) {
+    return { isValid: false, errorMessage: AddressErrors.InvalidCity };
+  }
+  return { isValid: true, errorMessage: '' };
+}
 
+export function postCodeValidation(value: string): { isValid: boolean; errorMessage: string } {
+  if (!value.trim()) {
+    return { isValid: false, errorMessage: AddressErrors.Required };
+  }
   return { isValid: true, errorMessage: '' };
 }

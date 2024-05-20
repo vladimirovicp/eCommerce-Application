@@ -100,12 +100,12 @@ class LoginPage extends FormPageCreator {
   }
 
   protected createLink(textContent: string, page: string): ElementCreator<HTMLElement> {
-    const linkBox = new ElementCreator({
+    const linkBox = new ElementCreator<HTMLDivElement>({
       tag: 'div',
       classNames: ['form__link'],
     });
 
-    const link = new ElementCreator({
+    const link = new ElementCreator<HTMLAnchorElement>({
       tag: 'a',
       textContent,
       callback: (): void => {
