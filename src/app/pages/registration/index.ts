@@ -7,7 +7,12 @@ import '../../../assets/scss/page/register.scss';
 import { typeTextToDate, typeDateToText } from '../../util/converter-input';
 import countryData from '../../util/data';
 import FormCreator from '../../util/form-creator';
-import { addressValidation, birthDateValidation, nameValidation } from '../../util/validation-fuction';
+import {
+  addressValidation,
+  birthDateValidation,
+  nameValidation,
+  postCodeValidation,
+} from '../../util/validation-fuction';
 import { registerNewCustomer } from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
@@ -312,8 +317,8 @@ export default class RegistrationPage extends FormPageCreator {
       this.shippingAddressFields.push(input);
     }
 
-    const error = this.addValidationErrorHandling(input, addressValidation);
-
+    // const error = this.addValidationErrorHandling(input, addressValidation);
+    const error = this.addValidationErrorHandling(input, postCodeValidation);
     field.addInnerElements([input, error]);
 
     return field;
