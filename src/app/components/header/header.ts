@@ -1,6 +1,7 @@
 import '../../../assets/scss/_header.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
+import adaptiveCloseMenu from '../../util/helper';
 import logo from '../../../assets/img/svg/logo.svg';
 import basket from '../../../assets/img/svg/basket.svg';
 import ListCreator from '../../util/list-creator';
@@ -19,6 +20,7 @@ export default class HeaderView extends View {
       textContent: 'HOME',
       callback: (): void => {
         this.router.navigate(`${Pages.HOME}`);
+        adaptiveCloseMenu();
       },
     },
     {
@@ -26,6 +28,7 @@ export default class HeaderView extends View {
       textContent: 'CATALOG',
       callback: (): void => {
         this.router.navigate(`${Pages.CATALOG}`);
+        adaptiveCloseMenu();
       },
     },
     {
@@ -33,6 +36,7 @@ export default class HeaderView extends View {
       textContent: 'ABOUT US',
       callback: (): void => {
         this.router.navigate(`${Pages.ABOUT}`);
+        adaptiveCloseMenu();
       },
     },
   ];
