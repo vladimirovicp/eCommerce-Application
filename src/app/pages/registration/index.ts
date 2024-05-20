@@ -316,8 +316,7 @@ export default class RegistrationPage extends FormPageCreator {
     } else {
       this.shippingAddressFields.push(input);
     }
-
-    // const error = this.addValidationErrorHandling(input, addressValidation);
+    
     const error = this.addValidationErrorHandling(input, postCodeValidation);
     field.addInnerElements([input, error]);
 
