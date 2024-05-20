@@ -55,13 +55,12 @@ class App {
         path: `${Pages.HOME}`,
         callback: (): void => {
           this.updateMain(new HomePage(), 'home-page');
-          if (localStorage.userId !== undefined) {
-            console.log(localStorage.userId);
-            this.header.isLoggedIn();
-          } else {
-            console.log(localStorage.userId);
-            this.header.isLoggedOut();
-          }
+        },
+      },
+      {
+        path: 'main',
+        callback: (): void => {
+          this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
@@ -83,13 +82,23 @@ class App {
       {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
-          this.updateMain(new LoginPage(this.router, this.header), 'login-page');
+          if (localStorage.userId === undefined) {
+            this.updateMain(new LoginPage(this.router, this.header), 'login-page');
+          } else {
+            this.updateMain(new HomePage(), 'home-page');
+            this.header.isLoggedIn();
+          }
         },
       },
       {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
-          this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
+          if (localStorage.userId === undefined) {
+            this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
+          } else {
+            this.updateMain(new HomePage(), 'home-page');
+            this.header.isLoggedIn();
+          }
         },
       },
       {
