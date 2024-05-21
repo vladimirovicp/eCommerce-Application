@@ -1,0 +1,27 @@
+.login{
+    &__box{
+        background-color: #1C1403;
+        padding: 3rem 2rem;
+        width: 24rem;
+        border-radius: 2rem;
+    }
+
+    &-page{
+        display: flex;
+        .container{
+            display: flex;
+            align-items:center;
+            justify-content: center;
+        } 
+    }
+}
+
+
+@media (max-width: 48em) {
+    .login{
+        &__box{
+            padding: 1rem 1rem;
+            width: 100%;
+        }
+    }
+}

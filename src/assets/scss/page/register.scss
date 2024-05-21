@@ -1,0 +1,72 @@
+.register{
+    &__box{
+        background-color: #1C1403;
+        padding: 3rem 2rem;
+        width: 40rem;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+    }
+    &-page{
+        display: flex;
+        .container{
+            display: flex;
+            align-items:center;
+            justify-content: center;
+        } 
+    }
+}
+
+.register-page{
+    .form{
+      &__field{
+        width: 19rem;
+        color: #fff;
+      }  
+
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+      }
+    }
+}
+
+.form{
+    &__fields{
+        display: flex;
+        justify-content: space-between;
+
+        &-title{
+            color: #fff;
+        }
+
+        &-sub-title{
+            color: #fff;
+        }
+
+
+    }
+
+}
+
+
+@media (max-width: 48em) {
+    .register{
+        &__box{
+            padding: 1rem 1rem;
+            width: 100%;
+        }
+    }
+
+    .register-page{
+        .form{
+            &__field{
+                width: 100%;
+            }
+
+            &__fields{
+                flex-direction: column;
+            }
+        }
+    }
+
+
+}
