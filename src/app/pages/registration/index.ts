@@ -13,7 +13,7 @@ import {
   nameValidation,
   postCodeValidation,
 } from '../../util/validation-fuction';
-import { registerNewCustomer } from '../../api/customers-requests';
+import { customerService } from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
@@ -86,51 +86,6 @@ export default class RegistrationPage extends FormPageCreator {
     ]);
 
     return this.formCreator;
-  }
-
-  private createFieldsTitle(text: string): ElementCreator<HTMLElement> {
-    return new ElementCreator({
-      textContent: text,
-      classNames: ['form__fields-title'],
-    });
-  }
-
-  private createFieldsSubTitle(text: string): ElementCreator<HTMLElement> {
-    return new ElementCreator({
-      textContent: text,
-      classNames: ['form__fields-sub-title'],
-    });
-  }
-
-  private createFields(
-    fieldOne: ElementCreator<HTMLElement>,
-    fieldTwo: ElementCreator<HTMLElement>
-  ): ElementCreator<HTMLElement> {
-    const fields = new ElementCreator({
-      classNames: ['form__fields'],
-    });
-
-    fields.addInnerElements([fieldOne, fieldTwo]);
-
-    return fields;
-  }
-
-  private createFirstName(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
-    });
-
-    const error = this.addValidationErrorHandling(input, nameValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
   }
 
   private createLastName(): ElementCreator<HTMLElement> {
@@ -316,7 +271,7 @@ export default class RegistrationPage extends FormPageCreator {
     } else {
       this.shippingAddressFields.push(input);
     }
-    
+
     const error = this.addValidationErrorHandling(input, postCodeValidation);
     field.addInnerElements([input, error]);
 
@@ -446,7 +401,7 @@ export default class RegistrationPage extends FormPageCreator {
       authenticationMode: 'Password',
     };
 
-    const isRegistered = await registerNewCustomer(customerDraft);
+    const isRegistered = await customerService.registerNewCustomer(customerDraft);
     if (isRegistered) {
       modalWindowCreator.showModalWindow('info', 'Registration successful!');
       // перенаправление на главную страницу, изменение ссылок в header

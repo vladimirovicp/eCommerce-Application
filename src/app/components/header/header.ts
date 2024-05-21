@@ -10,6 +10,7 @@ import { LinkParams } from '../../util/types';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../modal-window';
+import { customerService } from '../../api/customers-requests';
 
 export default class HeaderView extends View {
   private router: Router;
@@ -88,7 +89,7 @@ export default class HeaderView extends View {
       callback: (): void => {
         modalWindowCreator.showModalWindow('standart', 'Do you want to log out?');
         modalWindowCreator.createButton(() => {
-          localStorage.removeItem('userId');
+          customerService.clearCustomerInfo();
           this.isLoggedOut();
         }, 'yes');
         // this.router.navigate(`${Pages.REGISTRATION}`);

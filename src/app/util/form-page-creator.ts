@@ -2,7 +2,7 @@ import logoSrc from '../../assets/img/svg/logo.svg';
 import View from '../common/view';
 import ElementCreator from './element-creator';
 import InputCreator from './input-creator';
-import { emailValidation, passwordValidation } from './validation-fuction';
+import { emailValidation, nameValidation, passwordValidation } from './validation-fuction';
 import FormCreator from './form-creator';
 
 const imageSrc = {
@@ -18,7 +18,7 @@ abstract class FormPageCreator extends View {
       classNames: ['container'],
     };
     super(params);
-    this.formCreator = new FormCreator({ ...params });
+    this.formCreator = new FormCreator({});
   }
 
   protected createFormTitle(textContent: string): ElementCreator<HTMLElement> {
@@ -61,6 +61,33 @@ abstract class FormPageCreator extends View {
 
   protected createForm(): FormCreator {
     return this.formCreator;
+  }
+
+  protected createFieldsTitle(text: string): ElementCreator<HTMLElement> {
+    return new ElementCreator({
+      textContent: text,
+      classNames: ['form__fields-title'],
+    });
+  }
+
+  protected createFieldsSubTitle(text: string): ElementCreator<HTMLElement> {
+    return new ElementCreator({
+      textContent: text,
+      classNames: ['form__fields-sub-title'],
+    });
+  }
+
+  protected createFields(
+    fieldOne: ElementCreator<HTMLElement>,
+    fieldTwo: ElementCreator<HTMLElement>
+  ): ElementCreator<HTMLElement> {
+    const fields = new ElementCreator({
+      classNames: ['form__fields'],
+    });
+
+    fields.addInnerElements([fieldOne, fieldTwo]);
+
+    return fields;
   }
 
   protected createFieldEmail(): ElementCreator<HTMLElement> {
@@ -116,6 +143,24 @@ abstract class FormPageCreator extends View {
     fieldPassword.addInnerElements([fieldEye, error]);
 
     return fieldPassword;
+  }
+
+  protected createFirstName(): ElementCreator<HTMLElement> {
+    const field = new ElementCreator({
+      tag: 'div',
+      classNames: ['form__field'],
+    });
+
+    const input = new InputCreator({
+      type: 'text',
+      attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
+    });
+
+    const error = this.addValidationErrorHandling(input, nameValidation);
+
+    field.addInnerElements([input, error]);
+
+    return field;
   }
 
   protected addValidationErrorHandling(
