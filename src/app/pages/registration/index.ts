@@ -4,16 +4,8 @@ import './index.scss';
 import InputCreator from '../../util/input-creator';
 import ElementCreator from '../../util/element-creator';
 import '../../../assets/scss/page/register.scss';
-import { typeTextToDate, typeDateToText } from '../../util/converter-input';
-import countryData from '../../util/data';
 import FormCreator from '../../util/form-creator';
-import {
-  addressValidation,
-  birthDateValidation,
-  nameValidation,
-  postCodeValidation,
-} from '../../util/validation-fuction';
-import { customerService } from '../../api/customers-requests';
+import customerService from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
@@ -71,15 +63,17 @@ export default class RegistrationPage extends FormPageCreator {
       this.createFieldsTitle('Personal info'),
       this.createFieldEmail(),
       this.createFields(this.createFirstName(), this.createLastName()),
-      this.createbirthDate(),
+      this.createBirthDate(),
       this.createFieldsTitle('Address'),
       this.createFieldsSubTitle('Billing address'),
-      this.createFields(this.createCountry('address-field__billing'), this.createCity('address-field__billing')),
-      this.createFields(this.createPostalCode('address-field__billing'), this.createStreet('address-field__billing')),
+      this.createAddressGroup(true),
+      // this.createFields(this.createCountry('address-field__billing'), this.createCity('address-field__billing')),
+      // this.createFields(this.createPostalCode('address-field__billing'), this.createStreet('address-field__billing')),
       this.createCheckboxAddressShipping(),
       this.createFieldsSubTitle('Shipping address'),
-      this.createFields(this.createCountry('address-field__shipping'), this.createCity('address-field__shipping')),
-      this.createFields(this.createPostalCode('address-field__shipping'), this.createStreet('address-field__shipping')),
+      this.createAddressGroup(false),
+      // this.createFields(this.createCountry('address-field__shipping'), this.createCity('address-field__shipping')),
+      // this.createFields(this.createPostalCode('address-field__shipping'), this.createStreet('address-field__shipping')),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
       this.createButton('Register'),
@@ -88,192 +82,53 @@ export default class RegistrationPage extends FormPageCreator {
     return this.formCreator;
   }
 
-  private createLastName(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
-    });
-
-    const error = this.addValidationErrorHandling(input, nameValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  private createbirthDate(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'field__birth-date'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'birthDate', placeholder: 'Birth date', required: 'true' },
-      callbackFocus: typeTextToDate,
-      callbackBlur: typeDateToText,
-    });
-
-    const error = this.addValidationErrorHandling(input, birthDateValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  private createCountry(dependentFieldsClassName: string): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'field__country'],
-    });
-
-    const name = `${dependentFieldsClassName.replace('address-field__', '')}`;
-    const select = new ElementCreator<HTMLSelectElement>({
-      tag: 'select',
-      attributes: { name: `${name}Country` },
-    });
+  protected createCountry(
+    dependentFieldsClassName: string,
+    container: ElementCreator<HTMLDivElement>
+  ): { container: ElementCreator; input: ElementCreator<HTMLSelectElement> } {
+    const field = super.createCountry(dependentFieldsClassName, container);
 
     if (dependentFieldsClassName === 'address-field__billing') {
-      this.billingAddressFields.push(select);
+      this.billingAddressFields.push(field.input);
     } else {
-      this.shippingAddressFields.push(select);
+      this.shippingAddressFields.push(field.input);
     }
-
-    this.fillSelectWithCountries(select);
-
-    select.getElement().addEventListener(
-      'change',
-      () => {
-        const addressFields = document.querySelectorAll(`.${dependentFieldsClassName}`);
-        addressFields.forEach((addressField) => {
-          if (addressField instanceof HTMLInputElement) {
-            const inputfield = addressField;
-            inputfield.disabled = false;
-          }
-        });
-      },
-      { once: true }
-    );
-
-    field.addInnerElements([select]);
-    return field;
-  }
-
-  private fillSelectWithCountries(select: ElementCreator<HTMLSelectElement>): void {
-    const defaultOption = new ElementCreator({
-      tag: 'option',
-      attributes: {
-        selected: 'true',
-        disabled: 'true',
-        hidden: 'true',
-      },
-      textContent: 'Country',
-    });
-    select.addInnerElements([defaultOption]);
-
-    countryData.forEach((el) => {
-      const option = new ElementCreator({
-        tag: 'option',
-        attributes: { value: el.code },
-        textContent: el.name,
-      });
-      select.addInnerElements([option]);
-    });
-  }
-
-  private createCity(inputClassName: string): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-    const name = `${inputClassName.replace('address-field__', '')}`;
-    const input = new InputCreator({
-      type: 'text',
-      attributes: {
-        name: `${name}City`,
-        placeholder: 'City',
-        required: 'true',
-        disabled: 'true',
-      },
-      classNames: [inputClassName],
-    });
-
-    if (inputClassName === 'address-field__billing') {
-      this.checkBillingFieldsValidation(input);
-    } else {
-      this.shippingAddressFields.push(input);
-    }
-
-    const error = this.addValidationErrorHandling(input, addressValidation);
-
-    field.addInnerElements([input, error]);
 
     return field;
   }
 
-  private createStreet(inputClassName: string): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-
-    const name = `${inputClassName.replace('address-field__', '')}`;
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: {
-        name: `${name}Street`,
-        placeholder: 'Street',
-        required: 'true',
-        disabled: 'true',
-      },
-      classNames: [inputClassName],
-      // classNames: ['address-field__shipping'],
-    });
+  protected createCity(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+    const field = super.createCity(inputClassName);
 
     if (inputClassName === 'address-field__billing') {
-      this.checkBillingFieldsValidation(input);
+      this.checkBillingFieldsValidation(field.input);
     } else {
-      this.shippingAddressFields.push(input);
+      this.shippingAddressFields.push(field.input);
     }
-
-    const error = this.addValidationErrorHandling(input, addressValidation);
-
-    field.addInnerElements([input, error]);
 
     return field;
   }
 
-  private createPostalCode(inputClassName: string): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field'],
-    });
-    const name = `${inputClassName.replace('address-field__', '')}`;
-    const input = new InputCreator({
-      type: 'text',
-      attributes: {
-        name: `${name}PostalCode`,
-        placeholder: 'Postal code',
-        required: 'true',
-        disabled: 'true',
-      },
-      classNames: [inputClassName],
-    });
+  protected createStreet(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+    const field = super.createStreet(inputClassName);
 
     if (inputClassName === 'address-field__billing') {
-      this.checkBillingFieldsValidation(input);
+      this.checkBillingFieldsValidation(field.input);
     } else {
-      this.shippingAddressFields.push(input);
+      this.shippingAddressFields.push(field.input);
     }
 
-    const error = this.addValidationErrorHandling(input, postCodeValidation);
-    field.addInnerElements([input, error]);
+    return field;
+  }
+
+  protected createPostalCode(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+    const field = super.createPostalCode(inputClassName);
+
+    if (inputClassName === 'address-field__billing') {
+      this.checkBillingFieldsValidation(field.input);
+    } else {
+      this.shippingAddressFields.push(field.input);
+    }
 
     return field;
   }

@@ -10,7 +10,7 @@ import { LinkParams } from '../../util/types';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../modal-window';
-import { customerService } from '../../api/customers-requests';
+import customerService from '../../api/customers-requests';
 
 export default class HeaderView extends View {
   private router: Router;

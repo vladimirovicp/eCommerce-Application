@@ -2,7 +2,7 @@ import { MyCustomerSignin } from '@commercetools/platform-sdk';
 import ElementCreator from '../../util/element-creator';
 import '../../../assets/scss/page/login.scss';
 import FormCreator from '../../util/form-creator';
-import { customerService } from '../../api/customers-requests';
+import customerService from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
