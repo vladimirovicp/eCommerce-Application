@@ -76,7 +76,7 @@ export default class RegistrationPage extends FormPageCreator {
       // this.createFields(this.createPostalCode('address-field__shipping'), this.createStreet('address-field__shipping')),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
-      this.createButton('Register'),
+      this.createSubmitButton('Register', () => this.submitButtonCallback()),
     ]);
 
     return this.formCreator;
@@ -161,9 +161,11 @@ export default class RegistrationPage extends FormPageCreator {
 
     this.defaultAddressCheckbox.getElement().addEventListener('click', (): void => {
       if (this.defaultAddressCheckbox.getElement().checked === true) {
+        // при выборе чекбокса копируем данные из billing в shipping
         this.billingAddressFields.forEach((billingField, index) => {
           this.copyAddressValue(billingField, index);
         });
+        // делаем все поля shipping неактивными
         this.shippingAddressFields.forEach((shippingField) => this.toggleDisabled(shippingField, true));
       } else {
         this.shippingAddressFields.forEach((shippingField) => this.toggleDisabled(shippingField, false));
@@ -194,40 +196,25 @@ export default class RegistrationPage extends FormPageCreator {
     }
   }
 
-  protected createButton(textContent: string): ElementCreator<HTMLElement> {
-    const fieldBtn = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'form__button'],
-    });
-
-    const input = new InputCreator({
-      type: 'button',
-      attributes: { value: textContent, disabled: 'true' },
-      callback: (): void => {
-        const form = document.querySelector('form');
-        if (form !== null && form instanceof HTMLFormElement) {
-          this.shippingAddressFields.forEach((shippingField) => {
-            const field = shippingField.getElement();
-            if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = false;
-          });
-          const formData = new FormData(form);
-          const formDataObject: { [key: string]: string } = {};
-          formData.forEach((value, key: string) => {
-            formDataObject[key] = value as string;
-          });
-          this.shippingAddressFields.forEach((shippingField) => {
-            const field = shippingField.getElement();
-            if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = true;
-          });
-          console.log(formData, formDataObject);
-          this.handleSubmitForm(formDataObject);
-        }
-      },
-    });
-
-    fieldBtn.addInnerElements([input]);
-    this.formCreator.addSubmitButton(input.getElement());
-    return fieldBtn;
+  private submitButtonCallback(): void {
+    const form = document.querySelector('form');
+    if (form !== null && form instanceof HTMLFormElement) {
+      this.shippingAddressFields.forEach((shippingField) => {
+        const field = shippingField.getElement();
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = false;
+      });
+      const formData = new FormData(form);
+      const formDataObject: { [key: string]: string } = {};
+      formData.forEach((value, key: string) => {
+        formDataObject[key] = value as string;
+      });
+      this.shippingAddressFields.forEach((shippingField) => {
+        const field = shippingField.getElement();
+        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) field.disabled = true;
+      });
+      console.log(formData, formDataObject);
+      this.handleSubmitForm(formDataObject);
+    }
   }
 
   protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
@@ -253,6 +240,9 @@ export default class RegistrationPage extends FormPageCreator {
       dateOfBirth: formData.birthDate,
       addresses: [billingAddress, shippingAddress],
       defaultShippingAddress: 1,
+      defaultBillingAddress: 0,
+      shippingAddresses: [1],
+      billingAddresses: [0],
       authenticationMode: 'Password',
     };
 

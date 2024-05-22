@@ -6,7 +6,6 @@ import customerService from '../../api/customers-requests';
 import FormPageCreator from '../../util/form-page-creator';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
-import InputCreator from '../../util/input-creator';
 import modalWindowCreator from '../../components/modal-window';
 import HeaderView from '../../components/header/header';
 
@@ -52,36 +51,21 @@ class LoginPage extends FormPageCreator {
     this.formCreator.addInnerElements([
       this.createFieldEmail(),
       this.createFieldPassword(),
-      this.createButton('Login'),
+      this.createSubmitButton('Login', () => this.buttonCallback()),
     ]);
     return this.formCreator;
   }
 
-  protected createButton(textContent: string): ElementCreator<HTMLElement> {
-    const fieldBtn = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'form__button'],
-    });
-
-    const input = new InputCreator({
-      type: 'button',
-      attributes: { value: textContent, disabled: 'true' },
-      callback: (): void => {
-        const form = document.querySelector('form');
-        if (form !== null && form instanceof HTMLFormElement) {
-          const formData = new FormData(form);
-          const formDataObject: { [key: string]: string } = {};
-          formData.forEach((value, key: string) => {
-            formDataObject[key] = value as string;
-          });
-          this.handleSubmitForm(formDataObject);
-        }
-      },
-    });
-
-    fieldBtn.addInnerElements([input]);
-    this.formCreator.addSubmitButton(input.getElement());
-    return fieldBtn;
+  private buttonCallback(): void {
+    const form = document.querySelector('form');
+    if (form !== null && form instanceof HTMLFormElement) {
+      const formData = new FormData(form);
+      const formDataObject: { [key: string]: string } = {};
+      formData.forEach((value, key: string) => {
+        formDataObject[key] = value as string;
+      });
+      this.handleSubmitForm(formDataObject);
+    }
   }
 
   protected async handleSubmitForm(formData: { [key: string]: string }): Promise<void> {
@@ -93,9 +77,9 @@ class LoginPage extends FormPageCreator {
     const isAuthorized = await customerService.authorizeCustomer(customerDraft);
     if (isAuthorized) {
       modalWindowCreator.showModalWindow('info', 'Authorization successful!');
+      // перенаправление на главную страницу, изменение ссылок в header
       this.router.navigate(Pages.HOME);
       this.header.isLoggedIn();
-      // перенаправление на главную страницу, изменение ссылок в header
     }
   }
 

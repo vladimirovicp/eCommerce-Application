@@ -35,28 +35,10 @@ abstract class FormPageCreator extends View {
       tag: 'div',
       classNames: ['form__title'],
     });
-    const logo = new ElementCreator({
-      tag: 'span',
-      classNames: ['form__title-logo'],
-    });
-    const logoImg = new ElementCreator({
-      tag: 'img',
-      classNames: ['img-full'],
-      attributes: {
-        src: imageSrc.LOGO,
-        alt: 'logo',
-      },
-    });
+    formTitle.getElement().innerHTML = `<span class="form__title-logo">
+    <img class="img-full" src="${imageSrc.LOGO}" alt="logo">
+    </span><span class="form__title-text">${textContent}</span>`;
 
-    logo.addInnerElements([logoImg]);
-
-    const text = new ElementCreator({
-      tag: 'span',
-      classNames: ['form__title-text'],
-      textContent,
-    });
-
-    formTitle.addInnerElements([logo, text]);
     return formTitle;
   }
 
@@ -153,6 +135,7 @@ abstract class FormPageCreator extends View {
 
     return fieldPassword;
   }
+  // TODO убрать дублирование при создании сходных полей
 
   protected createFirstName(): ElementCreator<HTMLElement> {
     const field = new ElementCreator({
@@ -370,6 +353,23 @@ abstract class FormPageCreator extends View {
     this.formCreator.addValidationField(inputCreator);
 
     return errorCreator;
+  }
+
+  protected createSubmitButton(textContent: string, callback: () => void): ElementCreator<HTMLElement> {
+    const fieldBtn = new ElementCreator({
+      tag: 'div',
+      classNames: ['form__field', 'form__button'],
+    });
+
+    const input = new InputCreator({
+      type: 'button',
+      attributes: { value: textContent, disabled: 'true' },
+      callback,
+    });
+
+    fieldBtn.addInnerElements([input]);
+    this.formCreator.addSubmitButton(input.getElement());
+    return fieldBtn;
   }
 }
 
