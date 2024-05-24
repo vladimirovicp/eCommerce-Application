@@ -62,12 +62,47 @@ export default class ProfilePage extends FormPageCreator {
         this.createButton('Add address', () => this.showModalWindowChooseAddress()),
         this.createSubmitButton('Save changes', () => this.collectDataFromForm())
       ),
-      // this.createNewAddressButton('Add address'),
-      // this.createSubmitButton('Save changes', () => this.collectDataFromForm()),
-      this.createButton('Change password', () => {}),
+      this.createButton('Change password', () => this.showChangePasswordWindow()),
     ]);
 
     return this.formCreator;
+  }
+
+  private showChangePasswordWindow(): void {
+    modalWindowCreator.showModalWindow('standart', 'Would you like to change your password?');
+    // наполнение окна
+    const form = new FormCreator({});
+
+    const message1 = new ElementCreator<HTMLDivElement>({ textContent: 'Enter current password' });
+    const currentPasswordField = this.createFieldPassword('currentPassword', form);
+
+    const message2 = new ElementCreator<HTMLDivElement>({ textContent: 'Enter new password' });
+    const newPasswordField = this.createFieldPassword('newPassword', form);
+
+    const buttonContainer = this.createButton('Change password', () => this.changePassword(form.getElement()));
+    const changePasswordButton = buttonContainer.getElement().querySelector('input');
+    if (changePasswordButton) {
+      changePasswordButton.disabled = true;
+      form.addSubmitButton(changePasswordButton);
+    }
+    form.addInnerElements([message1, currentPasswordField, message2, newPasswordField, buttonContainer]);
+
+    modalWindowCreator.addInnerElements([form]);
+  }
+
+  private async changePassword(form: HTMLFormElement): Promise<void> {
+    const formData = new FormData(form);
+    const formDataObject: { [key: string]: string } = {};
+    formData.forEach((value, key: string) => {
+      formDataObject[key] = value as string;
+    });
+    const { currentPassword } = formDataObject;
+    const { newPassword } = formDataObject;
+    const isSuccessful = await customerService.changePassword(currentPassword, newPassword);
+    if (isSuccessful) {
+      modalWindowCreator.closeModalWindow();
+      modalWindowCreator.showModalWindow('info', 'Password changed successfully');
+    }
   }
 
   private fillInAddressForm(): ElementCreator<HTMLDivElement>[] {

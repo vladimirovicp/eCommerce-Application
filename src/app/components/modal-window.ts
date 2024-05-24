@@ -54,7 +54,7 @@ class ModalWindowCreator extends ElementCreator<HTMLDivElement> {
     this.element.append(buttonContainer.getElement());
   }
 
-  private closeModalWindow(): void {
+  public closeModalWindow(): void {
     this.element.classList.remove('active');
     document.body.classList.remove('_lock');
     while (this.modalContent.getElement().nextElementSibling) {

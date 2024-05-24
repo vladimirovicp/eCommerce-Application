@@ -18,7 +18,7 @@ const imageSrc = {
   LOGO: `${logoSrc}`,
 };
 
-abstract class FormPageCreator extends View {
+class FormPageCreator extends View {
   protected formCreator: FormCreator;
 
   constructor(classNames: string[]) {
@@ -97,25 +97,17 @@ abstract class FormPageCreator extends View {
     return fieldEmail;
   }
 
-  protected createFieldPassword(): ElementCreator<HTMLElement> {
-    const fieldPassword = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field', 'field__password'],
-    });
-
-    const fieldEye = new ElementCreator({
-      tag: 'div',
-      classNames: ['form__field-eye'],
-    });
+  protected createFieldPassword(name: string = 'password', form?: FormCreator): ElementCreator<HTMLElement> {
+    const fieldPassword = new ElementCreator({ classNames: ['form__field', 'field__password'] });
+    const fieldEye = new ElementCreator({ classNames: ['form__field-eye'] });
 
     const input = new InputCreator({
       type: 'password',
       classNames: ['password'],
-      attributes: { name: 'password', placeholder: 'Enter your password', required: 'true' },
+      attributes: { name, placeholder: 'Enter your password', required: 'true' },
     });
 
     const btnEye = new ElementCreator({
-      tag: 'div',
       classNames: ['eye'],
       callback: function eyeSwitch(): void {
         const currentType = input.getElement().getAttribute('type');
@@ -127,7 +119,16 @@ abstract class FormPageCreator extends View {
       },
     });
 
-    const error = this.addValidationErrorHandling(input, passwordValidation);
+    let error: ElementCreator<HTMLSpanElement>;
+
+    if (!form) {
+      error = this.addValidationErrorHandling(input, passwordValidation);
+    } else {
+      error = new ElementCreator({ tag: 'span' });
+
+      input.addValidation(passwordValidation, error.getElement());
+      form.addValidationField(input);
+    }
 
     fieldEye.addInnerElements([input, btnEye]);
     fieldPassword.addInnerElements([fieldEye, error]);

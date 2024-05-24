@@ -4,6 +4,7 @@ import {
   Customer,
   ByProjectKeyRequestBuilder,
   MyCustomerUpdate,
+  MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
 import { apiRoot, createApiRootPasswordFlow } from './build-client';
@@ -82,6 +83,44 @@ class CustomerService {
       }
     } catch (error) {
       // модальное окно
+    }
+  }
+
+  public async changePassword(currentPassword: string, newPassword: string): Promise<boolean> {
+    try {
+      if (this.apiRootPasswordFlow) {
+        // получение актуальной версии
+        const customerResponse = await this.apiRootPasswordFlow.me().get().execute();
+        const currentVersion = customerResponse.body.version;
+
+        const updateData: MyCustomerChangePassword = {
+          version: currentVersion,
+          currentPassword,
+          newPassword,
+        };
+        const response = await this.apiRootPasswordFlow
+          .me()
+          .password()
+          .post({
+            body: updateData,
+          })
+          .execute();
+        if (response.statusCode === 200) {
+          // обновление апиРута и токенов (?)
+          this.apiRootPasswordFlow = createApiRootPasswordFlow(response.body.email, newPassword);
+          return true;
+        }
+      }
+      // при ошибке модальное окно с инпутами  НЕ ЗАКРЫВАЕТСЯ меняется только текст сообщения
+      modalWindowCreator.showModalWindow('error', 'Unknown error. Please try again later');
+      return false;
+    } catch (error) {
+      const errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? error.message
+          : 'Unknown error. Please try again later';
+      modalWindowCreator.showModalWindow('error', `Can't get customer profile: ${errorMessage}`);
+      return false;
     }
   }
 
