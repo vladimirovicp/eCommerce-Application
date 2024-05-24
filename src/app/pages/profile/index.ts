@@ -1,5 +1,5 @@
 // import { BaseAddress, CustomerDraft } from '@commercetools/platform-sdk';
-import { Customer } from '@commercetools/platform-sdk';
+import { Customer, MyCustomerAddAddressAction } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/home.scss';
 import customerService from '../../api/customers-requests';
 import modalWindowCreator from '../../components/modal-window';
@@ -8,13 +8,31 @@ import FormCreator from '../../util/form-creator';
 import FormPageCreator from '../../util/form-page-creator';
 import InputCreator from '../../util/input-creator';
 
+// type ActionMap = {
+//   setFirstName: () => void;
+//   setLastName: () => void;
+//   setDateOfBirth: () => void;
+//   changeEmail: () => void;
+//   addAddress: () => void;
+//   changeAddress: () => void;
+//   removeAddress: () => void;
+//   setDefaultBillingAddress: () => void;
+//   setDefaultShippingAddress: () => void;
+// };
+
 export default class ProfilePage extends FormPageCreator {
-  private customerInfo: Customer | undefined;
+  private customerInfo: Customer | null = null;
+
+  private radioButtonIdCounter: number;
 
   constructor() {
     super();
-    this.customerInfo = customerService.customerInfo;
-    console.log(customerService.customerInfo);
+    this.getCustomerInfo();
+    this.radioButtonIdCounter = 1;
+  }
+
+  async getCustomerInfo(): Promise<void> {
+    this.customerInfo = await customerService.getCustomerInfo();
     this.setContent();
   }
 
@@ -30,10 +48,9 @@ export default class ProfilePage extends FormPageCreator {
     billingAddressesContainer.addInnerElements([]);
     this.formCreator.addInnerElements([
       this.createFieldsTitle('Personal info'),
-      this.createFirstName(),
-      this.createLastName(),
-      this.createBirthDate(),
       this.createFieldEmail(),
+      this.createFields(this.createFirstName(), this.createLastName()),
+      this.createBirthDate(),
 
       this.createFieldsTitle('Address'),
       this.createFieldsSubTitle('Billing address'),
@@ -80,6 +97,37 @@ export default class ProfilePage extends FormPageCreator {
       });
     }
     return [billingContainer, shippingContainer];
+  }
+
+  protected createAddressGroup(isBillingAddress: boolean, id?: string): ElementCreator<HTMLDivElement> {
+    const addressContainer = super.createAddressGroup(isBillingAddress, id);
+
+    const editElementCreator = new ElementCreator<HTMLDivElement>({
+      classNames: ['form__field-edit'],
+      // callback: () => {},
+    });
+    const deleteElementCreator = new ElementCreator<HTMLDivElement>({
+      classNames: ['form__field-delete'],
+      // callback: () => {},
+    });
+    addressContainer.getElement().prepend(editElementCreator.getElement(), deleteElementCreator.getElement());
+
+    // добавляем радиобаттон для выбора дефолтного адреса
+    const radioButtonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['radio-button', 'form__field'] });
+    const name = isBillingAddress ? 'radio-address__billing' : 'radio-address__shipping';
+    let isChecked: boolean = false;
+    if (id) {
+      // если адрес подгруженный, проверяем не дефолтный ли он
+      const defaultAddressId = isBillingAddress
+        ? this.customerInfo?.defaultBillingAddressId
+        : this.customerInfo?.defaultShippingAddressId;
+      isChecked = id === defaultAddressId;
+    }
+    radioButtonContainer.getElement().innerHTML = `<input type="radio" id="${name}${this.radioButtonIdCounter}" name="${name}" checked="${isChecked}"/>
+    <label for="${name}${this.radioButtonIdCounter}">Set as a default address</label>`;
+    this.radioButtonIdCounter += 1;
+    addressContainer.addInnerElements([radioButtonContainer]);
+    return addressContainer;
   }
 
   private createPasswordForm(): ElementCreator<HTMLElement> {
@@ -132,7 +180,7 @@ export default class ProfilePage extends FormPageCreator {
 
     const input = new InputCreator({
       type: 'button',
-      attributes: { value: textContent, disabled: 'true' },
+      attributes: { value: textContent },
       callback: (): void => {
         modalWindowCreator.showModalWindow('standart', 'What type of address do you want to add?');
         modalWindowCreator.createButton(() => this.addNewAddressField(false), 'Shipping Address');
@@ -154,27 +202,70 @@ export default class ProfilePage extends FormPageCreator {
     }
   }
 
-  private collectDataFromForm(): void {
-    const formData: { [key: string]: string } = { email: customerService.customerInfo?.email ?? '' };
+  private collectDataFromForm(): void {}
 
-    const mainFields = document.querySelectorAll('.main__field');
-    mainFields.forEach((field) => {
-      if (field instanceof HTMLInputElement && typeof field.name === 'string') {
-        formData[field.name] = field.value;
-      }
-    });
+  // private handleChangedFields(): void {
+  //   const actions: MyCustomerUpdateAction[] = [];
+  //   const form = this.formCreator.getElement();
 
-    // const billingAddresses = document.querySelectorAll('.billing-address');
-    // billingAddresses.forEach((address) => {
-    //   const billingAddressData = {
-    //     addressId: address.id,
-    //     address: {
-    //       streetName: address.querySelector('[name="billingStreet"]').value,
-    //       postalCode: '11111',
-    //       city: 'Any City',
-    //       country: 'US',
-    //     },
-    //   };
-    // });
+  //   const addAction = (actionName: string, key: string, value: any) => {
+  //     actions.push({ action: actionName, [key]: value });
+  //   };
+
+  //   form.querySelectorAll('.changed').forEach((field) => {
+  //     if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
+  //       const fieldActions: ActionMap = {
+  //         firstName: () => addAction('setFirstName', 'firstName', field.value),
+  //         lastName: () => addAction('setLastName', 'lastName', field.value),
+  //         birthDate: () => addAction('setDateOfBirth', 'dateOfBirth', field.value),
+  //         email: () => addAction('changeEmail', 'email', field.value),
+  //       };
+  //       fieldActions[field.name]?.();
+  //     } else {
+  //       const data = {
+  //         action: 'changeAddress',
+  //         addressId: field.id,
+  //         address: {
+  //           streetName: 'Example Street',
+  //           postalCode: '80933',
+  //           city: 'Exemplary City',
+  //           country: 'DE',
+  //         },
+  //       };
+  //       actions.push(data);
+  //     }
+  //   });
+  // }
+
+  private collectNewAddresses(): MyCustomerAddAddressAction[] {
+    const actions: MyCustomerAddAddressAction[] = [];
+    // вспомогательная функция
+    const getInputValue = (name: string, container: Element): string => {
+      const input = container.querySelector(`[name="${name}"]`);
+      return input instanceof HTMLInputElement || input instanceof HTMLSelectElement ? input.value : '';
+    };
+
+    const processAddresses = (selector: string, addressType: string): void => {
+      document.querySelectorAll(selector).forEach((address) => {
+        // выполнить для всех адресов без id, т е новых
+        if (!address.id) {
+          const data: MyCustomerAddAddressAction = {
+            action: 'addAddress',
+            address: {
+              streetName: getInputValue(`${addressType}Street`, address),
+              postalCode: getInputValue(`${addressType}PostalCode`, address),
+              city: getInputValue(`${addressType}City`, address),
+              country: getInputValue(`${addressType}Country`, address),
+            },
+          };
+          actions.push(data);
+        }
+      });
+    };
+
+    processAddresses('.billing-address', 'billing');
+    processAddresses('.shipping-address', 'shipping');
+
+    return actions;
   }
 }

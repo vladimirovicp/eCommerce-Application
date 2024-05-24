@@ -81,11 +81,21 @@ abstract class FormPageCreator extends View {
     return fields;
   }
 
-  protected createFieldEmail(): ElementCreator<HTMLElement> {
-    const fieldEmail = new ElementCreator({
-      tag: 'div',
+  private addAdditionalElement(className: string, container: ElementCreator<HTMLDivElement>): void {
+    const additionalElement = new ElementCreator<HTMLDivElement>({
+      classNames: [className],
+    });
+    container.addInnerElements([additionalElement]);
+  }
+
+  protected createFieldEmail(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+    const fieldEmail = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
+
+    if (additionalElementClassName) {
+      this.addAdditionalElement(additionalElementClassName, fieldEmail);
+    }
 
     const input = new InputCreator({
       type: 'email',
@@ -137,11 +147,14 @@ abstract class FormPageCreator extends View {
   }
   // TODO убрать дублирование при создании сходных полей
 
-  protected createFirstName(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
+  protected createFirstName(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+    const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
+
+    if (additionalElementClassName) {
+      this.addAdditionalElement(additionalElementClassName, field);
+    }
 
     const input = new InputCreator({
       type: 'text',
@@ -155,11 +168,14 @@ abstract class FormPageCreator extends View {
     return field;
   }
 
-  protected createLastName(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
+  protected createLastName(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+    const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
+
+    if (additionalElementClassName) {
+      this.addAdditionalElement(additionalElementClassName, field);
+    }
 
     const input = new InputCreator({
       type: 'text',
@@ -173,11 +189,14 @@ abstract class FormPageCreator extends View {
     return field;
   }
 
-  protected createBirthDate(): ElementCreator<HTMLElement> {
-    const field = new ElementCreator({
-      tag: 'div',
+  protected createBirthDate(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+    const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'field__birth-date', 'main__field'],
     });
+
+    if (additionalElementClassName) {
+      this.addAdditionalElement(additionalElementClassName, field);
+    }
 
     const input = new InputCreator({
       type: 'text',
@@ -197,7 +216,7 @@ abstract class FormPageCreator extends View {
     const className = `address-field__${isBillingAddress ? 'billing' : 'shipping'}`;
     const addressContainer = new ElementCreator<HTMLDivElement>({
       tag: 'div',
-      classNames: [isBillingAddress ? 'billing-address' : 'shipping-address'],
+      classNames: [isBillingAddress ? 'billing-address' : 'shipping-address', 'form__fields-group'],
       attributes: id ? { id } : {},
     });
     addressContainer.addInnerElements([

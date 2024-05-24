@@ -1,6 +1,11 @@
-import { ClientBuilder, AuthMiddlewareOptions, HttpMiddlewareOptions } from '@commercetools/sdk-client-v2';
+import {
+  ClientBuilder,
+  AuthMiddlewareOptions,
+  HttpMiddlewareOptions,
+  PasswordAuthMiddlewareOptions,
+} from '@commercetools/sdk-client-v2';
 
-import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
+import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 import { CT_PROJECT_KEY, CT_CLIENT_ID, CT_CLIENT_SECRET, CT_SCOPE, CT_AUTH_HOST, CT_API_HOST } from './credentials';
 
 const authMiddlewareOptions: AuthMiddlewareOptions = {
@@ -28,4 +33,47 @@ const ctpClient = new ClientBuilder()
 
 const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
 
-export default apiRoot;
+export function createApiRootPasswordFlow(username: string, password: string): ByProjectKeyRequestBuilder {
+  const passwordFlowOptions: PasswordAuthMiddlewareOptions = {
+    host: CT_AUTH_HOST,
+    projectKey: CT_PROJECT_KEY,
+    credentials: { clientId: CT_CLIENT_ID, clientSecret: CT_CLIENT_SECRET, user: { username, password } },
+    scopes: CT_SCOPE,
+    fetch,
+  };
+
+  const client = new ClientBuilder()
+    .withProjectKey(CT_PROJECT_KEY)
+    .withPasswordFlow(passwordFlowOptions)
+    .withHttpMiddleware(httpMiddlewareOptions)
+    .withLoggerMiddleware()
+    .build();
+
+  return createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
+}
+
+export async function fetchAuthToken(username: string, password: string): Promise<string> {
+  const url = `https://auth.europe-west1.gcp.commercetools.com/oauth/${CT_PROJECT_KEY}/customers/token`;
+
+  const details = new URLSearchParams({
+    grant_type: 'password',
+    username,
+    password,
+    // client_id: CT_CLIENT_ID,
+    // client_secret: CT_CLIENT_SECRET,
+  });
+
+  const credentials = btoa(`${CT_CLIENT_ID}:${CT_CLIENT_SECRET}`);
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${credentials}`,
+    },
+    body: details.toString(),
+  });
+  return response.json(); // Разбор тела ответа как JSON
+}
+
+export { apiRoot };
