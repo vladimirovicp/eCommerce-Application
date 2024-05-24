@@ -137,42 +137,62 @@ export default class ProfilePage extends FormPageCreator {
     return addressContainer;
   }
 
+  private addEditElement(input: HTMLInputElement): HTMLDivElement {
+    const textInput = input;
+    const editElement = new ElementCreator<HTMLDivElement>({
+      classNames: ['form__field-edit'],
+      callback: (): void => {
+        textInput.disabled = false;
+        textInput.classList.add('changed');
+      },
+    });
+    return editElement.getElement();
+  }
+
   protected createFirstName(): ElementCreator<HTMLElement> {
-    const field = super.createFirstName('form__field-edit');
+    const field = super.createFirstName();
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.firstName) {
       input.value = this.customerInfo.firstName;
       input.disabled = true;
+      const editElement = this.addEditElement(input);
+      field.getElement().prepend(editElement);
     }
     return field;
   }
 
   protected createLastName(): ElementCreator<HTMLElement> {
-    const field = super.createLastName('form__field-edit');
+    const field = super.createLastName();
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.lastName) {
       input.value = this.customerInfo.lastName;
       input.disabled = true;
+      const editElement = this.addEditElement(input);
+      field.getElement().prepend(editElement);
     }
     return field;
   }
 
   protected createBirthDate(): ElementCreator<HTMLElement> {
-    const field = super.createBirthDate('form__field-edit');
+    const field = super.createBirthDate();
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.dateOfBirth) {
       input.value = this.customerInfo.dateOfBirth;
       input.disabled = true;
+      const editElement = this.addEditElement(input);
+      field.getElement().prepend(editElement);
     }
     return field;
   }
 
   protected createFieldEmail(): ElementCreator<HTMLElement> {
-    const field = super.createFieldEmail('form__field-edit');
+    const field = super.createFieldEmail();
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo) {
       input.value = this.customerInfo.email;
       input.disabled = true;
+      const editElement = this.addEditElement(input);
+      field.getElement().prepend(editElement);
     }
     return field;
   }

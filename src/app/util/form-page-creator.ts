@@ -81,21 +81,10 @@ abstract class FormPageCreator extends View {
     return fields;
   }
 
-  private addAdditionalElement(className: string, container: ElementCreator<HTMLDivElement>): void {
-    const additionalElement = new ElementCreator<HTMLDivElement>({
-      classNames: [className],
-    });
-    container.addInnerElements([additionalElement]);
-  }
-
-  protected createFieldEmail(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+  protected createFieldEmail(): ElementCreator<HTMLElement> {
     const fieldEmail = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
-
-    if (additionalElementClassName) {
-      this.addAdditionalElement(additionalElementClassName, fieldEmail);
-    }
 
     const input = new InputCreator({
       type: 'email',
@@ -147,14 +136,10 @@ abstract class FormPageCreator extends View {
   }
   // TODO убрать дублирование при создании сходных полей
 
-  protected createFirstName(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+  protected createFirstName(): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
-
-    if (additionalElementClassName) {
-      this.addAdditionalElement(additionalElementClassName, field);
-    }
 
     const input = new InputCreator({
       type: 'text',
@@ -168,14 +153,10 @@ abstract class FormPageCreator extends View {
     return field;
   }
 
-  protected createLastName(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+  protected createLastName(): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
-
-    if (additionalElementClassName) {
-      this.addAdditionalElement(additionalElementClassName, field);
-    }
 
     const input = new InputCreator({
       type: 'text',
@@ -189,14 +170,10 @@ abstract class FormPageCreator extends View {
     return field;
   }
 
-  protected createBirthDate(additionalElementClassName?: string): ElementCreator<HTMLElement> {
+  protected createBirthDate(): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'field__birth-date', 'main__field'],
     });
-
-    if (additionalElementClassName) {
-      this.addAdditionalElement(additionalElementClassName, field);
-    }
 
     const input = new InputCreator({
       type: 'text',
