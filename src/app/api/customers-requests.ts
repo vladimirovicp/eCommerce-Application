@@ -77,29 +77,12 @@ class CustomerService {
       if (this.apiRootPasswordFlow) {
         const response = await this.apiRootPasswordFlow.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
-          console.log('Customer information updated successfully:', response.body);
-        } else {
-          console.error('Failed to update customer information:', response);
+          // модальное окно
         }
       }
     } catch (error) {
-      console.error('Error updating customer information:', error);
+      // модальное окно
     }
-    // const data = {
-    //   version: 3,
-    //   actions: [
-    //     {
-    //       action: 'addAddress',
-    //       address: {
-    //         streetName: 'Any Street',
-    //         streetNumber: '1337',
-    //         postalCode: '11111',
-    //         city: 'Any City',
-    //         country: 'US',
-    //       },
-    //     },
-    //   ],
-    // };
   }
 
   public clearCustomerInfo(): void {

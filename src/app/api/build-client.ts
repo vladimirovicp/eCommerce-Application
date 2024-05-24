@@ -55,12 +55,10 @@ export function createApiRootPasswordFlow(username: string, password: string): B
 export async function fetchAuthToken(username: string, password: string): Promise<string> {
   const url = `https://auth.europe-west1.gcp.commercetools.com/oauth/${CT_PROJECT_KEY}/customers/token`;
 
-  const details = new URLSearchParams({
+  const params = new URLSearchParams({
     grant_type: 'password',
     username,
     password,
-    // client_id: CT_CLIENT_ID,
-    // client_secret: CT_CLIENT_SECRET,
   });
 
   const credentials = btoa(`${CT_CLIENT_ID}:${CT_CLIENT_SECRET}`);
@@ -71,9 +69,9 @@ export async function fetchAuthToken(username: string, password: string): Promis
       'Content-Type': 'application/x-www-form-urlencoded',
       Authorization: `Basic ${credentials}`,
     },
-    body: details.toString(),
+    body: params.toString(),
   });
-  return response.json(); // Разбор тела ответа как JSON
+  return response.json();
 }
 
 export { apiRoot };

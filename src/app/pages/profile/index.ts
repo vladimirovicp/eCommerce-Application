@@ -1,6 +1,6 @@
 // import { BaseAddress, CustomerDraft } from '@commercetools/platform-sdk';
 import { Customer, MyCustomerAddAddressAction } from '@commercetools/platform-sdk';
-import '../../../assets/scss/page/home.scss';
+import '../../../assets/scss/page/account.scss';
 import customerService from '../../api/customers-requests';
 import modalWindowCreator from '../../components/modal-window';
 import ElementCreator from '../../util/element-creator';
@@ -26,7 +26,7 @@ export default class ProfilePage extends FormPageCreator {
   private radioButtonIdCounter: number;
 
   constructor() {
-    super();
+    super(['form__account']);
     this.getCustomerInfo();
     this.radioButtonIdCounter = 1;
   }
@@ -37,15 +37,14 @@ export default class ProfilePage extends FormPageCreator {
   }
 
   private setContent(): void {
-    const box = new ElementCreator({ classNames: ['form', 'register__box'] });
-    box.addInnerElements([this.createPersonalInfoForm(), this.createPasswordForm()]);
+    const box = new ElementCreator({ classNames: ['form', 'account__box'] });
+    box.addInnerElements([this.createFormTitle('PROFILE'), this.createPersonalInfoForm()]);
     this.viewElementCreator.addInnerElements([box]);
   }
 
   private createPersonalInfoForm(): FormCreator {
     const [billingAddressesContainer, shippingAddressesContainer] = this.fillInAddressForm();
 
-    billingAddressesContainer.addInnerElements([]);
     this.formCreator.addInnerElements([
       this.createFieldsTitle('Personal info'),
       this.createFieldEmail(),
@@ -59,8 +58,13 @@ export default class ProfilePage extends FormPageCreator {
       this.createFieldsSubTitle('Shipping address'),
       shippingAddressesContainer,
 
-      this.createNewAddressButton('Add address'),
-      this.createSubmitButton('Save changes', () => this.collectDataFromForm()),
+      this.createFields(
+        this.createButton('Add address', () => this.showModalWindowChooseAddress()),
+        this.createSubmitButton('Save changes', () => this.collectDataFromForm())
+      ),
+      // this.createNewAddressButton('Add address'),
+      // this.createSubmitButton('Save changes', () => this.collectDataFromForm()),
+      this.createButton('Change password', () => {}),
     ]);
 
     return this.formCreator;
@@ -117,6 +121,9 @@ export default class ProfilePage extends FormPageCreator {
     const name = isBillingAddress ? 'radio-address__billing' : 'radio-address__shipping';
     let isChecked: boolean = false;
     if (id) {
+      // делаем поле адреса изначально disabled
+      const countrySeletor = addressContainer.getElement().querySelector('select');
+      if (countrySeletor) countrySeletor.disabled = true;
       // если адрес подгруженный, проверяем не дефолтный ли он
       const defaultAddressId = isBillingAddress
         ? this.customerInfo?.defaultBillingAddressId
@@ -130,49 +137,47 @@ export default class ProfilePage extends FormPageCreator {
     return addressContainer;
   }
 
-  private createPasswordForm(): ElementCreator<HTMLElement> {
-    const passwordFormCreator = new FormCreator({});
-    passwordFormCreator.addInnerElements([this.createFieldsTitle('Password'), this.createFieldPassword()]);
-    return passwordFormCreator;
-  }
-
   protected createFirstName(): ElementCreator<HTMLElement> {
-    const field = super.createFirstName();
+    const field = super.createFirstName('form__field-edit');
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.firstName) {
       input.value = this.customerInfo.firstName;
+      input.disabled = true;
     }
     return field;
   }
 
   protected createLastName(): ElementCreator<HTMLElement> {
-    const field = super.createLastName();
+    const field = super.createLastName('form__field-edit');
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.lastName) {
       input.value = this.customerInfo.lastName;
+      input.disabled = true;
     }
     return field;
   }
 
   protected createBirthDate(): ElementCreator<HTMLElement> {
-    const field = super.createBirthDate();
+    const field = super.createBirthDate('form__field-edit');
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.dateOfBirth) {
       input.value = this.customerInfo.dateOfBirth;
+      input.disabled = true;
     }
     return field;
   }
 
   protected createFieldEmail(): ElementCreator<HTMLElement> {
-    const field = super.createFieldEmail();
+    const field = super.createFieldEmail('form__field-edit');
     const input = field.getElement().firstElementChild;
     if (input && input instanceof HTMLInputElement && this.customerInfo) {
       input.value = this.customerInfo.email;
+      input.disabled = true;
     }
     return field;
   }
 
-  protected createNewAddressButton(textContent: string): ElementCreator<HTMLElement> {
+  private createButton(textContent: string, callback: () => void): ElementCreator<HTMLElement> {
     const fieldBtn = new ElementCreator({
       tag: 'div',
       classNames: ['form__field', 'form__button'],
@@ -181,16 +186,17 @@ export default class ProfilePage extends FormPageCreator {
     const input = new InputCreator({
       type: 'button',
       attributes: { value: textContent },
-      callback: (): void => {
-        modalWindowCreator.showModalWindow('standart', 'What type of address do you want to add?');
-        modalWindowCreator.createButton(() => this.addNewAddressField(false), 'Shipping Address');
-        modalWindowCreator.createButton(() => this.addNewAddressField(true), 'Billing Address');
-      },
+      callback,
     });
 
     fieldBtn.addInnerElements([input]);
-    this.formCreator.addSubmitButton(input.getElement());
     return fieldBtn;
+  }
+
+  private showModalWindowChooseAddress(): void {
+    modalWindowCreator.showModalWindow('standart', 'What type of address do you want to add?');
+    modalWindowCreator.createButton(() => this.addNewAddressField(false), 'Shipping Address');
+    modalWindowCreator.createButton(() => this.addNewAddressField(true), 'Billing Address');
   }
 
   private addNewAddressField(isBillingField: boolean): void {

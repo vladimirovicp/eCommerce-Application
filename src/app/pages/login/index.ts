@@ -10,18 +10,12 @@ import modalWindowCreator from '../../components/modal-window';
 import HeaderView from '../../components/header/header';
 
 class LoginPage extends FormPageCreator {
-  protected formCreator: FormCreator;
-
   private header: HeaderView;
 
   router: Router;
 
   constructor(router: Router, header: HeaderView) {
-    super();
-    this.formCreator = new FormCreator({
-      classNames: ['form__login'],
-      // attributes: { action: '#' },
-    });
+    super(['form__login']);
     this.setContent();
     this.router = router;
     this.header = header;

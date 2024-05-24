@@ -13,8 +13,6 @@ import modalWindowCreator from '../../components/modal-window';
 import HeaderView from '../../components/header/header';
 
 export default class RegistrationPage extends FormPageCreator {
-  protected formCreator: FormCreator;
-
   private header: HeaderView;
 
   private router: Router;
@@ -28,7 +26,7 @@ export default class RegistrationPage extends FormPageCreator {
   private defaultAddressCheckbox: InputCreator;
 
   constructor(router: Router, header: HeaderView) {
-    super();
+    super(['form__register']);
     this.billingAddressFields = [];
     this.shippingAddressFields = [];
     this.defaultAddressCheckbox = new InputCreator({
@@ -38,10 +36,6 @@ export default class RegistrationPage extends FormPageCreator {
       // classNames: ['address-field__billing'],
     });
     this.isBillingFieldsValid = false;
-    this.formCreator = new FormCreator({
-      classNames: ['form__register'],
-      // attributes: { action: '#' },
-    });
     this.setRegistrationContent();
     this.router = router;
     this.header = header;

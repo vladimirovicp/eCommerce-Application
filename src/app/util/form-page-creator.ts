@@ -21,13 +21,13 @@ const imageSrc = {
 abstract class FormPageCreator extends View {
   protected formCreator: FormCreator;
 
-  constructor() {
+  constructor(classNames: string[]) {
     const params = {
       tag: 'div',
       classNames: ['container'],
     };
     super(params);
-    this.formCreator = new FormCreator({});
+    this.formCreator = new FormCreator({ classNames });
   }
 
   protected createFormTitle(textContent: string): ElementCreator<HTMLElement> {

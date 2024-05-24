@@ -1,0 +1,33 @@
+.account{
+    &-page{
+        display: flex;
+        padding-top: 2rem;
+        .form{
+            &__field{
+                width: 19rem;
+                color: #fff;
+            }  
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+            }
+        }
+        .container{
+            display: flex;
+            align-items:center;
+            justify-content: center;
+        } 
+    }
+    &__box{
+        background-color: #1C1403;
+        padding: 3rem 2rem;
+        width: 40rem;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+    }
+}
+
+
+@media (max-width: 48em) {
+
+        
+}
