@@ -81,7 +81,7 @@ class FormPageCreator extends View {
     return fields;
   }
 
-  protected createFieldEmail(): ElementCreator<HTMLElement> {
+  protected createFieldEmail(isValid?: boolean): ElementCreator<HTMLElement> {
     const fieldEmail = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
@@ -90,6 +90,10 @@ class FormPageCreator extends View {
       type: 'email',
       attributes: { placeholder: 'Enter your email address', name: 'email', required: 'true' },
     });
+
+    if (isValid) {
+      input.isValid = true;
+    }
 
     const error = this.addValidationErrorHandling(input, emailValidation);
     fieldEmail.addInnerElements([input, error]);
@@ -122,6 +126,7 @@ class FormPageCreator extends View {
     let error: ElementCreator<HTMLSpanElement>;
 
     if (!form) {
+      // корявенько конечно...
       error = this.addValidationErrorHandling(input, passwordValidation);
     } else {
       error = new ElementCreator({ tag: 'span' });
@@ -137,7 +142,7 @@ class FormPageCreator extends View {
   }
   // TODO убрать дублирование при создании сходных полей
 
-  protected createFirstName(): ElementCreator<HTMLElement> {
+  protected createFirstName(isValid?: boolean): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
@@ -147,6 +152,10 @@ class FormPageCreator extends View {
       attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
     });
 
+    if (isValid) {
+      input.isValid = true;
+    }
+
     const error = this.addValidationErrorHandling(input, nameValidation);
 
     field.addInnerElements([input, error]);
@@ -154,7 +163,7 @@ class FormPageCreator extends View {
     return field;
   }
 
-  protected createLastName(): ElementCreator<HTMLElement> {
+  protected createLastName(isValid?: boolean): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
@@ -164,6 +173,10 @@ class FormPageCreator extends View {
       attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
     });
 
+    if (isValid) {
+      input.isValid = true;
+    }
+
     const error = this.addValidationErrorHandling(input, nameValidation);
 
     field.addInnerElements([input, error]);
@@ -171,7 +184,7 @@ class FormPageCreator extends View {
     return field;
   }
 
-  protected createBirthDate(): ElementCreator<HTMLElement> {
+  protected createBirthDate(isValid?: boolean): ElementCreator<HTMLElement> {
     const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'field__birth-date', 'main__field'],
     });
@@ -183,6 +196,10 @@ class FormPageCreator extends View {
       callbackBlur: typeDateToText,
     });
 
+    if (isValid) {
+      input.isValid = true;
+    }
+
     const error = this.addValidationErrorHandling(input, birthDateValidation);
 
     field.addInnerElements([input, error]);
@@ -190,7 +207,11 @@ class FormPageCreator extends View {
     return field;
   }
 
-  protected createAddressGroup(isBillingAddress: boolean, id?: string): ElementCreator<HTMLDivElement> {
+  protected createAddressGroup(
+    isBillingAddress: boolean = true,
+    id?: string,
+    isValid?: boolean
+  ): ElementCreator<HTMLDivElement> {
     const className = `address-field__${isBillingAddress ? 'billing' : 'shipping'}`;
     const addressContainer = new ElementCreator<HTMLDivElement>({
       tag: 'div',
@@ -200,9 +221,12 @@ class FormPageCreator extends View {
     addressContainer.addInnerElements([
       this.createFields(
         this.createCountry(className, addressContainer).container,
-        this.createCity(className).container
+        this.createCity(className, isValid).container
       ),
-      this.createFields(this.createPostalCode(className).container, this.createStreet(className).container),
+      this.createFields(
+        this.createPostalCode(className, isValid).container,
+        this.createStreet(className, isValid).container
+      ),
     ]);
     return addressContainer;
   }
@@ -265,7 +289,7 @@ class FormPageCreator extends View {
     });
   }
 
-  protected createCity(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+  protected createCity(inputClassName: string, isValid?: boolean): { container: ElementCreator; input: InputCreator } {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -282,6 +306,8 @@ class FormPageCreator extends View {
       classNames: [inputClassName],
     });
 
+    if (isValid) input.isValid = true;
+
     const error = this.addValidationErrorHandling(input, addressValidation);
 
     field.addInnerElements([input, error]);
@@ -289,7 +315,10 @@ class FormPageCreator extends View {
     return { container: field, input };
   }
 
-  protected createStreet(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+  protected createStreet(
+    inputClassName: string,
+    isValid?: boolean
+  ): { container: ElementCreator; input: InputCreator } {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -308,6 +337,8 @@ class FormPageCreator extends View {
       classNames: [inputClassName],
     });
 
+    if (isValid) input.isValid = true;
+
     const error = this.addValidationErrorHandling(input, addressValidation);
 
     field.addInnerElements([input, error]);
@@ -315,7 +346,10 @@ class FormPageCreator extends View {
     return { container: field, input };
   }
 
-  protected createPostalCode(inputClassName: string): { container: ElementCreator; input: InputCreator } {
+  protected createPostalCode(
+    inputClassName: string,
+    isValid?: boolean
+  ): { container: ElementCreator; input: InputCreator } {
     const field = new ElementCreator({
       tag: 'div',
       classNames: ['form__field'],
@@ -331,6 +365,8 @@ class FormPageCreator extends View {
       },
       classNames: [inputClassName],
     });
+
+    if (isValid) input.isValid = true;
 
     const error = this.addValidationErrorHandling(input, postCodeValidation);
     field.addInnerElements([input, error]);

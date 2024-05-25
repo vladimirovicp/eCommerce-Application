@@ -5,6 +5,7 @@ import {
   ByProjectKeyRequestBuilder,
   MyCustomerUpdate,
   MyCustomerChangePassword,
+  MyCustomerUpdateAction,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
 import { apiRoot, createApiRootPasswordFlow } from './build-client';
@@ -73,16 +74,24 @@ class CustomerService {
     }
   }
 
-  public async updateCustomer(updateData: MyCustomerUpdate): Promise<void> {
+  public async updateCustomer(actions: MyCustomerUpdateAction[]): Promise<boolean> {
     try {
       if (this.apiRootPasswordFlow) {
+        const customerResponse = await this.apiRootPasswordFlow.me().get().execute();
+        const currentVersion = customerResponse.body.version;
+        const updateData: MyCustomerUpdate = {
+          version: currentVersion,
+          actions,
+        };
         const response = await this.apiRootPasswordFlow.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
-          // модальное окно
+          return true;
         }
       }
+      return false;
     } catch (error) {
       // модальное окно
+      return false;
     }
   }
 
