@@ -13,6 +13,7 @@ import {
 import FormCreator from './form-creator';
 import { typeDateToText, typeTextToDate } from './converter-input';
 import countryData from './data';
+import { InputParams } from './types';
 
 const imageSrc = {
   LOGO: `${logoSrc}`,
@@ -81,24 +82,72 @@ class FormPageCreator extends View {
     return fields;
   }
 
-  protected createFieldEmail(isValid?: boolean): ElementCreator<HTMLElement> {
-    const fieldEmail = new ElementCreator<HTMLDivElement>({
+  protected createFormField(
+    params: InputParams,
+    validationHandler: (value: string) => { isValid: boolean; errorMessage: string },
+    isValid?: boolean
+  ): ElementCreator<HTMLElement> {
+    const field = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field', 'main__field'],
     });
 
-    const input = new InputCreator({
-      type: 'email',
-      attributes: { placeholder: 'Enter your email address', name: 'email', required: 'true' },
-    });
+    const input = new InputCreator(params);
 
     if (isValid) {
       input.isValid = true;
     }
 
-    const error = this.addValidationErrorHandling(input, emailValidation);
-    fieldEmail.addInnerElements([input, error]);
+    const error = this.addValidationErrorHandling(input, validationHandler);
 
-    return fieldEmail;
+    field.addInnerElements([input, error]);
+
+    return field;
+  }
+
+  protected createFieldEmail(isValid?: boolean): ElementCreator<HTMLElement> {
+    return this.createFormField(
+      {
+        type: 'email',
+        attributes: { placeholder: 'Enter your email address', name: 'email', required: 'true' },
+      },
+      emailValidation,
+      isValid
+    );
+  }
+
+  protected createFirstName(isValid?: boolean): ElementCreator<HTMLElement> {
+    return this.createFormField(
+      {
+        type: 'text',
+        attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
+      },
+      nameValidation,
+      isValid
+    );
+  }
+
+  protected createLastName(isValid?: boolean): ElementCreator<HTMLElement> {
+    return this.createFormField(
+      {
+        type: 'text',
+        attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
+      },
+      nameValidation,
+      isValid
+    );
+  }
+
+  protected createBirthDate(isValid?: boolean): ElementCreator<HTMLElement> {
+    return this.createFormField(
+      {
+        type: 'text',
+        attributes: { name: 'dateOfBirth', placeholder: 'Birth date', required: 'true' },
+        callbackFocus: typeTextToDate,
+        callbackBlur: typeDateToText,
+      },
+      birthDateValidation,
+      isValid
+    );
   }
 
   protected createFieldPassword(name: string = 'password', form?: FormCreator): ElementCreator<HTMLElement> {
@@ -139,72 +188,6 @@ class FormPageCreator extends View {
     fieldPassword.addInnerElements([fieldEye, error]);
 
     return fieldPassword;
-  }
-  // TODO убрать дублирование при создании сходных полей
-
-  protected createFirstName(isValid?: boolean): ElementCreator<HTMLElement> {
-    const field = new ElementCreator<HTMLDivElement>({
-      classNames: ['form__field', 'main__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'firstName', placeholder: 'First name', required: 'true' },
-    });
-
-    if (isValid) {
-      input.isValid = true;
-    }
-
-    const error = this.addValidationErrorHandling(input, nameValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  protected createLastName(isValid?: boolean): ElementCreator<HTMLElement> {
-    const field = new ElementCreator<HTMLDivElement>({
-      classNames: ['form__field', 'main__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'lastName', placeholder: 'Last name', required: 'true' },
-    });
-
-    if (isValid) {
-      input.isValid = true;
-    }
-
-    const error = this.addValidationErrorHandling(input, nameValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
-  }
-
-  protected createBirthDate(isValid?: boolean): ElementCreator<HTMLElement> {
-    const field = new ElementCreator<HTMLDivElement>({
-      classNames: ['form__field', 'field__birth-date', 'main__field'],
-    });
-
-    const input = new InputCreator({
-      type: 'text',
-      attributes: { name: 'birthDate', placeholder: 'Birth date', required: 'true' },
-      callbackFocus: typeTextToDate,
-      callbackBlur: typeDateToText,
-    });
-
-    if (isValid) {
-      input.isValid = true;
-    }
-
-    const error = this.addValidationErrorHandling(input, birthDateValidation);
-
-    field.addInnerElements([input, error]);
-
-    return field;
   }
 
   protected createAddressGroup(

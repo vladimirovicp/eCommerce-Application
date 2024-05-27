@@ -1,5 +1,10 @@
-// import { BaseAddress, CustomerDraft } from '@commercetools/platform-sdk';
-import { Customer, MyCustomerAddAddressAction, MyCustomerUpdateAction } from '@commercetools/platform-sdk';
+import {
+  Customer,
+  MyCustomerAddAddressAction,
+  MyCustomerChangePassword,
+  MyCustomerUpdate,
+  MyCustomerUpdateAction,
+} from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/account.scss';
 import customerService from '../../api/customers-requests';
 import modalWindowCreator from '../../components/modal-window';
@@ -8,8 +13,10 @@ import FormCreator from '../../util/form-creator';
 import FormPageCreator from '../../util/form-page-creator';
 import { getInputValue } from '../../util/helper';
 import InputCreator from '../../util/input-creator';
+import { InputParams } from '../../util/types';
 
 export default class ProfilePage extends FormPageCreator {
+  // ужасно разросшийся класс, стоило бы разделить визуал и функционал, но где же на это время...
   private customerInfo: Customer | null = null;
 
   private actions: MyCustomerUpdateAction[];
@@ -34,7 +41,7 @@ export default class ProfilePage extends FormPageCreator {
   private setContent(): void {
     const box = new ElementCreator({ classNames: ['form', 'account__box'] });
     box.addInnerElements([this.createFormTitle('PROFILE'), this.createPersonalInfoForm()]);
-    this.viewElementCreator.addInnerElements([box]);
+    this.viewElementCreator.getElement().replaceChildren(box.getElement());
   }
 
   private createPersonalInfoForm(): FormCreator {
@@ -45,7 +52,7 @@ export default class ProfilePage extends FormPageCreator {
       this.createBirthDate(),
 
       this.createFieldsTitle('Address'),
-      this.fillInAddressForm(),
+      this.fillAddressForm(),
 
       this.createFields(
         this.createButton('Add address', () => this.addNewAddressField()),
@@ -68,12 +75,15 @@ export default class ProfilePage extends FormPageCreator {
     const message2 = new ElementCreator<HTMLDivElement>({ textContent: 'Enter new password' });
     const newPasswordField = this.createFieldPassword('newPassword', form);
 
-    const buttonContainer = this.createButton('Change password', () => this.changePassword(form.getElement()));
-    const changePasswordButton = buttonContainer.getElement().querySelector('input');
-    if (changePasswordButton) {
-      changePasswordButton.disabled = true;
-      form.addSubmitButton(changePasswordButton);
-    }
+    const buttonContainer = new ElementCreator({ classNames: ['form__field', 'form__button'] });
+    const changePasswordButton = new InputCreator({
+      type: 'button',
+      attributes: { value: 'Change password', disabled: 'true' },
+      callback: (): Promise<void> => this.changePassword(form.getElement()),
+    });
+    buttonContainer.addInnerElements([changePasswordButton]);
+    form.addSubmitButton(changePasswordButton.getElement());
+
     form.addInnerElements([message1, currentPasswordField, message2, newPasswordField, buttonContainer]);
 
     modalWindowCreator.addInnerElements([form]);
@@ -85,21 +95,27 @@ export default class ProfilePage extends FormPageCreator {
     formData.forEach((value, key: string) => {
       formDataObject[key] = value as string;
     });
-    const { currentPassword } = formDataObject;
-    const { newPassword } = formDataObject;
-    const isSuccessful = await customerService.changePassword(currentPassword, newPassword);
-    if (isSuccessful) {
-      modalWindowCreator.closeModalWindow();
-      modalWindowCreator.showModalWindow('info', 'Password changed successfully');
+
+    if (this.customerInfo) {
+      const updateData: MyCustomerChangePassword = {
+        version: this.customerInfo?.version,
+        currentPassword: formDataObject.currentPassword,
+        newPassword: formDataObject.newPassword,
+      };
+      const isSuccessful = await customerService.changePassword(updateData);
+      if (isSuccessful) {
+        modalWindowCreator.closeModalWindow();
+        modalWindowCreator.showModalWindow('info', 'Password changed successfully');
+        this.reloadProfile();
+      }
     }
   }
 
-  private fillInAddressForm(): ElementCreator<HTMLDivElement> {
+  private fillAddressForm(): ElementCreator<HTMLDivElement> {
     const addressesContainer = new ElementCreator<HTMLDivElement>({ classNames: ['addresses-container'] });
     if (this.customerInfo) {
       this.customerInfo.addresses.forEach((address) => {
         if (address.id) {
-          // typePrefix определяет, входит ли id адреса в список shippingAddressIds, и дальше пляшем от этого
           const addressForm = this.createAddressGroup(true, address.id).getElement();
           addressesContainer.addInnerElements([addressForm]);
 
@@ -124,18 +140,8 @@ export default class ProfilePage extends FormPageCreator {
     return addressesContainer;
   }
 
-  protected createAddressGroup(isBilling: boolean = true, id?: string): ElementCreator<HTMLDivElement> {
-    const addressContainer = super.createAddressGroup(isBilling, id, Boolean(id));
-    const countrySelector = addressContainer.getElement().querySelector('select');
-    let addressKey: string = '';
-    if (id) {
-      // делаем поле адреса изначально disabled
-      if (countrySelector) countrySelector.disabled = true;
-    } else {
-      // уникальный идентификатор на основе времени
-      addressKey = new Date().getTime().toString();
-      addressContainer.getElement().setAttribute('data-address-key', addressKey);
-    }
+  private createEditElement(addressContainer: HTMLDivElement, id: string | undefined): ElementCreator<HTMLDivElement> {
+    const countrySelector = addressContainer.querySelector('select');
     const editElementCreator = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field-edit'],
       callback: (): void => {
@@ -144,56 +150,93 @@ export default class ProfilePage extends FormPageCreator {
           countrySelector.dispatchEvent(new Event('change'));
           this.formCreator.checkFormValidity();
         }
-        addressContainer.getElement().classList.add('changed');
+        addressContainer.classList.add('changed');
       },
     });
+    return editElementCreator;
+  }
+
+  private createDeleteElement(
+    addressContainer: ElementCreator<HTMLDivElement>,
+    id: string | undefined,
+    addressKey: string
+  ): ElementCreator<HTMLDivElement> {
     const deleteElementCreator = new ElementCreator<HTMLDivElement>({
       classNames: ['form__field-delete'],
-      callback: (): void => {},
+      callback: (): void => {
+        modalWindowCreator.showModalWindow('standart', 'Would you like to remove this address?');
+        modalWindowCreator.createButton(() => {
+          addressContainer.getElement().remove();
+          this.formCreator.checkFormValidity();
+          if (id) {
+            this.actions.push({
+              action: 'removeAddress',
+              addressId: id,
+            });
+          } else if (addressKey) {
+            // если новый адрес был установлен как дефолтный - отменяем эту установку
+            if (this.defaultBillingAddress && addressKey === this.defaultBillingAddress.key) {
+              this.defaultBillingAddress = undefined;
+            }
+            if (this.defaultShippingAddress && addressKey === this.defaultShippingAddress.key) {
+              this.defaultShippingAddress = undefined;
+            }
+          }
+        }, 'Yes!');
+      },
     });
+    return deleteElementCreator;
+  }
+
+  protected createAddressGroup(isBilling: boolean = true, id?: string): ElementCreator<HTMLDivElement> {
+    const addressContainer = super.createAddressGroup(isBilling, id, Boolean(id));
+    const countrySelector = addressContainer.getElement().querySelector('select');
+    let addressKey: string = '';
+    if (id) {
+      // делаем поле адреса изначально disabled
+      if (countrySelector) countrySelector.disabled = true;
+    } else {
+      // для новых адресов - уникальный идентификатор на основе времени
+      addressKey = new Date().getTime().toString();
+      addressContainer.getElement().setAttribute('data-address-key', addressKey);
+    }
+    const editElementCreator = this.createEditElement(addressContainer.getElement(), id);
+    const deleteElementCreator = this.createDeleteElement(addressContainer, id, addressKey);
     addressContainer.getElement().prepend(editElementCreator.getElement(), deleteElementCreator.getElement());
     addressContainer.addInnerElements([this.createDefaultAddressRadioButtons(id ?? addressKey, Boolean(id))]);
     return addressContainer;
   }
 
-  private createDefaultAddressRadioButtons(id: string, isID: boolean): ElementCreator<HTMLDivElement> {
-    const radioButtonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['radio-button', 'form__field'] });
+  private createDefaultAddressRadioButtons(idKey: string, isID: boolean): ElementCreator<HTMLDivElement> {
+    const radioButtonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['form__fields'] });
 
-    const defaultBillingInput = new InputCreator({
-      type: 'radio',
-      id: `defaultBilling${id}`,
-      attributes: { name: 'defaultBilling' },
-    });
-    const defaultBillingLabel = defaultBillingInput.createLabel('Set as a default billing address');
-    const defaultShippingInput = new InputCreator({
-      type: 'radio',
-      id: `defaultShipping${id}`,
-      attributes: { name: 'defaultShipping' },
-    });
-    const defaultShippingLabel = defaultShippingInput.createLabel('Set as a default shipping address');
-    defaultBillingInput.getElement().addEventListener('change', (event) => {
-      if (event.target instanceof HTMLElement) {
-        this.defaultBillingAddress = { [isID ? 'id' : 'key']: id };
+    const createRadioButton = (type: 'billing' | 'shipping', id: string): ElementCreator<HTMLDivElement> => {
+      const radioButton = new ElementCreator<HTMLDivElement>({ classNames: ['radio-button', 'form__field'] });
+      const input = new InputCreator({
+        type: 'radio',
+        id: `default${type}${id}`,
+        attributes: { name: `default${type}` },
+      });
+      const label = input.createLabel(`Set as a default ${type} address`);
+
+      input.getElement().addEventListener('change', () => {
+        this[type === 'billing' ? 'defaultBillingAddress' : 'defaultShippingAddress'] = { [isID ? 'id' : 'key']: id };
         this.formCreator.checkFormValidity();
+      });
+
+      // Устанавливаем checked, если это текущий дефолтный адрес
+      if (id === this.customerInfo?.[type === 'billing' ? 'defaultBillingAddressId' : 'defaultShippingAddressId']) {
+        input.getElement().checked = true;
       }
-    });
-    defaultShippingInput.getElement().addEventListener('change', (event) => {
-      if (event.target instanceof HTMLElement) {
-        this.defaultShippingAddress = { [isID ? 'id' : 'key']: id };
-        this.formCreator.checkFormValidity();
-      }
-    });
-    if (id) {
-      // если адрес подгруженный, проверяем не дефолтный ли он
-      if (id === this.customerInfo?.defaultBillingAddressId) defaultBillingInput.getElement().checked = true;
-      if (id === this.customerInfo?.defaultShippingAddressId) defaultShippingInput.getElement().checked = true;
-    }
-    radioButtonContainer.addInnerElements([
-      defaultBillingInput,
-      defaultBillingLabel,
-      defaultShippingInput,
-      defaultShippingLabel,
-    ]);
+
+      radioButton.addInnerElements([input, label]);
+      return radioButton;
+    };
+
+    const billingRadioButton = createRadioButton('billing', idKey);
+    const shippingRadioButton = createRadioButton('shipping', idKey);
+    radioButtonContainer.addInnerElements([billingRadioButton, shippingRadioButton]);
+
     return radioButtonContainer;
   }
 
@@ -210,47 +253,18 @@ export default class ProfilePage extends FormPageCreator {
     return editElement.getElement();
   }
 
-  protected createFirstName(): ElementCreator<HTMLElement> {
-    const field = super.createFirstName(true);
+  protected createFormField(
+    params: InputParams,
+    validationHandler: (value: string) => { isValid: boolean; errorMessage: string }
+  ): ElementCreator<HTMLElement> {
+    const field = super.createFormField(params, validationHandler, true);
     const input = field.getElement().firstElementChild;
-    if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.firstName) {
-      input.value = this.customerInfo.firstName;
-      input.disabled = true;
-      const editElement = this.addEditElement(input);
-      field.getElement().prepend(editElement);
-    }
-    return field;
-  }
 
-  protected createLastName(): ElementCreator<HTMLElement> {
-    const field = super.createLastName(true);
-    const input = field.getElement().firstElementChild;
-    if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.lastName) {
-      input.value = this.customerInfo.lastName;
-      input.disabled = true;
-      const editElement = this.addEditElement(input);
-      field.getElement().prepend(editElement);
-    }
-    return field;
-  }
-
-  protected createBirthDate(): ElementCreator<HTMLElement> {
-    const field = super.createBirthDate(true);
-    const input = field.getElement().firstElementChild;
-    if (input && input instanceof HTMLInputElement && this.customerInfo && this.customerInfo.dateOfBirth) {
-      input.value = this.customerInfo.dateOfBirth;
-      input.disabled = true;
-      const editElement = this.addEditElement(input);
-      field.getElement().prepend(editElement);
-    }
-    return field;
-  }
-
-  protected createFieldEmail(): ElementCreator<HTMLElement> {
-    const field = super.createFieldEmail(true);
-    const input = field.getElement().firstElementChild;
-    if (input && input instanceof HTMLInputElement && this.customerInfo) {
-      input.value = this.customerInfo.email;
+    if (input instanceof HTMLInputElement && this.customerInfo && params.attributes) {
+      const value = this.customerInfo[params.attributes.name as keyof typeof this.customerInfo];
+      if (typeof value === 'string') {
+        input.value = value;
+      }
       input.disabled = true;
       const editElement = this.addEditElement(input);
       field.getElement().prepend(editElement);
@@ -260,7 +274,6 @@ export default class ProfilePage extends FormPageCreator {
 
   private createButton(textContent: string, callback: () => void): ElementCreator<HTMLElement> {
     const fieldBtn = new ElementCreator({
-      tag: 'div',
       classNames: ['form__field', 'form__button'],
     });
 
@@ -338,8 +351,8 @@ export default class ProfilePage extends FormPageCreator {
         this.actions.push(this.createChangedAddressData(field));
       }
     });
-    this.changeDefaultAddresses();
     this.collectNewAddresses();
+    this.changeDefaultAddresses();
     this.sendUpdatedData(this.actions);
   }
 
@@ -358,41 +371,44 @@ export default class ProfilePage extends FormPageCreator {
   }
 
   private collectNewAddresses(): void {
-    const processAddresses = (selector: string, addressType: string): void => {
-      document.querySelectorAll(selector).forEach((address) => {
-        // выполнить для всех адресов без id, т е новых
-        if (!address.id) {
-          const data: MyCustomerAddAddressAction = {
-            action: 'addAddress',
-            address: {
-              streetName: getInputValue(`${addressType}Street`, address),
-              postalCode: getInputValue(`${addressType}PostalCode`, address),
-              city: getInputValue(`${addressType}City`, address),
-              country: getInputValue(`${addressType}Country`, address),
-            },
-          };
-          this.actions.push(data);
-        }
-      });
-    };
-
-    processAddresses('.billing-address', 'billing');
-    processAddresses('.shipping-address', 'shipping');
+    document.querySelectorAll('.billing-address').forEach((address) => {
+      // выполнить для всех адресов без id, т е новых
+      if (!address.id) {
+        const data: MyCustomerAddAddressAction = {
+          action: 'addAddress',
+          address: {
+            key: address.getAttribute('data-address-key') ?? '',
+            streetName: getInputValue(`billingStreet`, address),
+            postalCode: getInputValue(`billingPostalCode`, address),
+            city: getInputValue(`billingCity`, address),
+            country: getInputValue(`billingCountry`, address),
+          },
+        };
+        this.actions.push(data);
+      }
+    });
   }
 
   private async sendUpdatedData(actions: MyCustomerUpdateAction[]): Promise<void> {
-    const isSuccessful = await customerService.updateCustomer(actions);
-    if (isSuccessful) {
-      modalWindowCreator.showModalWindow('info', 'Data updated successfully!');
-      console.log(document.querySelector('.account__box'));
-      const a = document.querySelector('.account__box');
-      if (a) a.innerHTML = '';
-      document.querySelector('.account__box')?.remove();
-      // this.viewElementCreator.getElement().innerHTML = '';
-      this.actions = [];
-      this.defaultBillingAddress = undefined;
-      this.defaultShippingAddress = undefined;
-      this.getCustomerInfo();
+    if (this.customerInfo) {
+      const updateData: MyCustomerUpdate = {
+        version: this.customerInfo.version,
+        actions,
+      };
+      const isSuccessful = await customerService.updateCustomer(updateData);
+      if (isSuccessful) {
+        modalWindowCreator.showModalWindow('info', 'Data updated successfully!');
+        // сбрасываем все на ноль, перезагружаем профиль
+        this.reloadProfile();
+      }
     }
+  }
+
+  private reloadProfile(): void {
+    this.formCreator.getElement().innerHTML = '';
+    this.actions = [];
+    this.defaultBillingAddress = undefined;
+    this.defaultShippingAddress = undefined;
+    this.getCustomerInfo();
   }
 }
