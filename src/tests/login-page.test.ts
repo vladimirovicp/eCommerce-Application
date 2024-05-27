@@ -2,7 +2,7 @@ import HeaderView from '../app/components/header/header';
 import LoginPage from '../app/pages/login';
 import { Pages } from '../app/router/pages';
 import Router from '../app/router/router';
-import { authorizeCustomer } from '../app/api/customers-requests';
+import customerService from '../app/api/customers-requests';
 import modalWindowCreator from '../app/components/modal-window';
 
 jest.mock('../app/components/modal-window', () => ({
@@ -10,7 +10,9 @@ jest.mock('../app/components/modal-window', () => ({
 }));
 
 jest.mock('../app/api/customers-requests', () => ({
-  authorizeCustomer: jest.fn(() => Promise.resolve(true)),
+  default: {
+    authorizeCustomer: jest.fn(() => Promise.resolve(true)),
+  },
 }));
 
 describe('LoginPage testing', () => {
@@ -44,7 +46,7 @@ describe('LoginPage testing', () => {
   it('should navigate to home page on successful login and initialize modal window', async () => {
     const formData = { email: 'user@example.com', password: 'password123' };
     await loginPage['handleSubmitForm'](formData);
-    expect(authorizeCustomer).toHaveBeenCalledWith({
+    expect(customerService.authorizeCustomer).toHaveBeenCalledWith({
       email: formData.email,
       password: formData.password,
     });
