@@ -10,9 +10,7 @@ jest.mock('../app/components/modal-window', () => ({
 }));
 
 jest.mock('../app/api/customers-requests', () => ({
-  default: {
-    authorizeCustomer: jest.fn(() => Promise.resolve(true)),
-  },
+  authorizeCustomer: jest.fn(() => Promise.resolve(true)),
 }));
 
 describe('LoginPage testing', () => {
