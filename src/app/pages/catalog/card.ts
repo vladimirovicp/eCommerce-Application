@@ -1,0 +1,86 @@
+import ElementCreator from '../../util/element-creator';
+import { CatalogCardParams } from '../../util/types';
+
+export default class CatalogCard extends ElementCreator {
+  constructor(cardParams: CatalogCardParams) {
+    super({
+      tag: 'div',
+      classNames: ['catalog-card'],
+    });
+    this.configureCard(cardParams);
+  }
+
+  private configureCard(params: CatalogCardParams): void {
+    this.addInnerElements([
+      this.setImage(params.imageUrl),
+      this.setPrices(params.price, params.discountPrice),
+      this.setTitle(params.name),
+      this.addButton(),
+    ]);
+  }
+
+  private setImage(url: string): HTMLElement {
+    const imageContainer = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__img'],
+    });
+    const image = new ElementCreator({
+      tag: 'img',
+      classNames: ['img-full'],
+      attributes: {
+        src: url,
+        alt: 'bike_image',
+      },
+    });
+    imageContainer.addInnerElements([image]);
+    return imageContainer.getElement();
+  }
+
+  private setPrices(fullPrice: number, discountPrice: number): HTMLElement {
+    const pricesContainer = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__price'],
+    });
+
+    const oldPrice = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__price-old'],
+      textContent: String(fullPrice),
+    });
+
+    const currentPrice = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__price-current'],
+      textContent: String(discountPrice),
+    });
+
+    pricesContainer.addInnerElements([currentPrice, oldPrice]);
+    return pricesContainer.getElement();
+  }
+
+  private setTitle(text: string): HTMLElement {
+    const title = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__title'],
+      textContent: text,
+    });
+    return title.getElement();
+  }
+
+  private addButton(): HTMLElement {
+    const buttonContainer = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__btn'],
+    });
+
+    const button = new ElementCreator({
+      tag: 'button',
+      classNames: ['btn-default'],
+      textContent: 'Into a basket',
+    });
+    button.setCallback(() => {}, 'click');
+
+    buttonContainer.addInnerElements([button]);
+    return buttonContainer.getElement();
+  }
+}

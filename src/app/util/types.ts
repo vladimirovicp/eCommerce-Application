@@ -45,3 +45,13 @@ export interface ListCountry {
   code: string;
   name: string;
 }
+
+
+export interface CatalogCardParams {
+  id: string;
+  name: string;
+  imageUrl: string;
+  description?: string;
+  price: number;
+  discountPrice: number;
+}
