@@ -1,7 +1,7 @@
 import '../../../assets/scss/_header.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
-import adaptiveCloseMenu from '../../util/helper';
+import { adaptiveCloseMenu } from '../../util/helper';
 import logo from '../../../assets/img/svg/logo.svg';
 import basket from '../../../assets/img/svg/basket.svg';
 import ListCreator from '../../util/list-creator';

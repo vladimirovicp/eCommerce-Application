@@ -104,7 +104,7 @@ class App {
       {
         path: `${Pages.PROFILE}`,
         callback: (): void => {
-          this.updateMain(new ProfilePage(), 'not-found-page');
+          this.updateMain(new ProfilePage(), 'account-page');
         },
       },
       {

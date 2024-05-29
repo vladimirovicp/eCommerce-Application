@@ -231,7 +231,7 @@ export default class RegistrationPage extends FormPageCreator {
       password: formData.password,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      dateOfBirth: formData.birthDate,
+      dateOfBirth: formData.dateOfBirth,
       addresses: [billingAddress, shippingAddress],
       defaultShippingAddress: 1,
       defaultBillingAddress: 0,

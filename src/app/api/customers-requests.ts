@@ -4,6 +4,7 @@ import {
   Customer,
   ByProjectKeyRequestBuilder,
   MyCustomerUpdate,
+  MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
 import { apiRoot, createApiRootPasswordFlow } from './build-client';
@@ -72,16 +73,52 @@ class CustomerService {
     }
   }
 
-  public async updateCustomer(updateData: MyCustomerUpdate): Promise<void> {
+  public async updateCustomer(updateData: MyCustomerUpdate): Promise<boolean> {
     try {
       if (this.apiRootPasswordFlow) {
         const response = await this.apiRootPasswordFlow.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
-          // модальное окно
+          return true;
         }
       }
+      modalWindowCreator.showModalWindow('error', 'Unknown error. Please try again later');
+      return false;
     } catch (error) {
-      // модальное окно
+      const errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? error.message
+          : 'Unknown error. Please try again later';
+      modalWindowCreator.showModalWindow('error', `Can't update customer profile: ${errorMessage}`);
+      return false;
+    }
+  }
+
+  public async changePassword(updateData: MyCustomerChangePassword): Promise<boolean> {
+    try {
+      if (this.apiRootPasswordFlow) {
+        const response = await this.apiRootPasswordFlow
+          .me()
+          .password()
+          .post({
+            body: updateData,
+          })
+          .execute();
+        if (response.statusCode === 200) {
+          // обновление апиРута и токенов (?)
+          this.apiRootPasswordFlow = createApiRootPasswordFlow(response.body.email, updateData.newPassword);
+          return true;
+        }
+      }
+      // при ошибке модальное окно с инпутами  НЕ ЗАКРЫВАЕТСЯ меняется только текст сообщения
+      modalWindowCreator.showModalWindow('error', 'Unknown error. Please try again later');
+      return false;
+    } catch (error) {
+      const errorMessage =
+        typeof error === 'object' && error !== null && 'message' in error
+          ? error.message
+          : 'Unknown error. Please try again later';
+      modalWindowCreator.showModalWindow('error', `Can't get customer profile: ${errorMessage}`);
+      return false;
     }
   }
 

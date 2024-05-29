@@ -12,4 +12,9 @@ const adaptiveCloseMenu = (): void => {
   }
 };
 
-export default adaptiveCloseMenu;
+const getInputValue = (name: string, container: Element): string => {
+  const input = container.querySelector(`[name="${name}"]`);
+  return input instanceof HTMLInputElement || input instanceof HTMLSelectElement ? input.value : '';
+};
+
+export { adaptiveCloseMenu, getInputValue };
