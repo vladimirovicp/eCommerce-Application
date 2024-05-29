@@ -12,14 +12,14 @@ export default class CatalogCard extends ElementCreator {
 
   private configureCard(params: CatalogCardParams): void {
     this.addInnerElements([
-      this.setImage(params.imageUrl),
+      this.setImage(params.imageUrl, params.name),
       this.setPrices(params.price, params.discountPrice),
       this.setTitle(params.name),
       this.addButton(),
     ]);
   }
 
-  private setImage(url: string): HTMLElement {
+  private setImage(url: string, altText: string): HTMLElement {
     const imageContainer = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__img'],
@@ -29,7 +29,7 @@ export default class CatalogCard extends ElementCreator {
       classNames: ['img-full'],
       attributes: {
         src: url,
-        alt: 'bike_image',
+        alt: altText,
       },
     });
     imageContainer.addInnerElements([image]);

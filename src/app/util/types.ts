@@ -46,7 +46,6 @@ export interface ListCountry {
   name: string;
 }
 
-
 export interface CatalogCardParams {
   id: string;
   name: string;
