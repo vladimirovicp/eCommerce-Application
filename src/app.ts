@@ -14,6 +14,7 @@ import RegistrationPage from './app/pages/registration';
 import ProfilePage from './app/pages/profile';
 import CartPage from './app/pages/cart';
 import View from './app/common/view';
+import SecondaryMenu from './app/components/secondary-menu';
 
 class App {
   private header: HeaderView;
@@ -22,18 +23,26 @@ class App {
 
   private router: Router;
 
+  private secondaryMenu: SecondaryMenu;
+
   constructor() {
     const routes = this.createRoutes();
     this.router = new Router(routes);
 
     this.header = new HeaderView(this.router);
+    this.secondaryMenu = new SecondaryMenu();
     this.main = new MainView();
     this.createView();
   }
 
   private createView(): void {
     const footer = new FooterView().getHtmlElement();
-    document.body.append(this.header.getHtmlElement(), this.main.getHtmlElement(), footer);
+    document.body.append(
+      this.header.getHtmlElement(),
+      this.secondaryMenu.getHtmlElement(),
+      this.main.getHtmlElement(),
+      footer
+    );
   }
 
   /* eslint-disable max-lines-per-function */
@@ -66,7 +75,7 @@ class App {
       {
         path: `${Pages.CATALOG}`,
         callback: (): void => {
-          this.updateMain(new CatalogPage(), 'not-found-page');
+          this.updateMain(new CatalogPage(this.secondaryMenu), 'catalog-page');
         },
       },
       /* {
