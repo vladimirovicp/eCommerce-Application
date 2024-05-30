@@ -15,6 +15,8 @@ import ProfilePage from './app/pages/profile';
 import CartPage from './app/pages/cart';
 import View from './app/common/view';
 import SecondaryMenu from './app/components/secondary-menu';
+import { createApiRootRefreshTokenFlow } from './app/api/build-client';
+import customerService from './app/api/customers-requests';
 
 class App {
   private header: HeaderView;
@@ -32,6 +34,12 @@ class App {
     this.header = new HeaderView(this.router);
     this.secondaryMenu = new SecondaryMenu();
     this.main = new MainView();
+    const token = localStorage.getItem('refresh_token');
+    if (token) {
+      console.log('ffffffff');
+      customerService.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
+      this.header.isLoggedIn();
+    }
     this.createView();
   }
 

@@ -91,8 +91,9 @@ export default class HeaderView extends View {
         modalWindowCreator.createButton(() => {
           customerService.clearCustomerInfo();
           this.isLoggedOut();
+          this.router.navigate(`${Pages.HOME}`);
         }, 'yes');
-        // this.router.navigate(`${Pages.REGISTRATION}`);
+        //
       },
     },
     {
