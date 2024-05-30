@@ -50,7 +50,7 @@ export interface CatalogCardParams {
   id: string;
   name: string;
   imageUrl: string;
-  description?: string;
+  description: string;
   price: number;
   discountPrice: number;
 }

@@ -9,10 +9,11 @@ export default async function getProducts(limit: number, offset: number): Promis
         queryArgs: {
           limit,
           offset,
+          filter: 'masterVariant.prices.discounted',
+          priceCurrency: 'USD',
         },
       })
       .execute();
-    console.log('Products received:', response.body.results);
     return response.body.results;
   } catch (error) {
     console.error('Failed to fetch products:', error);

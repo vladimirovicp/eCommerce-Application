@@ -23,8 +23,12 @@ interface FilterParameter {
 
 const FilterParameters: FilterParameter[] = [
   { name: 'category', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
-  { name: 'size', title: 'Wheel size', filterItems: ['12', '14', '16', '20'] },
-  { name: 'colour', title: 'Colour', filterItems: ['Black', 'Red', 'Yellow', 'Green', 'Silver'] },
+  { name: 'size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700c'] },
+  {
+    name: 'brake-type',
+    title: 'Brake type',
+    filterItems: ['hydraulic disc brakes', 'mechanical disc brakes', 'v-brakes'],
+  },
 ];
 
 export default class CatalogPage extends View {
@@ -67,8 +71,7 @@ export default class CatalogPage extends View {
         masterData: {
           current: {
             name,
-            description,
-            masterVariant: { images, prices },
+            masterVariant: { images, prices, attributes },
           },
         },
         id,
@@ -76,9 +79,9 @@ export default class CatalogPage extends View {
 
       const card = new CatalogCard({
         id,
-        name: name['en-GB'],
+        name: attributes?.[1]?.value || '',
         imageUrl: images?.[0]?.url || '',
-        description: description?.['en-GB'],
+        description: name['en-GB'],
         price: prices?.[0]?.value.centAmount || 0,
         discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
       });

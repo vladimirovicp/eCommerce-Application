@@ -51,30 +51,35 @@ class App {
       {
         path: `${Pages.NOT_FOUND}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new NotFoundPage(), 'not-found-page');
         },
       },
       {
         path: '',
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: `${Pages.HOME}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: 'main',
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: `${Pages.CATALOG}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new CatalogPage(this.secondaryMenu), 'catalog-page');
         },
       },
@@ -85,12 +90,14 @@ class App {
       {
         path: `${Pages.ABOUT}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new AboutPage(), 'not-found-page');
         },
       },
       {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           if (localStorage.userId === undefined) {
             this.updateMain(new LoginPage(this.router, this.header), 'login-page');
           } else {
@@ -102,6 +109,7 @@ class App {
       {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           if (localStorage.userId === undefined) {
             this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
           } else {
@@ -113,12 +121,14 @@ class App {
       {
         path: `${Pages.PROFILE}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new ProfilePage(), 'account-page');
         },
       },
       {
         path: `${Pages.CART}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent();
           this.updateMain(new CartPage(), 'not-found-page');
         },
       },

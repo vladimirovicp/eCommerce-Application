@@ -15,6 +15,7 @@ export default class CatalogCard extends ElementCreator {
       this.setImage(params.imageUrl, params.name),
       this.setPrices(params.price, params.discountPrice),
       this.setTitle(params.name),
+      this.setDescription(params.description),
       this.addButton(),
     ]);
   }
@@ -45,13 +46,13 @@ export default class CatalogCard extends ElementCreator {
     const oldPrice = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__price-old'],
-      textContent: `${String(fullPrice)}$`,
+      textContent: `$ ${String(Math.ceil(fullPrice / 100))}`,
     });
 
     const currentPrice = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__price-current'],
-      textContent: `${String(discountPrice)}$`,
+      textContent: `$ ${String(Math.ceil(discountPrice / 100))}`,
     });
 
     pricesContainer.addInnerElements([currentPrice, oldPrice]);
@@ -65,6 +66,15 @@ export default class CatalogCard extends ElementCreator {
       textContent: text,
     });
     return title.getElement();
+  }
+
+  private setDescription(text: string): HTMLElement {
+    const description = new ElementCreator({
+      tag: 'div',
+      classNames: ['catalog-card__description'],
+      textContent: text,
+    });
+    return description.getElement();
   }
 
   private addButton(): HTMLElement {
