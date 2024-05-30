@@ -25,7 +25,7 @@ export default class SecondaryMenu extends View {
     this.viewElementCreator.addInnerElements([this.container]);
   }
 
-  public addElement(element: HTMLElement | ElementCreator): void {
-    this.container.addInnerElements([element]);
+  public addElement(elements: (HTMLElement | ElementCreator)[]): void {
+    this.container.addInnerElements(elements);
   }
 }

@@ -34,6 +34,8 @@ export default class CatalogPage extends View {
 
   private currentSort: SortParameters;
 
+  private currentFilter: string[];
+
   constructor(secondaryMenu: SecondaryMenu) {
     const params = {
       tag: 'div',
@@ -45,7 +47,8 @@ export default class CatalogPage extends View {
       classNames: ['catalog-cards'],
     });
     this.currentSort = SortParameters.AlphabeticallyAZ;
-    this.createSecondaryNavMenu();
+    this.currentFilter = [];
+    this.createSecondaryMenu();
     this.setContent();
   }
 
@@ -82,6 +85,29 @@ export default class CatalogPage extends View {
 
       this.catalogCards.addInnerElements([card]);
     });
+  }
+
+  private createSecondaryMenu(): void {
+    const menuContainer = new ElementCreator({ classNames: ['secondary-menu__nav'] });
+    menuContainer.addInnerElements([this.createSortMenu(), this.createFilterMenu()]);
+
+    this.secondaryMenu.addElement([this.createSearchMenu(), menuContainer]);
+  }
+
+  private createSearchMenu(): ElementCreator {
+    const container = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__search'] });
+
+    const input = new InputCreator({ type: 'search', attributes: { placeholder: 'search' } });
+    const button = new ElementCreator<HTMLButtonElement>({
+      tag: 'button',
+      textContent: 'Search',
+      callback: (): void => {
+        // поиск
+      },
+    });
+    container.addInnerElements([input, button]);
+
+    return container;
   }
 
   private createSortMenu(): ElementCreator {
@@ -154,6 +180,9 @@ export default class CatalogPage extends View {
       tag: 'button',
       classNames: ['btn-default'],
       textContent: 'filter',
+      callback: (): void => {
+        // применить фильтры, обновить карточки, то же при закрытии меню фильтра
+      },
     });
 
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });
@@ -162,12 +191,12 @@ export default class CatalogPage extends View {
       textContent: 'FILTER',
     });
     filterMenuBox.addInnerElements([filterTitle]);
-
+    // генерирование каждой категории фильтрации и добавление их в контейнер
     FilterParameters.forEach((option) => {
       const category = this.createFilterParameter(option);
       filterMenuBox.addInnerElements([category]);
     });
-
+    // ////////////////////////
     filterMenuBox.addInnerElements([button]);
     filterContainer.addInnerElements([switchInput, label, filterMenuBox]);
     return filterContainer;
@@ -185,7 +214,14 @@ export default class CatalogPage extends View {
     const filterMenuItems = options.filterItems.map((text) => {
       const filterMenuItem = new ElementCreator<HTMLDivElement>({
         classNames: ['checkbox-with-text'],
-        callback: (): void => {},
+        callback: (): void => {
+          if (filterMenuItem.getElement().classList.contains('active')) {
+            this.currentFilter = this.currentFilter.filter((item) => item !== text);
+          } else {
+            this.currentFilter.push(text);
+          }
+          filterMenuItem.getElement().classList.toggle('active');
+        },
       });
       filterMenuItem.getElement().innerHTML = `<span class="filter__decor"></span><span class="filter__text">${text}</span>`;
       return filterMenuItem.getElement();
@@ -199,12 +235,5 @@ export default class CatalogPage extends View {
     filterListBox.addInnerElements([filterList.getHtmlElement()]);
     container.addInnerElements([titleElement, filterListBox]);
     return container;
-  }
-
-  private createSecondaryNavMenu(): void {
-    const menuContainer = new ElementCreator({ classNames: ['secondary-menu__nav'] });
-    menuContainer.addInnerElements([this.createSortMenu(), this.createFilterMenu()]);
-
-    this.secondaryMenu.addElement(menuContainer);
   }
 }

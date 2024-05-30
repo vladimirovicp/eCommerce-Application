@@ -45,13 +45,13 @@ export default class CatalogCard extends ElementCreator {
     const oldPrice = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__price-old'],
-      textContent: String(fullPrice),
+      textContent: `${String(fullPrice)}$`,
     });
 
     const currentPrice = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__price-current'],
-      textContent: String(discountPrice),
+      textContent: `${String(discountPrice)}$`,
     });
 
     pricesContainer.addInnerElements([currentPrice, oldPrice]);
