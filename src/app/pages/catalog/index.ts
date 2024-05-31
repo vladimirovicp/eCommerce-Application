@@ -1,6 +1,6 @@
 import '../../../assets/scss/page/catalog.scss';
-import { Product } from '@commercetools/platform-sdk';
-import getProducts from '../../api/products';
+import { ProductProjection } from '@commercetools/platform-sdk';
+import { getProducts, updateProducts } from '../../api/products';
 import View from '../../common/view';
 import SecondaryMenu from '../../components/secondary-menu';
 import ElementCreator from '../../util/element-creator';
@@ -22,8 +22,8 @@ interface FilterParameter {
 }
 
 const FilterParameters: FilterParameter[] = [
-  { name: 'category', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
-  { name: 'size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700c'] },
+  { name: 'is-electric', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
+  { name: 'wheel-size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700'] },
   {
     name: 'brake-type',
     title: 'Brake type',
@@ -38,7 +38,7 @@ export default class CatalogPage extends View {
 
   private currentSort: SortParameters;
 
-  private currentFilter: string[];
+  private currentFilter: { [key: string]: string[] };
 
   constructor(secondaryMenu: SecondaryMenu) {
     const params = {
@@ -51,7 +51,10 @@ export default class CatalogPage extends View {
       classNames: ['catalog-cards'],
     });
     this.currentSort = SortParameters.AlphabeticallyAZ;
-    this.currentFilter = [];
+    this.currentFilter = {};
+    FilterParameters.forEach((parameter) => {
+      this.currentFilter[parameter.name] = [];
+    });
     this.createSecondaryMenu();
     this.setContent();
   }
@@ -64,17 +67,13 @@ export default class CatalogPage extends View {
     this.viewElementCreator.addInnerElements([this.catalogCards]);
   }
 
-  private showProductCards(products: Product[]): void {
+  private showProductCards(products: ProductProjection[]): void {
     this.catalogCards.getElement().innerHTML = '';
     products.forEach((product) => {
       const {
-        masterData: {
-          current: {
-            name,
-            masterVariant: { images, prices, attributes },
-          },
-        },
         id,
+        name,
+        masterVariant: { images, prices, attributes },
       } = product;
 
       const card = new CatalogCard({
@@ -184,7 +183,8 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
-        // применить фильтры, обновить карточки, то же при закрытии меню фильтра
+        this.applyFilters();
+        // применить фильтры, обновить карточки, закрыть меню фильтров то же при закрытии меню фильтра
       },
     });
 
@@ -219,10 +219,11 @@ export default class CatalogPage extends View {
         classNames: ['checkbox-with-text'],
         callback: (): void => {
           if (filterMenuItem.getElement().classList.contains('active')) {
-            this.currentFilter = this.currentFilter.filter((item) => item !== text);
+            this.currentFilter[options.name] = this.currentFilter[options.name].filter((item) => item !== text);
           } else {
-            this.currentFilter.push(text);
+            this.currentFilter[options.name].push(text);
           }
+          console.log(this.currentFilter);
           filterMenuItem.getElement().classList.toggle('active');
         },
       });
@@ -238,5 +239,12 @@ export default class CatalogPage extends View {
     filterListBox.addInnerElements([filterList.getHtmlElement()]);
     container.addInnerElements([titleElement, filterListBox]);
     return container;
+  }
+
+  private async applyFilters(): Promise<void> {
+    const responce = await updateProducts(10, 0, this.currentFilter);
+    if (responce) {
+      this.showProductCards(responce);
+    }
   }
 }

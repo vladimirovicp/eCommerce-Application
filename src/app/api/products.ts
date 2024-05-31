@@ -1,10 +1,10 @@
-import { Product } from '@commercetools/platform-sdk';
+import { ProductProjection } from '@commercetools/platform-sdk';
 import { apiRoot } from './build-client';
 
-export default async function getProducts(limit: number, offset: number): Promise<Product[] | undefined> {
+export async function getProducts(limit: number, offset: number): Promise<ProductProjection[] | undefined> {
   try {
     const response = await apiRoot
-      .products()
+      .productProjections()
       .get({
         queryArgs: {
           limit,
@@ -14,6 +14,40 @@ export default async function getProducts(limit: number, offset: number): Promis
         },
       })
       .execute();
+    return response.body.results;
+  } catch (error) {
+    console.error('Failed to fetch products:', error);
+    return undefined;
+  }
+}
+
+export async function updateProducts(
+  limit: number,
+  offset: number,
+  filters: { [key: string]: string[] }
+): Promise<ProductProjection[] | undefined> {
+  try {
+    const query: string[] = [];
+    Object.keys(filters).forEach((key) => {
+      if (filters[key].length > 0) {
+        const values = filters[key].map((value) => `"${value}"`).join(', ');
+        query.push(`variants.attributes.${key}:${values}`);
+      }
+    });
+    console.log(query);
+
+    const response = await apiRoot
+      .productProjections()
+      .search()
+      .get({
+        queryArgs: {
+          limit,
+          offset,
+          'filter.query': query,
+        },
+      })
+      .execute();
+
     return response.body.results;
   } catch (error) {
     console.error('Failed to fetch products:', error);
