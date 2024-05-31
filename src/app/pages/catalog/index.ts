@@ -1,6 +1,6 @@
 import '../../../assets/scss/page/catalog.scss';
 import { ProductProjection } from '@commercetools/platform-sdk';
-import { getProducts, updateProducts } from '../../api/products';
+import updateProducts from '../../api/products';
 import View from '../../common/view';
 import SecondaryMenu from '../../components/secondary-menu';
 import ElementCreator from '../../util/element-creator';
@@ -13,6 +13,14 @@ enum SortParameters {
   AlphabeticallyZA = 'Alphabetically, Z-A',
   PriceLowToHigh = 'Price, low to high',
   PriceHighToLow = 'Price, high to low',
+}
+
+enum Categories {
+  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
+  'Youth Bikes' = 'af205cea-c574-49fd-9d83-4f1daa2f4edc',
+  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
+  'Hardtail Bikes' = 'f8375995-f174-4e8a-a3e4-bea3b402c725',
+  'Road Bikes' = '34c9a93e-cc3d-4495-bbfe-ad10edc02adb',
 }
 
 interface FilterParameter {
@@ -34,9 +42,15 @@ const FilterParameters: FilterParameter[] = [
 export default class CatalogPage extends View {
   private secondaryMenu: SecondaryMenu;
 
+  private cardsPerPage: number = 10;
+
+  private offset: number = 0;
+
   private catalogCards: ElementCreator;
 
   private currentSort: SortParameters;
+
+  private currentCategory: string;
 
   private currentFilter: { [key: string]: string[] };
 
@@ -47,6 +61,7 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
+    this.currentCategory = Categories['Dual Suspension Mountain Bikes'];
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -60,11 +75,13 @@ export default class CatalogPage extends View {
   }
 
   private async setContent(): Promise<void> {
-    const response = await getProducts(10, 0);
+    const categoryContainer = this.createCategoriesMenu();
+    this.viewElementCreator.addInnerElements([categoryContainer, this.catalogCards]);
+
+    const response = await updateProducts(this.cardsPerPage, this.offset, this.currentCategory);
     if (response) {
       this.showProductCards(response);
     }
-    this.viewElementCreator.addInnerElements([this.catalogCards]);
   }
 
   private showProductCards(products: ProductProjection[]): void {
@@ -87,6 +104,30 @@ export default class CatalogPage extends View {
 
       this.catalogCards.addInnerElements([card]);
     });
+  }
+
+  private createCategoriesMenu(): ElementCreator {
+    const categoryContainer = new ElementCreator({ classNames: ['category-container'] });
+    const categoryArray: HTMLElement[] = [];
+
+    Object.entries(Categories).forEach(([category, value], index) => {
+      const categoryElement = new ElementCreator({
+        classNames: index === 0 ? ['category', 'active'] : ['category'],
+        textContent: category,
+        callback: (event): void => {
+          const target = event?.target;
+          if (target instanceof HTMLElement && !target.classList.contains('active')) {
+            categoryArray.forEach((item) => item.classList.remove('active'));
+            target.classList.add('active');
+            this.currentCategory = value;
+            this.applyFilters(this.cardsPerPage, this.offset, this.currentFilter, this.currentCategory);
+          }
+        },
+      });
+      categoryArray.push(categoryElement.getElement());
+    });
+    categoryContainer.addInnerElements(categoryArray);
+    return categoryContainer;
   }
 
   private createSecondaryMenu(): void {
@@ -183,8 +224,8 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
-        this.applyFilters();
-        // применить фильтры, обновить карточки, закрыть меню фильтров то же при закрытии меню фильтра
+        this.applyFilters(this.cardsPerPage, this.offset, this.currentFilter, this.currentCategory);
+        // применить фильтры, обновить карточки, закрыть меню фильтров, то же при закрытии меню фильтра
       },
     });
 
@@ -223,7 +264,6 @@ export default class CatalogPage extends View {
           } else {
             this.currentFilter[options.name].push(text);
           }
-          console.log(this.currentFilter);
           filterMenuItem.getElement().classList.toggle('active');
         },
       });
@@ -241,8 +281,15 @@ export default class CatalogPage extends View {
     return container;
   }
 
-  private async applyFilters(): Promise<void> {
-    const responce = await updateProducts(10, 0, this.currentFilter);
+  private async applyFilters(
+    limit: number,
+    offset: number,
+    filters: {
+      [key: string]: string[];
+    },
+    category: string
+  ): Promise<void> {
+    const responce = await updateProducts(limit, offset, category, filters);
     if (responce) {
       this.showProductCards(responce);
     }

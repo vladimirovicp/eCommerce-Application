@@ -1,7 +1,24 @@
 .catalog {
   &-page {
     .container {
-      padding-top: 4.5rem;
+      padding-top: 0rem;
+    }
+
+    .category-container {
+      display: flex;
+      background-color: #9c9890;
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      .category {
+        cursor: pointer;
+      }
+
+      .active {
+        font-size: 1rem;
+        background: yellow;
+      }
     }
   }
 
