@@ -17,4 +17,22 @@ const getInputValue = (name: string, container: Element): string => {
   return input instanceof HTMLInputElement || input instanceof HTMLSelectElement ? input.value : '';
 };
 
-export { adaptiveCloseMenu, getInputValue };
+const sortChecked = (): void => {
+  const sortToggle = document.getElementById('sort-toggle') as HTMLInputElement;
+  if (sortToggle) {
+    if (sortToggle.checked) {
+      sortToggle.checked = false;
+    }
+  }
+};
+
+const filterChecked = (): void => {
+  const filterToggle = document.getElementById('filter-toggle') as HTMLInputElement;
+  if (filterToggle) {
+    if (filterToggle.checked) {
+      filterToggle.checked = false;
+    }
+  }
+};
+
+export { adaptiveCloseMenu, getInputValue, sortChecked, filterChecked };
