@@ -1,5 +1,4 @@
 .modal{
-
     position: fixed;
     top: 50%;
     left: -100%;
@@ -8,7 +7,7 @@
     z-index: 20;
     background-color: #1C1403;
     color: #fff;
-    padding: 3.5rem 1.6rem 1.5rem 1.6rem;
+    padding: 3.5rem 3rem 1.5rem 3rem;
     border: 1px solid #fff;
 
     &.active{
@@ -73,7 +72,6 @@
 
     &__btn{
         margin: .5rem auto 0;
-
         border-radius: 10rem;
         width: 100%;
         height: 2rem;
@@ -85,11 +83,32 @@
         cursor: pointer;
         border-color: #FDAD11;
         background-color: #F1CF8E;
-
-
-        
         &-box{
             margin: 0 auto;
+        }
+    }
+
+
+}
+
+.swiper-popup{
+    &__button{
+        &-prev, &-next{
+            position: absolute;
+            width: 1.2rem;
+            height: 1.7rem;
+            background:url('../img/svg/arrow_white.svg');
+            background-size: contain;
+            cursor: pointer;
+            top: 50%;
+            transform: translateX(-50%);
+        }
+        &-prev{
+            left: 0;
+            transform: rotate(180deg) translateX(-50%);
+        }
+        &-next{
+            right: 0;
         }
     }
 }
