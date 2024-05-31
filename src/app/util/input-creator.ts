@@ -19,13 +19,18 @@ class InputCreator extends ElementCreator<HTMLInputElement> {
     this.element.setAttribute('type', type);
   }
 
-  public createLabel(labelText: string, labelClass?: string): HTMLLabelElement {
+  public createLabel(labelText: string, labelClass?: string, innerElements?: ElementCreator[]): HTMLLabelElement {
     const labelParams: ElementParams = {
       tag: 'label',
       textContent: labelText,
       classNames: labelClass ? [labelClass] : undefined,
     };
     const labelCreator = new ElementCreator<HTMLLabelElement>(labelParams);
+
+    if (innerElements) {
+      labelCreator.addInnerElements(innerElements);
+    }
+
     const labelElement = labelCreator.getElement();
 
     if (this.element.id) {
