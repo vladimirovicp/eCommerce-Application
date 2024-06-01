@@ -9,8 +9,9 @@ import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
 
 enum SortParameters {
-  AlphabeticallyAZ = 'Alphabetically, A-Z',
-  AlphabeticallyZA = 'Alphabetically, Z-A',
+  'name.en-GB asc' = 'Alphabetically, A-Z',
+  'name.en-GB desc' = 'Alphabetically, Z-A',
+  // TODO вместо PriceLowToHigh и PriceHighToLow должен быть релевантный запрос на сортировку по цене
   PriceLowToHigh = 'Price, low to high',
   PriceHighToLow = 'Price, high to low',
 }
@@ -48,9 +49,11 @@ export default class CatalogPage extends View {
 
   private catalogCards: ElementCreator;
 
-  private currentSort: SortParameters;
+  private currentSort: string;
 
   private currentCategory: string;
+
+  private searchValue: string;
 
   private currentFilter: { [key: string]: string[] };
 
@@ -65,8 +68,9 @@ export default class CatalogPage extends View {
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
-    this.currentSort = SortParameters.AlphabeticallyAZ;
+    this.currentSort = 'name.en-GB asc';
     this.currentFilter = {};
+    this.searchValue = '';
     FilterParameters.forEach((parameter) => {
       this.currentFilter[parameter.name] = [];
     });
@@ -78,7 +82,7 @@ export default class CatalogPage extends View {
     const categoryContainer = this.createCategoriesMenu();
     this.viewElementCreator.addInnerElements([categoryContainer, this.catalogCards]);
 
-    const response = await updateProducts(this.cardsPerPage, this.offset, this.currentCategory);
+    const response = await updateProducts(this.cardsPerPage, this.offset, this.currentCategory, this.currentSort);
     if (response) {
       this.showProductCards(response);
     }
@@ -86,24 +90,28 @@ export default class CatalogPage extends View {
 
   private showProductCards(products: ProductProjection[]): void {
     this.catalogCards.getElement().innerHTML = '';
-    products.forEach((product) => {
-      const {
-        id,
-        name,
-        masterVariant: { images, prices, attributes },
-      } = product;
+    if (products.length === 0) {
+      this.catalogCards.getElement().innerHTML = 'No products found matching your request';
+    } else {
+      products.forEach((product) => {
+        const {
+          id,
+          name,
+          masterVariant: { images, prices, attributes },
+        } = product;
 
-      const card = new CatalogCard({
-        id,
-        name: attributes?.[1]?.value || '',
-        imageUrl: images?.[0]?.url || '',
-        description: name['en-GB'],
-        price: prices?.[0]?.value.centAmount || 0,
-        discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+        const card = new CatalogCard({
+          id,
+          name: attributes?.[1]?.value || '',
+          imageUrl: images?.[0]?.url || '',
+          description: name['en-GB'],
+          price: prices?.[0]?.value.centAmount || 0,
+          discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+        });
+
+        this.catalogCards.addInnerElements([card]);
       });
-
-      this.catalogCards.addInnerElements([card]);
-    });
+    }
   }
 
   private createCategoriesMenu(): ElementCreator {
@@ -119,8 +127,9 @@ export default class CatalogPage extends View {
           if (target instanceof HTMLElement && !target.classList.contains('active')) {
             categoryArray.forEach((item) => item.classList.remove('active'));
             target.classList.add('active');
+
             this.currentCategory = value;
-            this.applyFilters(this.cardsPerPage, this.offset, this.currentFilter, this.currentCategory);
+            this.applyСhanges();
           }
         },
       });
@@ -141,11 +150,17 @@ export default class CatalogPage extends View {
     const container = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__search'] });
 
     const input = new InputCreator({ type: 'search', attributes: { placeholder: 'search' } });
+    input.getElement().addEventListener('keypress', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        this.applySearch(input.getElement());
+      }
+    });
+
     const button = new ElementCreator<HTMLButtonElement>({
       tag: 'button',
       textContent: 'Search',
-      callback: (): void => {
-        // поиск
+      callback: async (): Promise<void> => {
+        this.applySearch(input.getElement());
       },
     });
     container.addInnerElements([input, button]);
@@ -176,21 +191,22 @@ export default class CatalogPage extends View {
   }
 
   private createSortParameters(switchInput: InputCreator): HTMLElement {
-    const sortMenuItems = Object.keys(SortParameters).map((key, index) => {
-      const value = SortParameters[key as keyof typeof SortParameters];
+    const sortMenuItems = Object.entries(SortParameters).map(([key, value], index) => {
       const sortMenuItem = new ElementCreator<HTMLDivElement>({
         classNames: index === 0 ? ['checkbox-with-text', 'active'] : ['checkbox-with-text'],
-        callback: (): void => {
-          this.currentSort = value;
+        callback: async (): Promise<void> => {
+          this.currentSort = key;
+          // переключение классов для того, чтобы чекбокс стал активным
           sortMenuItems.forEach((item) => {
             if (item.classList.contains('active')) {
               item.classList.remove('active');
             }
           });
           sortMenuItem.getElement().classList.add('active');
+
           switchInput.getElement().dispatchEvent(new MouseEvent('click'));
-          // обновить данные
-          // закрывать меню по клику снаружи
+          this.applyСhanges();
+          // TODO закрыть меню
         },
       });
       sortMenuItem.getElement().innerHTML = `<span class="filter__decor"></span><span class="filter__text">${value}</span>`;
@@ -224,8 +240,8 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
-        this.applyFilters(this.cardsPerPage, this.offset, this.currentFilter, this.currentCategory);
-        // применить фильтры, обновить карточки, закрыть меню фильтров, то же при закрытии меню фильтра
+        this.applyСhanges();
+        // TODO закрыть меню фильтров, тот же колбэк должен применяться при любом закрытии меню фильтров
       },
     });
 
@@ -281,17 +297,32 @@ export default class CatalogPage extends View {
     return container;
   }
 
-  private async applyFilters(
-    limit: number,
-    offset: number,
-    filters: {
-      [key: string]: string[];
-    },
-    category: string
-  ): Promise<void> {
-    const responce = await updateProducts(limit, offset, category, filters);
-    if (responce) {
-      this.showProductCards(responce);
+  private async applyСhanges(): Promise<void> {
+    const response = await updateProducts(
+      this.cardsPerPage,
+      this.offset,
+      this.currentCategory,
+      this.currentSort,
+      this.currentFilter,
+      this.searchValue ? this.searchValue : undefined
+    );
+    if (response) {
+      this.showProductCards(response);
     }
+  }
+
+  private async applySearch(input: HTMLInputElement): Promise<void> {
+    this.searchValue = input.value;
+    // введенное значение остается в инпуте, показывая по чему мы сейчас фильтруем
+    // введенное в поиске значение СОХРАНЯЕТСЯ при переходе по категориям (?)
+
+    // сбрасываем все фильтры
+    FilterParameters.forEach((parameter) => {
+      this.currentFilter[parameter.name] = [];
+    });
+    document.querySelectorAll('.checkbox-with-text').forEach((filter) => {
+      filter.classList.remove('active');
+    });
+    this.applyСhanges();
   }
 }
