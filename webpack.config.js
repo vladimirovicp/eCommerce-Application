@@ -47,13 +47,17 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'dist'),
       clean: true,
       assetModuleFilename: 'assets/[hash][ext]',
+      // publicPath: '/',
     },
     devServer: {
       static: path.join(__dirname, 'src'),
       compress: true,
       port: 9000,
       open: true,
-      historyApiFallback: true,
+      // historyApiFallback: true,
+      historyApiFallback: {
+        index: '/',
+      },
     },
   };
 };

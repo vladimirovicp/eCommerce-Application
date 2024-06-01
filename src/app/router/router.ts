@@ -1,5 +1,4 @@
-// import { Pages, PRODUCT_ID } from './pages';
-import { Pages } from './pages';
+import { PRODUCT_ID, Pages } from './pages';
 import { PagePath, Route } from './router-types';
 
 export default class Router {
@@ -20,7 +19,7 @@ export default class Router {
   navigate(path: string): void {
     const parsedPath = this.parseUrl(path);
     const pathToFind =
-      parsedPath.productId === undefined ? parsedPath.pageName : `${parsedPath.pageName}/${parsedPath.productId}`;
+      parsedPath.productId === undefined ? parsedPath.pageName : `${parsedPath.pageName}/${PRODUCT_ID}`;
     const route = this.routes.find((item) => item.path === pathToFind);
     if (route === undefined) {
       const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
@@ -28,21 +27,27 @@ export default class Router {
         routeNotFound.callback();
       }
     } else {
-      // route.callback(parsedPath.productId);
-      window.history.pushState({}, '', `/${route.path}`);
-      route.callback();
+      const pathToShow =
+        parsedPath.productId === undefined
+          ? `/${parsedPath.pageName}`
+          : `/${parsedPath.pageName}/${parsedPath.productId}`;
+      window.history.pushState({}, '', pathToShow);
+      route.callback(parsedPath.productId);
     }
   }
 
   private navigateOnload(path: string): void {
-    const route = this.routes.find((item) => item.path === path);
+    const parsedPath = this.parseUrl(path);
+    const pathToFind =
+      parsedPath.productId === undefined ? parsedPath.pageName : `${parsedPath.pageName}/${PRODUCT_ID}`;
+    const route = this.routes.find((item) => item.path === pathToFind);
     if (route === undefined) {
       const routeNotFound = this.routes.find((item) => item.path === Pages.NOT_FOUND);
       if (routeNotFound !== undefined) {
         routeNotFound.callback();
       }
     } else {
-      route.callback();
+      route.callback(parsedPath.productId);
     }
   }
 

@@ -7,6 +7,7 @@ import ElementCreator from '../../util/element-creator';
 import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
+import Router from '../../router/router';
 
 enum SortParameters {
   AlphabeticallyAZ = 'Alphabetically, A-Z',
@@ -32,6 +33,8 @@ const FilterParameters: FilterParameter[] = [
 ];
 
 export default class CatalogPage extends View {
+  private router: Router;
+
   private secondaryMenu: SecondaryMenu;
 
   private catalogCards: ElementCreator;
@@ -40,7 +43,7 @@ export default class CatalogPage extends View {
 
   private currentFilter: string[];
 
-  constructor(secondaryMenu: SecondaryMenu) {
+  constructor(secondaryMenu: SecondaryMenu, router: Router) {
     const params = {
       tag: 'div',
       classNames: ['container'],
@@ -54,6 +57,7 @@ export default class CatalogPage extends View {
     this.currentFilter = [];
     this.createSecondaryMenu();
     this.setContent();
+    this.router = router;
   }
 
   private async setContent(): Promise<void> {
@@ -75,16 +79,21 @@ export default class CatalogPage extends View {
           },
         },
         id,
+        key,
       } = product;
 
-      const card = new CatalogCard({
-        id,
-        name: attributes?.[1]?.value || '',
-        imageUrl: images?.[0]?.url || '',
-        description: name['en-GB'],
-        price: prices?.[0]?.value.centAmount || 0,
-        discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
-      });
+      const card = new CatalogCard(
+        {
+          id,
+          name: attributes?.[1]?.value || '',
+          imageUrl: images?.[0]?.url || '',
+          description: name['en-GB'],
+          price: prices?.[0]?.value.centAmount || 0,
+          discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+          key,
+        },
+        this.router
+      );
 
       this.catalogCards.addInnerElements([card]);
     });

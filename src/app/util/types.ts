@@ -53,4 +53,5 @@ export interface CatalogCardParams {
   description: string;
   price: number;
   discountPrice: number;
+  key?: string;
 }
