@@ -7,6 +7,7 @@ import ElementCreator from '../../util/element-creator';
 import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
+import { sortChecked, filterChecked } from '../../util/helper';
 
 enum SortParameters {
   'name.en-GB asc' = 'Alphabetically, A-Z',
@@ -170,7 +171,14 @@ export default class CatalogPage extends View {
 
   private createSortMenu(): ElementCreator {
     const sortContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__sort'] });
-    const switchInput = new InputCreator({ type: 'checkbox', id: 'sort-toggle', classNames: ['sort-toggle__input'] });
+    const switchInput = new InputCreator({
+      type: 'checkbox',
+      id: 'sort-toggle',
+      classNames: ['sort-toggle__input'],
+      callback: (): void => {
+        filterChecked();
+      },
+    });
     const sortByElement = new ElementCreator<HTMLDivElement>({
       classNames: ['secondary-menu__sort-text'],
       textContent: 'Sort by:',
@@ -223,11 +231,13 @@ export default class CatalogPage extends View {
 
   private createFilterMenu(): ElementCreator<HTMLDivElement> {
     const filterContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter'] });
-
     const switchInput = new InputCreator({
       type: 'checkbox',
       id: 'filter-toggle',
       classNames: ['filter-toggle__input'],
+      callback: (): void => {
+        sortChecked();
+      },
     });
     const stringElement = new ElementCreator({
       tag: 'span',
@@ -244,7 +254,6 @@ export default class CatalogPage extends View {
         // TODO закрыть меню фильтров, тот же колбэк должен применяться при любом закрытии меню фильтров
       },
     });
-
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });
     const filterTitle = new ElementCreator<HTMLDivElement>({
       classNames: ['secondary-menu__filter-title'],
