@@ -1,4 +1,5 @@
 import '../../../assets/scss/page/catalog.scss';
+import './index.scss';
 import { ProductProjection } from '@commercetools/platform-sdk';
 import updateProducts from '../../api/products';
 import View from '../../common/view';
@@ -238,6 +239,7 @@ export default class CatalogPage extends View {
     return sortList.getHtmlElement();
   }
 
+  /* eslint-disable max-lines-per-function */
   private createFilterMenu(): ElementCreator<HTMLDivElement> {
     const filterContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter'] });
     const switchInput = new InputCreator({

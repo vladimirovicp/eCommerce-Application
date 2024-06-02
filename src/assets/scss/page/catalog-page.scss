@@ -1,11 +1,14 @@
-.catalog-page{
+.catalog-product{
     .container{
         display: flex;
         justify-content: space-between;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
     }
 
     &__slider{
         width: 35rem;
+        //background-color: bisque;
         display: flex;
         justify-content: space-between;
         padding: 2rem 0 2rem 2rem;
@@ -14,26 +17,32 @@
         .swiper{
             &-carousel{
                 width: 6rem;
+                //background-color:green;
                 margin: 0;
                 height: 27rem;
                 top: 50%;
                 transform: translateY(-50%);
+
                 &__wrapper{
                     position: relative;
                 }
+
                 .swiper-wrapper{
 
                 }
+
                 .swiper-slide{
                     img{
                         opacity: 0.5;
                         transition: opacity .4s ease-in-out;
                     } 
                 }
+
                 .swiper-slide-thumb-active{
                     img{
                         opacity: 1;
                     }
+                    
                 }
             }
 

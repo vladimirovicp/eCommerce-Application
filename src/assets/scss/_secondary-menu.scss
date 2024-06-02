@@ -120,6 +120,12 @@
             opacity: 0;
 
             transition: height .5s, line-height .5s, opacity .5s, padding .5s, border .5s;
+
+            .btn-default{
+                height: 0;
+                font-size: 0;
+                border: 0;
+            }
         }
 
         &-title{
@@ -142,6 +148,11 @@
                 }
                 .filter-item{
                     padding-bottom: .4rem;
+                }
+                .btn-default{
+                    height: 2.5rem;
+                    font-size: unset;
+                    border: 0.2rem solid #FDAD11;
                 }
             }
         }

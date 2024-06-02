@@ -73,7 +73,7 @@ export default class ProductPage extends View {
   private setSlider(params: ProductResponse): HTMLElement {
     const slider = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__slider'],
+      classNames: ['catalog-product__slider'],
     });
     const image = new ElementCreator({
       tag: 'img',
@@ -93,18 +93,18 @@ export default class ProductPage extends View {
   private setProductInfo(params: ProductResponse): HTMLElement {
     const infoContainer = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__info'],
+      classNames: ['catalog-product__info'],
     });
 
     const title = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__title'],
+      classNames: ['catalog-product__title'],
       textContent: params.name,
     });
 
     const descriptionContainer = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__text'],
+      classNames: ['catalog-product__text'],
     });
     descriptionContainer.addInnerElements([
       new ElementCreator({
@@ -120,29 +120,29 @@ export default class ProductPage extends View {
   private setProductPrices(params: ProductResponse): HTMLElement {
     const сontainer = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__price'],
+      classNames: ['catalog-product__price'],
     });
 
     const pricesContainer = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__price-wrapper'],
+      classNames: ['catalog-product__price-wrapper'],
     });
     pricesContainer.addInnerElements([
       new ElementCreator({
         tag: 'div',
-        classNames: ['catalog-page__price-discount'],
+        classNames: ['catalog-product__price-discount'],
         textContent: `$ ${params.discountPrice / 100}`,
       }),
       new ElementCreator({
         tag: 'div',
-        classNames: ['catalog-page__price-old'],
+        classNames: ['catalog-product__price-old'],
         textContent: `$ ${params.fullPrice / 100}`,
       }),
     ]);
 
     const buttonContainer = new ElementCreator({
       tag: 'div',
-      classNames: ['catalog-page__btn'],
+      classNames: ['catalog-product__btn'],
     });
     const button = new ElementCreator({
       tag: 'button',
