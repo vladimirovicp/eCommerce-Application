@@ -18,6 +18,7 @@ import SecondaryMenu from './app/components/secondary-menu';
 import { createApiRootRefreshTokenFlow } from './app/api/build-client';
 import customerService from './app/api/customers-requests';
 
+
 class App {
   private header: HeaderView;
 
