@@ -7,15 +7,6 @@ import '../../../assets/scss/page/catalog-page.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 
-/* eslint-disable */
-const swiperCarousel = new Swiper('.swiper-general', {
-  direction: 'vertical',
-  spaceBetween: 10,
-  slidesPerView: 4,
-  freeMode: true,
-  watchSlidesProgress: true,
-});
-
 interface ProductResponse {
   name: string;
   description: string;
@@ -81,8 +72,18 @@ export default class ProductPage extends View {
       this.setProductPrices(params),
     ]);
   }
+  /* eslint-disable max-lines-per-function */
 
   private setSlider(params: ProductResponse): HTMLElement {
+    /* eslint-disable */
+    const swiperCarousel = new Swiper('.swiper-general', {
+      direction: 'vertical',
+      spaceBetween: 10,
+      slidesPerView: 4,
+      freeMode: true,
+      watchSlidesProgress: true,
+    });
+
     const slider = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-product__slider'],
@@ -92,9 +93,9 @@ export default class ProductPage extends View {
       classNames: ['swiper-carousel__wrapper'],
     });
 
-    const swiperCarousel = new ElementCreator({
+    const swiperCarousel2 = new ElementCreator({
       tag: 'div',
-      classNames: ['swiper','swiper-general'],
+      classNames: ['swiper', 'swiper-general'],
     });
 
     const swiperWrapper = new ElementCreator({
@@ -175,8 +176,8 @@ export default class ProductPage extends View {
 
     swiperWrapper.addInnerElements([swiperslide1,swiperslide2,swiperslide3,swiperslide4, generalButtonprev, generalButtonNext])
 
-    swiperCarousel.addInnerElements([swiperWrapper])
-    swiperCarouselWrapper.addInnerElements([swiperCarousel])
+    swiperCarousel2.addInnerElements([swiperWrapper])
+    swiperCarouselWrapper.addInnerElements([swiperCarousel2])
     //swiperCarouselWrapper.addInnerElements([image]);
     slider.addInnerElements([swiperCarouselWrapper]);
     //slider.addInnerElements([image]);
