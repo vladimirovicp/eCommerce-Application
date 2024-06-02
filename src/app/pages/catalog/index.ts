@@ -8,6 +8,7 @@ import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
 import { sortChecked, filterChecked } from '../../util/helper';
+import Router from '../../router/router';
 
 enum SortParameters {
   'name.en-GB asc' = 'Alphabetically, A-Z',
@@ -42,6 +43,8 @@ const FilterParameters: FilterParameter[] = [
 ];
 
 export default class CatalogPage extends View {
+  private router: Router;
+
   private secondaryMenu: SecondaryMenu;
 
   private cardsPerPage: number = 10;
@@ -58,7 +61,7 @@ export default class CatalogPage extends View {
 
   private currentFilter: { [key: string]: string[] };
 
-  constructor(secondaryMenu: SecondaryMenu) {
+  constructor(secondaryMenu: SecondaryMenu, router: Router) {
     const params = {
       tag: 'div',
       classNames: ['container'],
@@ -77,6 +80,7 @@ export default class CatalogPage extends View {
     });
     this.createSecondaryMenu();
     this.setContent();
+    this.router = router;
   }
 
   private async setContent(): Promise<void> {
@@ -98,17 +102,22 @@ export default class CatalogPage extends View {
         const {
           id,
           name,
+          key,
           masterVariant: { images, prices, attributes },
         } = product;
 
-        const card = new CatalogCard({
-          id,
-          name: attributes?.[1]?.value || '',
-          imageUrl: images?.[0]?.url || '',
-          description: name['en-GB'],
-          price: prices?.[0]?.value.centAmount || 0,
-          discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
-        });
+        const card = new CatalogCard(
+          {
+            id,
+            name: attributes?.[1]?.value || '',
+            imageUrl: images?.[0]?.url || '',
+            description: name['en-GB'],
+            price: prices?.[0]?.value.centAmount || 0,
+            discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+            key,
+          },
+          this.router
+        );
 
         this.catalogCards.addInnerElements([card]);
       });

@@ -3,7 +3,7 @@ import HeaderView from './app/components/header/header';
 import MainView from './app/components/main/main';
 import FooterView from './app/components/footer/footer';
 import Router from './app/router/router';
-import { Pages } from './app/router/pages';
+import { Pages, PRODUCT_ID } from './app/router/pages';
 import { Route } from './app/router/router-types';
 import NotFoundPage from './app/pages/not-found';
 import HomePage from './app/pages/home';
@@ -15,9 +15,9 @@ import ProfilePage from './app/pages/profile';
 import CartPage from './app/pages/cart';
 import View from './app/common/view';
 import SecondaryMenu from './app/components/secondary-menu';
+import ProductPage from './app/pages/product';
 import { createApiRootRefreshTokenFlow } from './app/api/build-client';
 import customerService from './app/api/customers-requests';
-
 
 class App {
   private header: HeaderView;
@@ -89,13 +89,17 @@ class App {
         path: `${Pages.CATALOG}`,
         callback: (): void => {
           this.secondaryMenu.updateContent();
-          this.updateMain(new CatalogPage(this.secondaryMenu), 'catalog-page');
+          this.updateMain(new CatalogPage(this.secondaryMenu, this.router), 'catalog-page');
         },
       },
-      /* {
+      {
         path: `${Pages.CATALOG}/${PRODUCT_ID}`,
-        callback: (id?: string): void => {},
-      }, */
+        callback: (id?: string): void => {
+          if (id !== undefined) {
+            this.updateMain(new ProductPage(id), 'catalog-page');
+          }
+        },
+      },
       {
         path: `${Pages.ABOUT}`,
         callback: (): void => {

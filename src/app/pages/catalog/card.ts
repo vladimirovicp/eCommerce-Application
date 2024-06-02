@@ -1,12 +1,20 @@
+import { Pages } from '../../router/pages';
+import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
 import { CatalogCardParams } from '../../util/types';
 
 export default class CatalogCard extends ElementCreator {
-  constructor(cardParams: CatalogCardParams) {
+  private router: Router;
+
+  constructor(cardParams: CatalogCardParams, router: Router) {
     super({
       tag: 'div',
       classNames: ['catalog-card'],
+      callback: () => {
+        this.router.navigate(`${Pages.CATALOG}/${cardParams.key}`);
+      },
     });
+    this.router = router;
     this.configureCard(cardParams);
   }
 
