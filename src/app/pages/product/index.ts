@@ -1,8 +1,20 @@
 // import { ProductProjection } from '@commercetools/platform-sdk';
+import Swiper from 'swiper';
+import 'swiper/css/bundle';
+
 import { apiRoot } from '../../api/build-client';
 import '../../../assets/scss/page/catalog-page.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
+
+/* eslint-disable */
+const swiperCarousel = new Swiper('.swiper-carousel', {
+  direction: 'vertical',
+  spaceBetween: 10,
+  slidesPerView: 4,
+  freeMode: true,
+  watchSlidesProgress: true,
+});
 
 interface ProductResponse {
   name: string;
@@ -75,18 +87,99 @@ export default class ProductPage extends View {
       tag: 'div',
       classNames: ['catalog-product__slider'],
     });
+    const swiperCarouselWrapper = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-carousel__wrapper'],
+    });
+
+    const swiperCarousel = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper','swiper-general'],
+    });
+
+    const swiperWrapper = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-wrapper'],
+    });
+
+    const swiperslide1 = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-slide'],
+    });
+    const swiperslide2 = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-slide'],
+    });
+    const swiperslide3 = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-slide'],
+    });
+    const swiperslide4 = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-slide'],
+    });
+
+
     const image = new ElementCreator({
       tag: 'img',
+      classNames: ['img-full'],
       attributes: {
         src: params.images[0],
         alt: 'Photo',
       },
     });
+    const image2 = new ElementCreator({
+      tag: 'img',
+      classNames: ['img-full'],
+      attributes: {
+        src: params.images[0],
+        alt: 'Photo',
+      },
+    });
+    const image3 = new ElementCreator({
+      tag: 'img',
+      classNames: ['img-full'],
+      attributes: {
+        src: params.images[0],
+        alt: 'Photo',
+      },
+    });
+    const image4 = new ElementCreator({
+      tag: 'img',
+      classNames: ['img-full'],
+      attributes: {
+        src: params.images[0],
+        alt: 'Photo',
+      },
+    });
+
+
+    const generalButtonprev = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-general__button-prev'],
+    });
+    const generalButtonNext = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-general__button-next'],
+    });
+
+
     /*
     Url фотографий лежат в массиве params.images
     */
 
-    slider.addInnerElements([image]);
+    swiperslide1.addInnerElements([image]);
+    swiperslide2.addInnerElements([image2]);
+    swiperslide3.addInnerElements([image3]);
+    swiperslide4.addInnerElements([image4]);
+
+    swiperWrapper.addInnerElements([swiperslide1,swiperslide2,swiperslide3,swiperslide4, generalButtonprev, generalButtonNext])
+
+    swiperCarousel.addInnerElements([swiperWrapper])
+    swiperCarouselWrapper.addInnerElements([swiperCarousel])
+    //swiperCarouselWrapper.addInnerElements([image]);
+    slider.addInnerElements([swiperCarouselWrapper]);
+    //slider.addInnerElements([image]);
     return slider.getElement();
   }
 
