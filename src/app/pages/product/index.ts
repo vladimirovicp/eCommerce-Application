@@ -1,5 +1,6 @@
 // import { ProductProjection } from '@commercetools/platform-sdk';
 import Swiper from 'swiper';
+import { Navigation, Pagination, Thumbs } from 'swiper/modules';
 import 'swiper/css/bundle';
 
 import { apiRoot } from '../../api/build-client';
@@ -65,22 +66,55 @@ export default class ProductPage extends View {
     }
   }
 
-  private configurePage(params: ProductResponse): void {
-    this.viewElementCreator.addInnerElements([
-      this.setSlider(params),
-      this.setProductInfo(params),
-      this.setProductPrices(params),
-    ]);
-    /* eslint-disable */
-    const swiper = new Swiper('.swiper-general', {
+  private configureSwiper(): void {
+    const swiperCarouselSettings = new Swiper('.swiper-carousel', {
       direction: 'vertical',
       spaceBetween: 10,
       slidesPerView: 4,
       freeMode: true,
       watchSlidesProgress: true,
+      navigation: {
+        nextEl: '.swiper-general__button-next',
+        prevEl: '.swiper-general__button-prev',
+      },
+    });
+    /* eslint-disable */
+    const swiperGeneralSettings = new Swiper('.swiper-general', {
+      modules: [Navigation, Pagination, Thumbs],
+      loop: true,
+      spaceBetween: 10,
+      thumbs: {
+        swiper: swiperCarouselSettings,
+      },
+      navigation: {
+        nextEl: '.swiper-general__button-next',
+        prevEl: '.swiper-general__button-prev',
+      },
+    });
+
+    const swiperPopupSettings = new Swiper('.swiper-popup', {
+      modules: [Navigation, Thumbs],
+      loop: true,
+      spaceBetween: 10,
+      thumbs: {
+        swiper: swiperCarouselSettings,
+      },
+      navigation: {
+        nextEl: '.swiper-popup__button-prev',
+        prevEl: '.swiper-popup__button-next',
+      },
     });
   }
-  /* eslint-disable max-lines-per-function */
+
+  private configurePage(params: ProductResponse): void {
+    this.viewElementCreator.addInnerElements([
+      this.setSlider(params),
+      this.setProductInfo(params),
+      this.setProductPrices(params),
+      this.createModalSlide(params),
+    ]);
+    this.configureSwiper();
+  }
 
   private setSlider(params: ProductResponse): HTMLElement {
     const slider = new ElementCreator({
@@ -91,101 +125,115 @@ export default class ProductPage extends View {
       tag: 'div',
       classNames: ['swiper-carousel__wrapper'],
     });
-
-    const swiperCarousel2 = new ElementCreator({
+    const swiperCarousel = this.createSlider(params.images,'swiper-carousel');
+    swiperCarouselWrapper.addInnerElements([swiperCarousel]);
+    const buttonPrev = new ElementCreator({
       tag: 'div',
-      classNames: ['swiper', 'swiper-general'],
+      classNames: ['swiper-general__button-prev'],
     });
+    const buttonNext = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper-general__button-next'],
+    });
+    swiperCarouselWrapper.addInnerElements([buttonPrev, buttonNext]);
+    const swiperGeneral = this.createSlider(params.images, 'swiper-general');
+    slider.addInnerElements([swiperCarouselWrapper, swiperGeneral]);
+    return slider.getElement();
+  }
 
+  private createSlider(images: string[], classSlider: string): ElementCreator {
+    let swiperCarousel = new ElementCreator({
+      tag: 'div',
+      classNames: ['swiper', classSlider],
+    });
+    if (classSlider === 'swiper-carousel') {
+      swiperCarousel = new ElementCreator({
+        tag: 'div',
+        classNames: ['swiper', classSlider],
+        attributes: { thumbsSlider: '' },
+      });
+    }
     const swiperWrapper = new ElementCreator({
       tag: 'div',
       classNames: ['swiper-wrapper'],
     });
-
-    const swiperslide1 = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-slide'],
-    });
-    const swiperslide2 = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-slide'],
-    });
-    const swiperslide3 = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-slide'],
-    });
-    const swiperslide4 = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-slide'],
-    });
-
-    const image = new ElementCreator({
-      tag: 'img',
-      classNames: ['img-full'],
-      attributes: {
-        src: params.images[0],
-        alt: 'Photo',
-      },
-    });
-    const image2 = new ElementCreator({
-      tag: 'img',
-      classNames: ['img-full'],
-      attributes: {
-        src: params.images[0],
-        alt: 'Photo',
-      },
-    });
-    const image3 = new ElementCreator({
-      tag: 'img',
-      classNames: ['img-full'],
-      attributes: {
-        src: params.images[0],
-        alt: 'Photo',
-      },
-    });
-    const image4 = new ElementCreator({
-      tag: 'img',
-      classNames: ['img-full'],
-      attributes: {
-        src: params.images[0],
-        alt: 'Photo',
-      },
-    });
-
-    const generalButtonprev = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-general__button-prev'],
-    });
-    const generalButtonNext = new ElementCreator({
-      tag: 'div',
-      classNames: ['swiper-general__button-next'],
-    });
-
-    /*
-    Url фотографий лежат в массиве params.images
-    */
-
-    swiperslide1.addInnerElements([image]);
-    swiperslide2.addInnerElements([image2]);
-    swiperslide3.addInnerElements([image3]);
-    swiperslide4.addInnerElements([image4]);
-
-    swiperWrapper.addInnerElements([
-      swiperslide1,
-      swiperslide2,
-      swiperslide3,
-      swiperslide4,
-      generalButtonprev,
-      generalButtonNext,
-    ]);
-
-    swiperCarousel2.addInnerElements([swiperWrapper]);
-    swiperCarouselWrapper.addInnerElements([swiperCarousel2]);
-    //swiperCarouselWrapper.addInnerElements([image]);
-    slider.addInnerElements([swiperCarouselWrapper]);
-    //slider.addInnerElements([image]);
-    return slider.getElement();
+    let coutn: number = 4;
+    let imagDefault = true;
+    if (images.length >= coutn){
+      coutn = images.length;
+      imagDefault = false;
+    }
+    for (let i = 0; i < coutn; i += 1) {
+      const src: string = imagDefault ? images[0] : images[i];
+      let swiperslide = new ElementCreator({
+        tag: 'div',
+        classNames: ['swiper-slide'],
+      });
+      if (classSlider === 'swiper-general' ){
+        swiperslide = new ElementCreator({
+          tag: 'div',
+          classNames: ['swiper-slide'],
+          callback: () => {
+            const modalStandart = document.querySelector('.modal__standart');
+            if (modalStandart){
+              modalStandart.classList.add('active');
+              document.body.classList.add('_lock');
+            }
+          }
+        });
+      }
+      const image = new ElementCreator({
+        tag: 'img',
+        classNames: ['img-full'],
+        attributes: {
+          src: src,
+          alt: 'Photo',
+        },
+      });
+      swiperslide.addInnerElements([image]);
+      swiperWrapper.addInnerElements([swiperslide]);
+    }
+    swiperCarousel.addInnerElements([swiperWrapper]);
+    return swiperCarousel;
   }
+
+  private createModalSlide(params: ProductResponse): HTMLElement{
+    const modal = new ElementCreator({
+      tag: 'div',
+      classNames: ['modal', 'modal__standart'],
+    });
+    const modalClose = new ElementCreator({
+      tag: 'span',
+      classNames: ['modal__close', 'modal-close__standart'],
+      callback: () => {
+        const closeModalStandart = document.querySelector('.modal-close__standart');
+        const modalStandart = document.querySelector('.modal__standart');
+        if (modalStandart && closeModalStandart) {
+          modalStandart.classList.remove('active');
+          document.body.classList.remove('_lock');
+        }
+      }
+    });
+    const modalContent = new ElementCreator({
+      classNames: ['modal__content'],
+    });
+
+    const buttonPrev = new ElementCreator({
+      classNames: ['swiper-popup__button-prev'],
+    });
+    const buttonNext = new ElementCreator({
+      classNames: ['swiper-popup__button-next'],
+    });
+
+    const swiperswiperPopup = this.createSlider(params.images, 'swiper-popup');
+
+    modalContent.addInnerElements([swiperswiperPopup]);
+
+    modal.addInnerElements([modalClose,modalContent,buttonPrev,buttonNext]);
+
+    return modal.getElement();
+  }
+
 
   private setProductInfo(params: ProductResponse): HTMLElement {
     const infoContainer = new ElementCreator({
