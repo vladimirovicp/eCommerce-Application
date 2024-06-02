@@ -21,14 +21,30 @@
         background: yellow;
       }
     }
+  }
 
-    &-cards{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 2rem;
+  &-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  &-card {
+    width: 13.4rem;
+    //height: 27.1rem;
+    border: 1px solid #9c9890;
+    border-radius: 1.2rem;
+    overflow: hidden;
+
+    &__img {
+      height: 17.4rem;
+      border-radius: 1.2rem;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
     }
-
 
     &-card{
         width: 13.4rem;
@@ -91,8 +107,20 @@
 
         &__btn{
             margin: 0 .5rem .5rem;
-
         }
+      }
+    }
+    &__title {
+      padding-bottom: 0.5rem;
+      padding-left: 1rem;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
+    }
+    &__description {
+      font-size: 0.7rem;
+      margin: 0 1rem 1rem;
+      cursor: pointer;
     }
 }
 
@@ -104,23 +132,21 @@
     }
 }
 
-
 @media (hover: hover) {
-    .catalog{
-        &-card{
-            &__img{
-                img{
-                    transform: scale(1.2);
-                    transition: all .4s ease-in;
-                }
-
-            }
-
-            &:hover{
-                .catalog-card__img img{
-                    transform: scale(1);
-                }
-            }
+  .catalog {
+    &-card {
+      &__img {
+        img {
+          transform: scale(1.2);
+          transition: all 0.4s ease-in;
         }
+      }
+
+      &:hover {
+        .catalog-card__img img {
+          transform: scale(1);
+        }
+      }
     }
+  }
 }

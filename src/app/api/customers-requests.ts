@@ -7,31 +7,34 @@ import {
   MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
-import { apiRoot, createApiRootPasswordFlow } from './build-client';
+import { apiRoot, createApiRootRefreshTokenFlow, fetchAuthToken } from './build-client';
+
+enum ErrorMessages {
+  authorize = 'Authorization failed:',
+  register = 'Registration failed:',
+  getInfo = "Can't get customer profile:",
+  updateInfo = "Can't update customer profile:",
+}
 
 class CustomerService {
-  public customerInfo: Customer | undefined;
+  // public customerInfo: Customer | undefined;
 
-  private apiRootPasswordFlow: ByProjectKeyRequestBuilder | undefined = undefined;
+  public apiRootRefreshToken: ByProjectKeyRequestBuilder | undefined = undefined;
 
   public async authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
     try {
       const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
       if (response && response.statusCode === 200) {
-        const { id } = response.body.customer;
-        this.customerInfo = response.body.customer;
-        localStorage.setItem('userId', id);
-        this.apiRootPasswordFlow = createApiRootPasswordFlow(customerDraft.email, customerDraft.password);
+        // this.customerInfo = response.body.customer;
+        // localStorage.setItem('userId', id);
+        const token = await fetchAuthToken(customerDraft.email, customerDraft.password);
+        this.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
         return true;
       }
       modalWindowCreator.showModalWindow('error', 'Authorization failed. Please try again.');
       return false;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? error.message
-          : 'Unknown error. Please try again later';
-      modalWindowCreator.showModalWindow('error', `${errorMessage}`);
+      this.handleError(ErrorMessages.authorize, error);
       return false;
     }
   }
@@ -46,37 +49,29 @@ class CustomerService {
       });
       return true;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? error.message
-          : 'Unknown error. Please try again later';
-      modalWindowCreator.showModalWindow('error', `Registration failed: ${errorMessage}`);
+      this.handleError(ErrorMessages.register, error);
       return false;
     }
   }
 
   public async getCustomerInfo(): Promise<null | Customer> {
     try {
-      if (this.apiRootPasswordFlow) {
-        const response = await this.apiRootPasswordFlow.me().get().execute();
+      if (this.apiRootRefreshToken) {
+        const response = await this.apiRootRefreshToken.me().get().execute();
         const customerInfo = response.body;
         return customerInfo;
       }
       return null;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? error.message
-          : 'Unknown error. Please try again later';
-      modalWindowCreator.showModalWindow('error', `Can't get customer profile: ${errorMessage}`);
+      this.handleError(ErrorMessages.getInfo, error);
       return null;
     }
   }
 
   public async updateCustomer(updateData: MyCustomerUpdate): Promise<boolean> {
     try {
-      if (this.apiRootPasswordFlow) {
-        const response = await this.apiRootPasswordFlow.me().post({ body: updateData }).execute();
+      if (this.apiRootRefreshToken) {
+        const response = await this.apiRootRefreshToken.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
           return true;
         }
@@ -84,19 +79,15 @@ class CustomerService {
       modalWindowCreator.showModalWindow('error', 'Unknown error. Please try again later');
       return false;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? error.message
-          : 'Unknown error. Please try again later';
-      modalWindowCreator.showModalWindow('error', `Can't update customer profile: ${errorMessage}`);
+      this.handleError(ErrorMessages.updateInfo, error);
       return false;
     }
   }
 
   public async changePassword(updateData: MyCustomerChangePassword): Promise<boolean> {
     try {
-      if (this.apiRootPasswordFlow) {
-        const response = await this.apiRootPasswordFlow
+      if (this.apiRootRefreshToken) {
+        const response = await this.apiRootRefreshToken
           .me()
           .password()
           .post({
@@ -105,7 +96,8 @@ class CustomerService {
           .execute();
         if (response.statusCode === 200) {
           // обновление апиРута и токенов (?)
-          this.apiRootPasswordFlow = createApiRootPasswordFlow(response.body.email, updateData.newPassword);
+          const refreshToken = await fetchAuthToken(response.body.email, updateData.newPassword);
+          this.apiRootRefreshToken = createApiRootRefreshTokenFlow(refreshToken);
           return true;
         }
       }
@@ -113,18 +105,27 @@ class CustomerService {
       modalWindowCreator.showModalWindow('error', 'Unknown error. Please try again later');
       return false;
     } catch (error) {
-      const errorMessage =
-        typeof error === 'object' && error !== null && 'message' in error
-          ? error.message
-          : 'Unknown error. Please try again later';
-      modalWindowCreator.showModalWindow('error', `Can't get customer profile: ${errorMessage}`);
+      this.handleError(ErrorMessages.getInfo, error);
       return false;
     }
   }
 
   public clearCustomerInfo(): void {
-    localStorage.removeItem('userId');
-    this.customerInfo = undefined;
+    localStorage.removeItem('refresh_token');
+    // this.customerInfo = undefined;
+  }
+
+  private handleError(message: ErrorMessages, error: unknown): void {
+    if (error instanceof Error && 'code' in error && error.code === 401) {
+      this.clearCustomerInfo();
+      window.location.reload();
+      modalWindowCreator.showModalWindow('error', `Your session has expired. Please log in again`);
+    }
+    const errorMessage =
+      typeof error === 'object' && error !== null && 'message' in error
+        ? error.message
+        : 'Unknown error. Please try again later';
+    modalWindowCreator.showModalWindow('error', `${message} ${errorMessage}`);
   }
 }
 

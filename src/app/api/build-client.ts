@@ -3,6 +3,7 @@ import {
   AuthMiddlewareOptions,
   HttpMiddlewareOptions,
   PasswordAuthMiddlewareOptions,
+  RefreshAuthMiddlewareOptions,
 } from '@commercetools/sdk-client-v2';
 
 import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
@@ -32,6 +33,7 @@ const ctpClient = new ClientBuilder()
   .build();
 
 const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
+// export let apiTokenRoot: ByProjectKeyRequestBuilder;
 
 export function createApiRootPasswordFlow(username: string, password: string): ByProjectKeyRequestBuilder {
   const passwordFlowOptions: PasswordAuthMiddlewareOptions = {
@@ -71,7 +73,36 @@ export async function fetchAuthToken(username: string, password: string): Promis
     },
     body: params.toString(),
   });
-  return response.json();
+  const data = await response.json();
+  const refreshToken = data.refresh_token;
+  localStorage.setItem('refresh_token', refreshToken);
+  // createApiRootRefreshTokenFlow(refreshToken);
+  console.log(refreshToken);
+  return refreshToken;
+}
+
+// withRefreshTokenFlow
+
+export function createApiRootRefreshTokenFlow(refreshToken: string): ByProjectKeyRequestBuilder {
+  const options: RefreshAuthMiddlewareOptions = {
+    host: CT_AUTH_HOST,
+    projectKey: CT_PROJECT_KEY,
+    credentials: {
+      clientId: CT_CLIENT_ID,
+      clientSecret: CT_CLIENT_SECRET,
+    },
+    refreshToken,
+    // tokenCache: TokenCache,
+  };
+
+  const client = new ClientBuilder()
+    .withProjectKey(CT_PROJECT_KEY)
+    .withRefreshTokenFlow(options)
+    .withHttpMiddleware(httpMiddlewareOptions)
+    .withLoggerMiddleware()
+    .build();
+
+  return createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
 }
 
 export { apiRoot };

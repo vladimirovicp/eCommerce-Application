@@ -27,6 +27,7 @@ export default async function updateProducts(
         queryArgs: {
           limit,
           offset,
+
           'filter.query': query,
           sort,
           ...(searchValue ? { 'text.en-GB': searchValue } : {}),
