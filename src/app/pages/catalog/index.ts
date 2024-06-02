@@ -1,19 +1,29 @@
 import '../../../assets/scss/page/catalog.scss';
-import { Product } from '@commercetools/platform-sdk';
-import getProducts from '../../api/products';
+import { ProductProjection } from '@commercetools/platform-sdk';
+import updateProducts from '../../api/products';
 import View from '../../common/view';
 import SecondaryMenu from '../../components/secondary-menu';
 import ElementCreator from '../../util/element-creator';
 import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
+import { sortChecked, filterChecked } from '../../util/helper';
 import Router from '../../router/router';
 
 enum SortParameters {
-  AlphabeticallyAZ = 'Alphabetically, A-Z',
-  AlphabeticallyZA = 'Alphabetically, Z-A',
+  'name.en-GB asc' = 'Alphabetically, A-Z',
+  'name.en-GB desc' = 'Alphabetically, Z-A',
+  // TODO вместо PriceLowToHigh и PriceHighToLow должен быть релевантный запрос на сортировку по цене
   PriceLowToHigh = 'Price, low to high',
   PriceHighToLow = 'Price, high to low',
+}
+
+enum Categories {
+  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
+  'Youth Bikes' = 'af205cea-c574-49fd-9d83-4f1daa2f4edc',
+  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
+  'Hardtail Bikes' = 'f8375995-f174-4e8a-a3e4-bea3b402c725',
+  'Road Bikes' = '34c9a93e-cc3d-4495-bbfe-ad10edc02adb',
 }
 
 interface FilterParameter {
@@ -23,8 +33,8 @@ interface FilterParameter {
 }
 
 const FilterParameters: FilterParameter[] = [
-  { name: 'category', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
-  { name: 'size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700c'] },
+  { name: 'is-electric', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
+  { name: 'wheel-size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700'] },
   {
     name: 'brake-type',
     title: 'Brake type',
@@ -37,11 +47,19 @@ export default class CatalogPage extends View {
 
   private secondaryMenu: SecondaryMenu;
 
+  private cardsPerPage: number = 10;
+
+  private offset: number = 0;
+
   private catalogCards: ElementCreator;
 
-  private currentSort: SortParameters;
+  private currentSort: string;
 
-  private currentFilter: string[];
+  private currentCategory: string;
+
+  private searchValue: string;
+
+  private currentFilter: { [key: string]: string[] };
 
   constructor(secondaryMenu: SecondaryMenu, router: Router) {
     const params = {
@@ -50,53 +68,85 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
+    this.currentCategory = Categories['Dual Suspension Mountain Bikes'];
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
-    this.currentSort = SortParameters.AlphabeticallyAZ;
-    this.currentFilter = [];
+    this.currentSort = 'name.en-GB asc';
+    this.currentFilter = {};
+    this.searchValue = '';
+    FilterParameters.forEach((parameter) => {
+      this.currentFilter[parameter.name] = [];
+    });
     this.createSecondaryMenu();
     this.setContent();
     this.router = router;
   }
 
   private async setContent(): Promise<void> {
-    const response = await getProducts(10, 0);
+    const categoryContainer = this.createCategoriesMenu();
+    this.viewElementCreator.addInnerElements([categoryContainer, this.catalogCards]);
+
+    const response = await updateProducts(this.cardsPerPage, this.offset, this.currentCategory, this.currentSort);
     if (response) {
       this.showProductCards(response);
     }
-    this.viewElementCreator.addInnerElements([this.catalogCards]);
   }
 
-  private showProductCards(products: Product[]): void {
+  private showProductCards(products: ProductProjection[]): void {
     this.catalogCards.getElement().innerHTML = '';
-    products.forEach((product) => {
-      const {
-        masterData: {
-          current: {
-            name,
-            masterVariant: { images, prices, attributes },
-          },
-        },
-        id,
-        key,
-      } = product;
-
-      const card = new CatalogCard(
-        {
+    if (products.length === 0) {
+      this.catalogCards.getElement().innerHTML = 'No products found matching your request';
+    } else {
+      products.forEach((product) => {
+        const {
           id,
-          name: attributes?.[1]?.value || '',
-          imageUrl: images?.[0]?.url || '',
-          description: name['en-GB'],
-          price: prices?.[0]?.value.centAmount || 0,
-          discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+          name,
           key,
-        },
-        this.router
-      );
+          masterVariant: { images, prices, attributes },
+        } = product;
 
-      this.catalogCards.addInnerElements([card]);
+        const card = new CatalogCard(
+          {
+            id,
+            name: attributes?.[1]?.value || '',
+            imageUrl: images?.[0]?.url || '',
+            description: name['en-GB'],
+            price: prices?.[0]?.value.centAmount || 0,
+            discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
+            key,
+          },
+          this.router
+        );
+
+        this.catalogCards.addInnerElements([card]);
+      });
+    }
+  }
+
+  private createCategoriesMenu(): ElementCreator {
+    const categoryContainer = new ElementCreator({ classNames: ['category-container'] });
+    const categoryArray: HTMLElement[] = [];
+
+    Object.entries(Categories).forEach(([category, value], index) => {
+      const categoryElement = new ElementCreator({
+        classNames: index === 0 ? ['category', 'active'] : ['category'],
+        textContent: category,
+        callback: (event): void => {
+          const target = event?.target;
+          if (target instanceof HTMLElement && !target.classList.contains('active')) {
+            categoryArray.forEach((item) => item.classList.remove('active'));
+            target.classList.add('active');
+
+            this.currentCategory = value;
+            this.applyСhanges();
+          }
+        },
+      });
+      categoryArray.push(categoryElement.getElement());
     });
+    categoryContainer.addInnerElements(categoryArray);
+    return categoryContainer;
   }
 
   private createSecondaryMenu(): void {
@@ -110,11 +160,17 @@ export default class CatalogPage extends View {
     const container = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__search'] });
 
     const input = new InputCreator({ type: 'search', attributes: { placeholder: 'search' } });
+    input.getElement().addEventListener('keypress', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        this.applySearch(input.getElement());
+      }
+    });
+
     const button = new ElementCreator<HTMLButtonElement>({
       tag: 'button',
       textContent: 'Search',
-      callback: (): void => {
-        // поиск
+      callback: async (): Promise<void> => {
+        this.applySearch(input.getElement());
       },
     });
     container.addInnerElements([input, button]);
@@ -124,7 +180,14 @@ export default class CatalogPage extends View {
 
   private createSortMenu(): ElementCreator {
     const sortContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__sort'] });
-    const switchInput = new InputCreator({ type: 'checkbox', id: 'sort-toggle', classNames: ['sort-toggle__input'] });
+    const switchInput = new InputCreator({
+      type: 'checkbox',
+      id: 'sort-toggle',
+      classNames: ['sort-toggle__input'],
+      callback: (): void => {
+        filterChecked();
+      },
+    });
     const sortByElement = new ElementCreator<HTMLDivElement>({
       classNames: ['secondary-menu__sort-text'],
       textContent: 'Sort by:',
@@ -145,21 +208,22 @@ export default class CatalogPage extends View {
   }
 
   private createSortParameters(switchInput: InputCreator): HTMLElement {
-    const sortMenuItems = Object.keys(SortParameters).map((key, index) => {
-      const value = SortParameters[key as keyof typeof SortParameters];
+    const sortMenuItems = Object.entries(SortParameters).map(([key, value], index) => {
       const sortMenuItem = new ElementCreator<HTMLDivElement>({
         classNames: index === 0 ? ['checkbox-with-text', 'active'] : ['checkbox-with-text'],
-        callback: (): void => {
-          this.currentSort = value;
+        callback: async (): Promise<void> => {
+          this.currentSort = key;
+          // переключение классов для того, чтобы чекбокс стал активным
           sortMenuItems.forEach((item) => {
             if (item.classList.contains('active')) {
               item.classList.remove('active');
             }
           });
           sortMenuItem.getElement().classList.add('active');
+
           switchInput.getElement().dispatchEvent(new MouseEvent('click'));
-          // обновить данные
-          // закрывать меню по клику снаружи
+          this.applyСhanges();
+          // TODO закрыть меню
         },
       });
       sortMenuItem.getElement().innerHTML = `<span class="filter__decor"></span><span class="filter__text">${value}</span>`;
@@ -176,11 +240,13 @@ export default class CatalogPage extends View {
 
   private createFilterMenu(): ElementCreator<HTMLDivElement> {
     const filterContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter'] });
-
     const switchInput = new InputCreator({
       type: 'checkbox',
       id: 'filter-toggle',
       classNames: ['filter-toggle__input'],
+      callback: (): void => {
+        sortChecked();
+      },
     });
     const stringElement = new ElementCreator({
       tag: 'span',
@@ -193,10 +259,10 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
-        // применить фильтры, обновить карточки, то же при закрытии меню фильтра
+        this.applyСhanges();
+        // TODO закрыть меню фильтров, тот же колбэк должен применяться при любом закрытии меню фильтров
       },
     });
-
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });
     const filterTitle = new ElementCreator<HTMLDivElement>({
       classNames: ['secondary-menu__filter-title'],
@@ -228,9 +294,9 @@ export default class CatalogPage extends View {
         classNames: ['checkbox-with-text'],
         callback: (): void => {
           if (filterMenuItem.getElement().classList.contains('active')) {
-            this.currentFilter = this.currentFilter.filter((item) => item !== text);
+            this.currentFilter[options.name] = this.currentFilter[options.name].filter((item) => item !== text);
           } else {
-            this.currentFilter.push(text);
+            this.currentFilter[options.name].push(text);
           }
           filterMenuItem.getElement().classList.toggle('active');
         },
@@ -247,5 +313,34 @@ export default class CatalogPage extends View {
     filterListBox.addInnerElements([filterList.getHtmlElement()]);
     container.addInnerElements([titleElement, filterListBox]);
     return container;
+  }
+
+  private async applyСhanges(): Promise<void> {
+    const response = await updateProducts(
+      this.cardsPerPage,
+      this.offset,
+      this.currentCategory,
+      this.currentSort,
+      this.currentFilter,
+      this.searchValue ? this.searchValue : undefined
+    );
+    if (response) {
+      this.showProductCards(response);
+    }
+  }
+
+  private async applySearch(input: HTMLInputElement): Promise<void> {
+    this.searchValue = input.value;
+    // введенное значение остается в инпуте, показывая по чему мы сейчас фильтруем
+    // введенное в поиске значение СОХРАНЯЕТСЯ при переходе по категориям (?)
+
+    // сбрасываем все фильтры
+    FilterParameters.forEach((parameter) => {
+      this.currentFilter[parameter.name] = [];
+    });
+    document.querySelectorAll('.checkbox-with-text').forEach((filter) => {
+      filter.classList.remove('active');
+    });
+    this.applyСhanges();
   }
 }

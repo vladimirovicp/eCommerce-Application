@@ -1,4 +1,6 @@
 .secondary-menu{
+    z-index: 10;
+    position: relative;
     background-color: #F1CF8E;
     .container{
         height: 2rem;
@@ -6,11 +8,9 @@
         align-items: center;
         justify-content: space-between;
     }
-
     &__breadcrumbs{
 
     }
-
     &__search{
         position: relative;
         display: flex;
@@ -20,6 +20,13 @@
             border: 1px solid #FFA800;
             border-radius: 10px;
             padding-left: 1rem;
+            height: 1.3rem;
+            width: 12rem;
+            margin-left: 7rem;
+
+            &:focus{
+                outline: none;
+            }
         }
         button{
             position: absolute;
@@ -29,11 +36,10 @@
             border: 0;
             font-size: 0;
             width: 2.3rem;
-            height: 1.3rem;
+            height: 1.4rem;
             display: block;
             border-radius: 10px;
             background-image: url('../img/svg/search.svg');
-           //background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             cursor: pointer;
@@ -66,17 +72,10 @@
             width: 11.5rem;
             right: 0px;
             z-index: 1;
-
             line-height: 0;
             opacity: 0;
             transition: height .5s, line-height .5s, opacity .5s, padding .5s, border .5s;
-        }
-        
-        // &-btn{
-        //     border: unset;
-        //     background: unset;
-        // }
-
+        }        
         .sort-toggle__input{
             &:checked ~ .secondary-menu__sort-box{
                 opacity: 1;
@@ -96,8 +95,6 @@
     }
 
     &__filter{
-
-
         &-btn{
             background-color: #FFA800;
             border: 1px solid #FFA800;
@@ -106,7 +103,6 @@
             border-radius:2rem;
             cursor: pointer;
             transition: background-color 1s;
-    
             &:hover{
                 background-color: #fff;
             }
@@ -120,8 +116,6 @@
             width: 13rem;
             right: 0px;
             z-index: 1;
-
-            //height: 0;
             line-height: 0;
             opacity: 0;
 
@@ -132,7 +126,6 @@
             text-align: center;
             text-transform: uppercase;
             font-weight: bold;
-            //padding-bottom: 2rem;
         }
 
         .filter-toggle__input{
@@ -141,14 +134,12 @@
                 padding: 2rem 1rem;
                 line-height: unset;
                 height: unset;
-
                 .filter-box{
                     padding-top: 1rem;
                     &__title{
                         padding-bottom: .5rem;
                     }
                 }
-
                 .filter-item{
                     padding-bottom: .4rem;
                 }
@@ -187,19 +178,11 @@
 
 .filter, .sort{
 
-    &-box{
-        //padding-top: 1rem;
-
-        // &__title{
-        //     padding-bottom: .5rem;
-        // }
-    }
-
+    &-box{}
     &__item{
         position: relative; 
         margin-bottom: 0.4rem;
     }
-
     &__decor{
         display: block;
         width: 1rem;
@@ -211,16 +194,22 @@
         border: 1px solid #000;
         border-radius: 6px;
     }
-
-    &__text{
-
-    }
-
+    &__text{}
     &-toggle__input{
         display: none;
     }
 }
 
+@media(max-width: 48em){
+    .secondary-menu{
+        &__search{
+            display: none;
+        }
+        &__nav{
+            display: none;
+        }
+    }
+}
 
 @media(min-width: 64em){
     .secondary-menu{
@@ -229,3 +218,4 @@
         } 
     }  
 }
+
