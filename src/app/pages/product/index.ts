@@ -71,19 +71,18 @@ export default class ProductPage extends View {
       this.setProductInfo(params),
       this.setProductPrices(params),
     ]);
-  }
-  /* eslint-disable max-lines-per-function */
-
-  private setSlider(params: ProductResponse): HTMLElement {
     /* eslint-disable */
-    const swiperCarousel = new Swiper('.swiper-general', {
+    const swiper = new Swiper('.swiper-general', {
       direction: 'vertical',
       spaceBetween: 10,
       slidesPerView: 4,
       freeMode: true,
       watchSlidesProgress: true,
     });
+  }
+  /* eslint-disable max-lines-per-function */
 
+  private setSlider(params: ProductResponse): HTMLElement {
     const slider = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-product__slider'],
@@ -120,7 +119,6 @@ export default class ProductPage extends View {
       classNames: ['swiper-slide'],
     });
 
-
     const image = new ElementCreator({
       tag: 'img',
       classNames: ['img-full'],
@@ -154,7 +152,6 @@ export default class ProductPage extends View {
       },
     });
 
-
     const generalButtonprev = new ElementCreator({
       tag: 'div',
       classNames: ['swiper-general__button-prev'],
@@ -163,7 +160,6 @@ export default class ProductPage extends View {
       tag: 'div',
       classNames: ['swiper-general__button-next'],
     });
-
 
     /*
     Url фотографий лежат в массиве params.images
@@ -174,10 +170,17 @@ export default class ProductPage extends View {
     swiperslide3.addInnerElements([image3]);
     swiperslide4.addInnerElements([image4]);
 
-    swiperWrapper.addInnerElements([swiperslide1,swiperslide2,swiperslide3,swiperslide4, generalButtonprev, generalButtonNext])
+    swiperWrapper.addInnerElements([
+      swiperslide1,
+      swiperslide2,
+      swiperslide3,
+      swiperslide4,
+      generalButtonprev,
+      generalButtonNext,
+    ]);
 
-    swiperCarousel2.addInnerElements([swiperWrapper])
-    swiperCarouselWrapper.addInnerElements([swiperCarousel2])
+    swiperCarousel2.addInnerElements([swiperWrapper]);
+    swiperCarouselWrapper.addInnerElements([swiperCarousel2]);
     //swiperCarouselWrapper.addInnerElements([image]);
     slider.addInnerElements([swiperCarouselWrapper]);
     //slider.addInnerElements([image]);
