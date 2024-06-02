@@ -1,9 +1,25 @@
-.catalog{
-    &-page{
-        .container{
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
+.catalog {
+  &-page {
+    .container {
+      padding-top: 0rem;
+      padding-bottom: 2rem;
+    }
+
+    .category-container {
+      display: flex;
+      background-color: #9c9890;
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      .category {
+        cursor: pointer;
+      }
+
+      .active {
+        font-size: 1rem;
+        background: yellow;
+      }
     }
 
     &-cards{
