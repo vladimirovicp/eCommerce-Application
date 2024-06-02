@@ -8,7 +8,7 @@ import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 
 /* eslint-disable */
-const swiperCarousel = new Swiper('.swiper-carousel', {
+const swiperCarousel = new Swiper('.swiper-general', {
   direction: 'vertical',
   spaceBetween: 10,
   slidesPerView: 4,
