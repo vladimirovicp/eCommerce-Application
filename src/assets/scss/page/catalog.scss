@@ -7,10 +7,14 @@
 
     .category-container {
       display: flex;
-      background-color: #9c9890;
+      background-color: #F1CF8E;
+      border-radius:2rem;
       width: 100%;
       justify-content: space-between;
       margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      box-sizing: border-box;
+      color: #9C9890;
 
       .category {
         cursor: pointer;
@@ -18,7 +22,7 @@
 
       .active {
         font-size: 1rem;
-        background: yellow;
+        color: #000;
       }
     }
   }
@@ -32,7 +36,6 @@
 
   &-card {
     width: 13.4rem;
-    //height: 27.1rem;
     border: 1px solid #9c9890;
     border-radius: 1.2rem;
     overflow: hidden;
