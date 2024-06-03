@@ -11,7 +11,8 @@ export default async function updateProducts(
 ): Promise<ProductProjection[] | undefined> {
   try {
     const query: string[] = [];
-    if (category !== '') query.push(`categories.id:"${category}"`);
+
+    if (category) query.push(`categories.id:"${category}"`);
     if (filters) {
       Object.keys(filters).forEach((key) => {
         if (filters[key].length > 0) {

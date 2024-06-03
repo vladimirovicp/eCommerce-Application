@@ -334,7 +334,7 @@ export default class ProfilePage extends FormPageCreator {
             this.actions.push({ action: 'setLastName', lastName: field.value });
             break;
           }
-          case 'birthDate': {
+          case 'dateOfBirth': {
             this.actions.push({ action: 'setDateOfBirth', dateOfBirth: field.value });
             break;
           }
