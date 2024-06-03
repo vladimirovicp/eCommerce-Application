@@ -37,7 +37,6 @@ class App {
     this.main = new MainView();
     const token = localStorage.getItem('refresh_token');
     if (token) {
-      console.log('ffffffff');
       customerService.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
       this.header.isLoggedIn();
     }
@@ -96,6 +95,7 @@ class App {
         path: `${Pages.CATALOG}/${PRODUCT_ID}`,
         callback: (id?: string): void => {
           if (id !== undefined) {
+            this.secondaryMenu.updateContent();
             this.updateMain(new ProductPage(id), 'catalog-product');
           }
         },

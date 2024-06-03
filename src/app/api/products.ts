@@ -10,7 +10,8 @@ export default async function updateProducts(
   searchValue?: string
 ): Promise<ProductProjection[] | undefined> {
   try {
-    const query: string[] = [`categories.id:"${category}"`];
+    const query: string[] = [];
+    if (category !== '') query.push(`categories.id:"${category}"`);
     if (filters) {
       Object.keys(filters).forEach((key) => {
         if (filters[key].length > 0) {
@@ -19,7 +20,6 @@ export default async function updateProducts(
         }
       });
     }
-
     const response = await apiRoot
       .productProjections()
       .search()
@@ -27,14 +27,12 @@ export default async function updateProducts(
         queryArgs: {
           limit,
           offset,
-
           'filter.query': query,
           sort,
           ...(searchValue ? { 'text.en-GB': searchValue } : {}),
         },
       })
       .execute();
-
     return response.body.results;
   } catch (error) {
     console.error('Failed to fetch products:', error);

@@ -14,17 +14,17 @@ import Router from '../../router/router';
 enum SortParameters {
   'name.en-GB asc' = 'Alphabetically, A-Z',
   'name.en-GB desc' = 'Alphabetically, Z-A',
-  // TODO вместо PriceLowToHigh и PriceHighToLow должен быть релевантный запрос на сортировку по цене
-  PriceLowToHigh = 'Price, low to high',
-  PriceHighToLow = 'Price, high to low',
+  'variants.attributes.discount-price asc' = 'Price, low to high',
+  'variants.attributes.discount-price desc' = 'Price, high to low',
 }
 
 enum Categories {
-  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
+  'Show all' = '',
   'Youth Bikes' = 'af205cea-c574-49fd-9d83-4f1daa2f4edc',
-  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
   'Hardtail Bikes' = 'f8375995-f174-4e8a-a3e4-bea3b402c725',
   'Road Bikes' = '34c9a93e-cc3d-4495-bbfe-ad10edc02adb',
+  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
+  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
 }
 
 interface FilterParameter {
@@ -34,7 +34,7 @@ interface FilterParameter {
 }
 
 const FilterParameters: FilterParameter[] = [
-  { name: 'is-electric', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
+  { name: 'brand', title: 'Brand', filterItems: ['Apollo', 'BMC', 'Marin', 'Merida', 'Norco', 'Radius'] },
   { name: 'wheel-size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700'] },
   {
     name: 'brake-type',
@@ -48,7 +48,7 @@ export default class CatalogPage extends View {
 
   private secondaryMenu: SecondaryMenu;
 
-  private cardsPerPage: number = 10;
+  private cardsPerPage: number = 50;
 
   private offset: number = 0;
 
@@ -69,7 +69,7 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
-    this.currentCategory = Categories['Dual Suspension Mountain Bikes'];
+    this.currentCategory = Categories['Show all'];
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -152,9 +152,24 @@ export default class CatalogPage extends View {
 
   private createSecondaryMenu(): void {
     const menuContainer = new ElementCreator({ classNames: ['secondary-menu__nav'] });
-    menuContainer.addInnerElements([this.createSortMenu(), this.createFilterMenu()]);
+    menuContainer.addInnerElements([this.createRemoveFiltersButton(), this.createFilterMenu(), this.createSortMenu()]);
 
     this.secondaryMenu.addElement([this.createSearchMenu(), menuContainer]);
+  }
+
+  private createRemoveFiltersButton(): ElementCreator<HTMLSpanElement> {
+    const button = new ElementCreator<HTMLSpanElement>({
+      tag: 'span',
+      classNames: ['secondary-menu__filter-btn'],
+      textContent: 'remove filters',
+      callback: (): void => {
+        FilterParameters.forEach((parameter) => {
+          this.currentFilter[parameter.name] = [];
+        });
+        this.applyСhanges();
+      },
+    });
+    return button;
   }
 
   private createSearchMenu(): ElementCreator {
