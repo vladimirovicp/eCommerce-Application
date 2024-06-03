@@ -10,45 +10,14 @@ import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
 import { sortChecked, filterChecked } from '../../util/helper';
 import Router from '../../router/router';
-
-enum SortParameters {
-  'name.en-GB asc' = 'Alphabetically, A-Z',
-  'name.en-GB desc' = 'Alphabetically, Z-A',
-  // TODO вместо PriceLowToHigh и PriceHighToLow должен быть релевантный запрос на сортировку по цене
-  PriceLowToHigh = 'Price, low to high',
-  PriceHighToLow = 'Price, high to low',
-}
-
-enum Categories {
-  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
-  'Youth Bikes' = 'af205cea-c574-49fd-9d83-4f1daa2f4edc',
-  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
-  'Hardtail Bikes' = 'f8375995-f174-4e8a-a3e4-bea3b402c725',
-  'Road Bikes' = '34c9a93e-cc3d-4495-bbfe-ad10edc02adb',
-}
-
-interface FilterParameter {
-  name: string;
-  title: string;
-  filterItems: string[];
-}
-
-const FilterParameters: FilterParameter[] = [
-  { name: 'is-electric', title: 'Category', filterItems: ['Bikes', 'Electric Bikes'] },
-  { name: 'wheel-size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700'] },
-  {
-    name: 'brake-type',
-    title: 'Brake type',
-    filterItems: ['hydraulic disc brakes', 'mechanical disc brakes', 'v-brakes'],
-  },
-];
+import { Categories, FilterParameter, FilterParameters, SortParameters } from './constants';
 
 export default class CatalogPage extends View {
   private router: Router;
 
   private secondaryMenu: SecondaryMenu;
 
-  private cardsPerPage: number = 10;
+  private cardsPerPage: number = 50;
 
   private offset: number = 0;
 
@@ -69,7 +38,7 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
-    this.currentCategory = Categories['Dual Suspension Mountain Bikes'];
+    this.currentCategory = Categories['Show all'];
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -139,6 +108,7 @@ export default class CatalogPage extends View {
             categoryArray.forEach((item) => item.classList.remove('active'));
             target.classList.add('active');
 
+            this.secondaryMenu.updateContent(['catalog', category], false);
             this.currentCategory = value;
             this.applyСhanges();
           }
@@ -152,9 +122,24 @@ export default class CatalogPage extends View {
 
   private createSecondaryMenu(): void {
     const menuContainer = new ElementCreator({ classNames: ['secondary-menu__nav'] });
-    menuContainer.addInnerElements([this.createSortMenu(), this.createFilterMenu()]);
+    menuContainer.addInnerElements([this.createRemoveFiltersButton(), this.createFilterMenu(), this.createSortMenu()]);
 
     this.secondaryMenu.addElement([this.createSearchMenu(), menuContainer]);
+  }
+
+  private createRemoveFiltersButton(): ElementCreator<HTMLSpanElement> {
+    const button = new ElementCreator<HTMLSpanElement>({
+      tag: 'span',
+      classNames: ['secondary-menu__filter-btn'],
+      textContent: 'remove filters',
+      callback: (): void => {
+        FilterParameters.forEach((parameter) => {
+          this.currentFilter[parameter.name] = [];
+        });
+        this.applyСhanges();
+      },
+    });
+    return button;
   }
 
   private createSearchMenu(): ElementCreator {
@@ -261,8 +246,9 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
+        document.body.classList.remove('_lock');
+        filterChecked();
         this.applyСhanges();
-        // TODO закрыть меню фильтров, тот же колбэк должен применяться при любом закрытии меню фильтров
       },
     });
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });

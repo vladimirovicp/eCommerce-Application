@@ -6,6 +6,8 @@ import { apiRoot } from '../../api/build-client';
 import '../../../assets/scss/page/catalog-page.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
+import SecondaryMenu from '../../components/secondary-menu';
+import { CategoriesReverse } from '../catalog/constants';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 
@@ -21,9 +23,11 @@ interface ProductResponse {
 export default class ProductPage extends View {
   private responseObject: ProductResponse;
 
+  private secondaryMenu: SecondaryMenu;
+
   private router: Router;
 
-  constructor(id: string, router: Router) {
+  constructor(id: string, router: Router, secondaryMenu: SecondaryMenu) {
     const params = {
       tag: 'div',
       classNames: ['container'],
@@ -39,6 +43,7 @@ export default class ProductPage extends View {
     };
     this.router = router;
     this.findProductByKey(id);
+    this.secondaryMenu = secondaryMenu;
   }
 
   private async findProductByKey(productKey: string): Promise<void> {
@@ -118,6 +123,11 @@ export default class ProductPage extends View {
       this.createModalSlide(params),
     ]);
     this.configureSwiper();
+    this.secondaryMenu.updateContent([
+      'catalog',
+      CategoriesReverse[this.responseObject.category],
+      this.responseObject.name,
+    ]);
   }
 
   private setSlider(params: ProductResponse): HTMLElement {
@@ -129,7 +139,7 @@ export default class ProductPage extends View {
       tag: 'div',
       classNames: ['swiper-carousel__wrapper'],
     });
-    const swiperCarousel = this.createSlider(params.images,'swiper-carousel');
+    const swiperCarousel = this.createSlider(params.images, 'swiper-carousel');
     swiperCarouselWrapper.addInnerElements([swiperCarousel]);
     const buttonPrev = new ElementCreator({
       tag: 'div',
@@ -163,7 +173,7 @@ export default class ProductPage extends View {
     });
     let coutn: number = 4;
     let imagDefault = true;
-    if (images.length >= coutn){
+    if (images.length >= coutn) {
       coutn = images.length;
       imagDefault = false;
     }
@@ -173,17 +183,17 @@ export default class ProductPage extends View {
         tag: 'div',
         classNames: ['swiper-slide'],
       });
-      if (classSlider === 'swiper-general' ){
+      if (classSlider === 'swiper-general') {
         swiperslide = new ElementCreator({
           tag: 'div',
           classNames: ['swiper-slide'],
           callback: () => {
             const modalStandart = document.querySelector('.modal__standart');
-            if (modalStandart){
+            if (modalStandart) {
               modalStandart.classList.add('active');
               document.body.classList.add('_lock');
             }
-          }
+          },
         });
       }
       const image = new ElementCreator({
@@ -201,7 +211,7 @@ export default class ProductPage extends View {
     return swiperCarousel;
   }
 
-  private createModalSlide(params: ProductResponse): HTMLElement{
+  private createModalSlide(params: ProductResponse): HTMLElement {
     const modal = new ElementCreator({
       tag: 'div',
       classNames: ['modal', 'modal__standart'],
@@ -216,7 +226,7 @@ export default class ProductPage extends View {
           modalStandart.classList.remove('active');
           document.body.classList.remove('_lock');
         }
-      }
+      },
     });
     const modalContent = new ElementCreator({
       classNames: ['modal__content'],
@@ -233,11 +243,10 @@ export default class ProductPage extends View {
 
     modalContent.addInnerElements([swiperswiperPopup]);
 
-    modal.addInnerElements([modalClose,modalContent,buttonPrev,buttonNext]);
+    modal.addInnerElements([modalClose, modalContent, buttonPrev, buttonNext]);
 
     return modal.getElement();
   }
-
 
   private setProductInfo(params: ProductResponse): HTMLElement {
     const infoContainer = new ElementCreator({
