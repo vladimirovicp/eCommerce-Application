@@ -21,7 +21,6 @@ const lockCheckedSortFilter = (e: Event): void => {
   const element = e.target as HTMLElement;
   const filterToggle = document.getElementById('filter-toggle') as HTMLInputElement;
   const sortToggle = document.getElementById('sort-toggle') as HTMLInputElement;
-  console.log(element.className);
   if (element.className === '_lock') {
     filterToggle.checked = true;
     if (filterToggle.checked) {

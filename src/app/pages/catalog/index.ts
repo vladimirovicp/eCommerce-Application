@@ -276,6 +276,9 @@ export default class CatalogPage extends View {
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
+        console.log('888');
+        document.body.classList.remove('_lock');
+        filterChecked();
         this.applyСhanges();
         // TODO закрыть меню фильтров, тот же колбэк должен применяться при любом закрытии меню фильтров
       },

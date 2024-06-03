@@ -17,7 +17,6 @@
         .swiper{
             &-carousel{
                 width: 6rem;
-                //background-color:green;
                 margin: 0;
                 height: 27rem;
                 top: 50%;
@@ -27,10 +26,6 @@
                     position: relative;
                 }
 
-                .swiper-wrapper{
-
-                }
-
                 .swiper-slide{
                     img{
                         cursor: pointer;
@@ -38,7 +33,6 @@
                         transition: opacity .4s ease-in-out;
                     } 
                 }
-
                 .swiper-slide-thumb-active{
                     img{
                         cursor: default;
@@ -139,14 +133,59 @@
                 transform: translate(-50%, -50%);
             }
         }
-
-        &__btn{
-
-        }
     }
 
     .modal{
         width: 30rem;
     }
 
+}
+
+
+@media(max-width: 64em){
+    .catalog-product{
+        .container{
+            flex-wrap: wrap;
+        }
+
+        &__slider{
+            order: 2;
+        }
+
+        &__info{
+            order: 0;
+        }
+
+        &__price{
+            order: 1;
+        }
+    }
+}
+
+@media(max-width: 48em){
+    .catalog-product{
+        &__slider{
+            height: 15rem;
+            display: flex;
+            padding: 1rem 0.5rem;
+            .swiper-carousel{
+                padding: 0 0.1rem;
+                width: 4rem;
+                height: 10rem;
+            }
+
+            .swiper-general{
+                width: 12rem;
+                height: 14rem;
+            }
+        }
+    }
+}
+
+@media(min-width: 90em){
+    .catalog-product{
+        .modal{
+            width: 40rem;
+        }
+    }
 }
