@@ -2,11 +2,12 @@
 import Swiper from 'swiper';
 import { Navigation, Pagination, Thumbs } from 'swiper/modules';
 import 'swiper/css/bundle';
-
 import { apiRoot } from '../../api/build-client';
 import '../../../assets/scss/page/catalog-page.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
+import Router from '../../router/router';
+import { Pages } from '../../router/pages';
 
 interface ProductResponse {
   name: string;
@@ -20,7 +21,9 @@ interface ProductResponse {
 export default class ProductPage extends View {
   private responseObject: ProductResponse;
 
-  constructor(id: string) {
+  private router: Router;
+
+  constructor(id: string, router: Router) {
     const params = {
       tag: 'div',
       classNames: ['container'],
@@ -34,6 +37,7 @@ export default class ProductPage extends View {
       images: [],
       category: '',
     };
+    this.router = router;
     this.findProductByKey(id);
   }
 
@@ -62,7 +66,7 @@ export default class ProductPage extends View {
       this.configurePage(this.responseObject);
       console.log(this.responseObject);
     } catch (error) {
-      console.error('Failed to fetch products:', error);
+      this.router.navigate(`${Pages.NOT_FOUND}`);
     }
   }
 
