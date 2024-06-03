@@ -19,6 +19,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.5",
     "@types/jest": "^29.5.12",
+    "@types/swiper": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "css-loader": "^7.1.1",
@@ -50,6 +51,7 @@
   },
   "dependencies": {
     "@commercetools/platform-sdk": "^7.8.0",
-    "@commercetools/sdk-client-v2": "^2.5.0"
+    "@commercetools/sdk-client-v2": "^2.5.0",
+    "swiper": "^11.1.4"
   }
 }
