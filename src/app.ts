@@ -96,7 +96,7 @@ class App {
         path: `${Pages.CATALOG}/${PRODUCT_ID}`,
         callback: (id?: string): void => {
           if (id !== undefined) {
-            this.updateMain(new ProductPage(id), 'catalog-product');
+            this.updateMain(new ProductPage(id, this.router), 'catalog-product');
           }
         },
       },
