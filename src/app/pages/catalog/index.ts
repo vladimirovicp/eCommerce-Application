@@ -10,38 +10,7 @@ import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
 import { sortChecked, filterChecked } from '../../util/helper';
 import Router from '../../router/router';
-
-enum SortParameters {
-  'name.en-GB asc' = 'Alphabetically, A-Z',
-  'name.en-GB desc' = 'Alphabetically, Z-A',
-  'variants.attributes.discount-price asc' = 'Price, low to high',
-  'variants.attributes.discount-price desc' = 'Price, high to low',
-}
-
-enum Categories {
-  'Show all' = '',
-  'Youth Bikes' = 'af205cea-c574-49fd-9d83-4f1daa2f4edc',
-  'Hardtail Bikes' = 'f8375995-f174-4e8a-a3e4-bea3b402c725',
-  'Road Bikes' = '34c9a93e-cc3d-4495-bbfe-ad10edc02adb',
-  'Dual Suspension Mountain Bikes' = 'b7bf9e66-3831-425a-96d2-3752598ede46',
-  'Electric Dual Suspension Mountain Bikes' = '8a42fd4e-8279-454a-8bc9-ed68a79103f8',
-}
-
-interface FilterParameter {
-  name: string;
-  title: string;
-  filterItems: string[];
-}
-
-const FilterParameters: FilterParameter[] = [
-  { name: 'brand', title: 'Brand', filterItems: ['Apollo', 'BMC', 'Marin', 'Merida', 'Norco', 'Radius'] },
-  { name: 'wheel-size', title: 'Wheel size', filterItems: ['24', '27.5', '29', '700'] },
-  {
-    name: 'brake-type',
-    title: 'Brake type',
-    filterItems: ['hydraulic disc brakes', 'mechanical disc brakes', 'v-brakes'],
-  },
-];
+import { Categories, FilterParameter, FilterParameters, SortParameters } from './constants';
 
 export default class CatalogPage extends View {
   private router: Router;
@@ -139,6 +108,7 @@ export default class CatalogPage extends View {
             categoryArray.forEach((item) => item.classList.remove('active'));
             target.classList.add('active');
 
+            this.secondaryMenu.updateContent(['catalog', category], false);
             this.currentCategory = value;
             this.applyСhanges();
           }
