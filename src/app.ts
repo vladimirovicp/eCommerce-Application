@@ -111,10 +111,12 @@ class App {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
           this.secondaryMenu.updateContent();
-          if (localStorage.userId === undefined) {
+          if (localStorage.refresh_token === undefined) {
             this.updateMain(new LoginPage(this.router, this.header), 'login-page');
           } else {
-            this.updateMain(new HomePage(), 'home-page');
+            // this.updateMain(new HomePage(), 'home-page');
+            // this.header.isLoggedIn();
+            this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
         },
@@ -123,10 +125,10 @@ class App {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
           this.secondaryMenu.updateContent();
-          if (localStorage.userId === undefined) {
+          if (localStorage.refresh_token === undefined) {
             this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
           } else {
-            this.updateMain(new HomePage(), 'home-page');
+            this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
         },
@@ -135,7 +137,12 @@ class App {
         path: `${Pages.PROFILE}`,
         callback: (): void => {
           this.secondaryMenu.updateContent();
-          this.updateMain(new ProfilePage(), 'account-page');
+          if (localStorage.refresh_token !== undefined) {
+            this.updateMain(new ProfilePage(), 'account-page');
+          } else {
+            this.router.navigate(`${Pages.LOGIN}`);
+            this.header.isLoggedOut();
+          }
         },
       },
       {
