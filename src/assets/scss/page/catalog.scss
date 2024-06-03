@@ -85,9 +85,13 @@
       &__description{
           padding-bottom: 0.5rem;
           padding-left: 1rem;
+          padding-right: 1rem;
           font-size: .7rem;
           line-height: 120%;
           font-weight: 300;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
       }
 
       &__btn{

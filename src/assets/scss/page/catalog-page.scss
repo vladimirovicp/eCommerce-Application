@@ -136,7 +136,19 @@
     }
 
     .modal{
-        width: 30rem;
+        width: 90vw;
+        height: 90vh;
+        box-sizing: border-box;
+
+        .modal__content{
+            width: 100%;
+            height: 100%;              
+        }
+
+        .swiper-popup{
+            width: 100%;
+            height: 100%;
+        }
     }
 
 }
@@ -184,8 +196,6 @@
 
 @media(min-width: 90em){
     .catalog-product{
-        .modal{
-            width: 40rem;
-        }
+
     }
 }
