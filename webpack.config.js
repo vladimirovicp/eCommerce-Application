@@ -47,7 +47,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'dist'),
       clean: true,
       assetModuleFilename: 'assets/[hash][ext]',
-      // publicPath: '/',
+      publicPath: '/',
     },
     devServer: {
       static: path.join(__dirname, 'src'),
