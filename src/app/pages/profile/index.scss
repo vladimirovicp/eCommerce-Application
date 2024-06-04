@@ -1,0 +1,55 @@
+.form__fields-group{
+    .radio-button{
+        display: flex;
+        align-items: center;
+        input{
+            margin-right: .5rem;
+        }
+    }
+}
+
+.billing-address{
+    transition: background-color .4s ease-in-out, padding .4s ease-in-out;
+}
+
+.billing-address{
+    &:has(.form__fields > .radio-button > input[type="radio"]:checked){
+        background-color: rgb(77 75 71);
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+
+@media(max-width: 48em){
+
+    .account{
+        &-page{
+            .form__field{
+                width: 100%;
+
+                &-edit{
+                    top: 0.5rem;
+                }
+
+            }
+
+            .addresses-container{
+                .form__field-edit{
+                    top: 0.2rem;
+                }
+                .form__field-delete{
+                    top: 0.2rem;
+                }
+            }
+
+            
+        }
+
+        &__box{
+            width: 100%;
+        }
+    }
+
+    
+}

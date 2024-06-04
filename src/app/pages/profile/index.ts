@@ -6,6 +6,7 @@ import {
   MyCustomerUpdateAction,
 } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/account.scss';
+import './index.scss';
 import customerService from '../../api/customers-requests';
 import modalWindowCreator from '../../components/modal-window';
 import ElementCreator from '../../util/element-creator';

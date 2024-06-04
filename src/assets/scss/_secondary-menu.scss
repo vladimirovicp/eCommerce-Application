@@ -115,6 +115,7 @@
             background-color: #fff;
             top: 2rem;
             width: 13rem;
+            
             right: 0px;
             z-index: 1;
             line-height: 0;
@@ -141,6 +142,9 @@
                 padding: 2rem 1rem;
                 line-height: unset;
                 height: unset;
+                max-height: calc(100vh - 15rem);
+                overflow: hidden;
+                overflow-y: auto;
                 .filter-box{
                     padding-top: 1rem;
                     &__title{
