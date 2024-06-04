@@ -9,7 +9,9 @@
         justify-content: space-between;
     }
     &__breadcrumbs{
-
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
     }
     &__search{
         position: relative;
@@ -22,7 +24,6 @@
             padding-left: 1rem;
             height: 1.3rem;
             width: 12rem;
-            margin-left: 7rem;
 
             &:focus{
                 outline: none;
@@ -50,10 +51,10 @@
     &__nav{
         display: flex;
         position: relative;
+        align-items: center;
     }
 
     &__sort{
-        margin-right: 2rem;
         position: relative;
         &-button{
             display: flex;
@@ -222,11 +223,27 @@
     }
 }
 
+@media(min-width: 48em) and (max-width: 64em) {
+    .secondary-menu{
+        &__breadcrumbs{
+            width: 16rem;
+        }
+    }
+}
+
 @media(min-width: 64em){
     .secondary-menu{
         .container{
             height: 2.5rem;
         } 
+        &__breadcrumbs{
+            width: 26rem;
+        }
+        &__nav{
+            width: 26rem;
+            justify-content: flex-end;
+        }
     }  
+
 }
 
