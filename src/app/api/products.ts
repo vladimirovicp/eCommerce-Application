@@ -30,7 +30,7 @@ export default async function updateProducts(
           offset,
           'filter.query': query,
           sort,
-          ...(searchValue ? { 'text.en-GB': searchValue } : {}),
+          ...(searchValue ? { 'text.en-GB': `${searchValue}` } : {}),
         },
       })
       .execute();

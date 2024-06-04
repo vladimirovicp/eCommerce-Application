@@ -38,7 +38,14 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
-    this.currentCategory = Categories['Show all'];
+    this.currentCategory = this.secondaryMenu.category
+      ? Categories[this.secondaryMenu.category as keyof typeof Categories]
+      : Categories['Show all'];
+    if (this.secondaryMenu.category) {
+      this.secondaryMenu.updateContent(['catalog', this.secondaryMenu.category], false);
+      this.secondaryMenu.category = undefined;
+    }
+
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -98,9 +105,9 @@ export default class CatalogPage extends View {
     const categoryContainer = new ElementCreator({ classNames: ['category-container'] });
     const categoryArray: HTMLElement[] = [];
 
-    Object.entries(Categories).forEach(([category, value], index) => {
+    Object.entries(Categories).forEach(([category, value]) => {
       const categoryElement = new ElementCreator({
-        classNames: index === 0 ? ['category', 'active'] : ['category'],
+        classNames: value === this.currentCategory ? ['category', 'active'] : ['category'],
         textContent: category,
         callback: (event): void => {
           const target = event?.target;
@@ -243,6 +250,7 @@ export default class CatalogPage extends View {
     const label = switchInput.createLabel('', 'secondary-menu__filter-button', [stringElement]);
     const button = new ElementCreator<HTMLButtonElement>({
       tag: 'button',
+      id: 'catalog-filter-button',
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {

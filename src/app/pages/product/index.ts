@@ -69,7 +69,6 @@ export default class ProductPage extends View {
         }
       }
       this.configurePage(this.responseObject);
-      console.log(this.responseObject);
     } catch (error) {
       this.router.navigate(`${Pages.NOT_FOUND}`);
     }
