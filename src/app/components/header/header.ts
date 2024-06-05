@@ -1,7 +1,7 @@
 import '../../../assets/scss/_header.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
-import adaptiveCloseMenu from '../../util/helper';
+import { adaptiveCloseMenu } from '../../util/helper';
 import logo from '../../../assets/img/svg/logo.svg';
 import basket from '../../../assets/img/svg/basket.svg';
 import ListCreator from '../../util/list-creator';
@@ -10,6 +10,7 @@ import { LinkParams } from '../../util/types';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../modal-window';
+import customerService from '../../api/customers-requests';
 
 export default class HeaderView extends View {
   private router: Router;
@@ -88,10 +89,11 @@ export default class HeaderView extends View {
       callback: (): void => {
         modalWindowCreator.showModalWindow('standart', 'Do you want to log out?');
         modalWindowCreator.createButton(() => {
-          localStorage.removeItem('userId');
+          customerService.clearCustomerInfo();
           this.isLoggedOut();
+          this.router.navigate(`${Pages.HOME}`);
         }, 'yes');
-        // this.router.navigate(`${Pages.REGISTRATION}`);
+        //
       },
     },
     {

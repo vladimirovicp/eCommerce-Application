@@ -16,16 +16,13 @@
             width: 2.2rem;
             height: 1.2rem;
         }
-
     }
 
     &__nav{
+
         &-toggle{
-        display: none; 
+            display: none; 
         }
-    }
-
-    &__nav{
         display: flex;
         align-items: center;
         &-list{
@@ -66,6 +63,8 @@
         width: 1.125rem;
         height: 1.125rem;
     }
+
+    
 }
 
 @media(max-width: 64em){
@@ -253,7 +252,7 @@
 
 @media(min-width: 64em){
     .header{
-
+        border-top: 2rem solid #1C1403;
         .container{
             height: 4.2rem;
             flex: 1;
@@ -286,7 +285,15 @@
                 height: 100%;
             }
         }
+
+        &__bottom{
+            .container{
+                height: 2rem;
+            }
+        }
     }
+
+
 }
 
 

@@ -3,7 +3,7 @@ import HeaderView from './app/components/header/header';
 import MainView from './app/components/main/main';
 import FooterView from './app/components/footer/footer';
 import Router from './app/router/router';
-import { Pages } from './app/router/pages';
+import { Pages, PRODUCT_ID } from './app/router/pages';
 import { Route } from './app/router/router-types';
 import NotFoundPage from './app/pages/not-found';
 import HomePage from './app/pages/home';
@@ -14,6 +14,10 @@ import RegistrationPage from './app/pages/registration';
 import ProfilePage from './app/pages/profile';
 import CartPage from './app/pages/cart';
 import View from './app/common/view';
+import SecondaryMenu from './app/components/secondary-menu';
+import ProductPage from './app/pages/product';
+import { createApiRootRefreshTokenFlow } from './app/api/build-client';
+import customerService from './app/api/customers-requests';
 
 class App {
   private header: HeaderView;
@@ -22,18 +26,31 @@ class App {
 
   private router: Router;
 
+  private secondaryMenu: SecondaryMenu;
+
   constructor() {
     const routes = this.createRoutes();
     this.router = new Router(routes);
 
     this.header = new HeaderView(this.router);
+    this.secondaryMenu = new SecondaryMenu(this.router);
     this.main = new MainView();
+    const token = localStorage.getItem('refresh_token');
+    if (token) {
+      customerService.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
+      this.header.isLoggedIn();
+    }
     this.createView();
   }
 
   private createView(): void {
     const footer = new FooterView().getHtmlElement();
-    document.body.append(this.header.getHtmlElement(), this.main.getHtmlElement(), footer);
+    document.body.append(
+      this.header.getHtmlElement(),
+      this.secondaryMenu.getHtmlElement(),
+      this.main.getHtmlElement(),
+      footer
+    );
   }
 
   /* eslint-disable max-lines-per-function */
@@ -42,50 +59,63 @@ class App {
       {
         path: `${Pages.NOT_FOUND}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent(['not found']);
           this.updateMain(new NotFoundPage(), 'not-found-page');
         },
       },
       {
         path: '',
         callback: (): void => {
+          this.secondaryMenu.updateContent(['']);
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: `${Pages.HOME}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent(['']);
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: 'main',
         callback: (): void => {
+          this.secondaryMenu.updateContent(['']);
           this.updateMain(new HomePage(), 'home-page');
         },
       },
       {
         path: `${Pages.CATALOG}`,
         callback: (): void => {
-          this.updateMain(new CatalogPage(), 'not-found-page');
+          this.secondaryMenu.updateContent(['catalog', 'all']);
+          this.updateMain(new CatalogPage(this.secondaryMenu, this.router), 'catalog-page');
         },
       },
-      /* {
+      {
         path: `${Pages.CATALOG}/${PRODUCT_ID}`,
-        callback: (id?: string): void => {},
-      }, */
+        callback: (id?: string): void => {
+          if (id !== undefined) {
+            this.updateMain(new ProductPage(id, this.router, this.secondaryMenu), 'catalog-product');
+          }
+        },
+      },
       {
         path: `${Pages.ABOUT}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent(['about']);
           this.updateMain(new AboutPage(), 'not-found-page');
         },
       },
       {
         path: `${Pages.LOGIN}`,
         callback: (): void => {
-          if (localStorage.userId === undefined) {
+          this.secondaryMenu.updateContent(['login']);
+          if (localStorage.refresh_token === undefined) {
             this.updateMain(new LoginPage(this.router, this.header), 'login-page');
           } else {
-            this.updateMain(new HomePage(), 'home-page');
+            // this.updateMain(new HomePage(), 'home-page');
+            // this.header.isLoggedIn();
+            this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
         },
@@ -93,10 +123,11 @@ class App {
       {
         path: `${Pages.REGISTRATION}`,
         callback: (): void => {
-          if (localStorage.userId === undefined) {
+          this.secondaryMenu.updateContent(['registration']);
+          if (localStorage.refresh_token === undefined) {
             this.updateMain(new RegistrationPage(this.router, this.header), 'register-page');
           } else {
-            this.updateMain(new HomePage(), 'home-page');
+            this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
         },
@@ -104,12 +135,19 @@ class App {
       {
         path: `${Pages.PROFILE}`,
         callback: (): void => {
-          this.updateMain(new ProfilePage(), 'not-found-page');
+          this.secondaryMenu.updateContent(['profile']);
+          if (localStorage.refresh_token !== undefined) {
+            this.updateMain(new ProfilePage(), 'account-page');
+          } else {
+            this.router.navigate(`${Pages.LOGIN}`);
+            this.header.isLoggedOut();
+          }
         },
       },
       {
         path: `${Pages.CART}`,
         callback: (): void => {
+          this.secondaryMenu.updateContent(['cart']);
           this.updateMain(new CartPage(), 'not-found-page');
         },
       },
