@@ -8,7 +8,7 @@ import ElementCreator from '../../util/element-creator';
 import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
-import { sortChecked, filterChecked } from '../../util/helper';
+// import { sortChecked, filterChecked } from '../../util/helper';
 import Router from '../../router/router';
 import { Categories, FilterParameter, FilterParameters, SortParameters } from './constants';
 
@@ -38,7 +38,14 @@ export default class CatalogPage extends View {
     };
     super(params);
     this.secondaryMenu = secondaryMenu;
-    this.currentCategory = Categories['Show all'];
+    this.currentCategory = this.secondaryMenu.category
+      ? Categories[this.secondaryMenu.category as keyof typeof Categories]
+      : Categories['Show all'];
+    if (this.secondaryMenu.category) {
+      this.secondaryMenu.updateContent(['catalog', this.secondaryMenu.category], false);
+      this.secondaryMenu.category = undefined;
+    }
+
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -98,9 +105,9 @@ export default class CatalogPage extends View {
     const categoryContainer = new ElementCreator({ classNames: ['category-container'] });
     const categoryArray: HTMLElement[] = [];
 
-    Object.entries(Categories).forEach(([category, value], index) => {
+    Object.entries(Categories).forEach(([category, value]) => {
       const categoryElement = new ElementCreator({
-        classNames: index === 0 ? ['category', 'active'] : ['category'],
+        classNames: value === this.currentCategory ? ['category', 'active'] : ['category'],
         textContent: category,
         callback: (event): void => {
           const target = event?.target;
@@ -171,7 +178,7 @@ export default class CatalogPage extends View {
       id: 'sort-toggle',
       classNames: ['sort-toggle__input'],
       callback: (): void => {
-        filterChecked();
+        this.filterChecked();
       },
     });
     const sortByElement = new ElementCreator<HTMLDivElement>({
@@ -232,7 +239,7 @@ export default class CatalogPage extends View {
       id: 'filter-toggle',
       classNames: ['filter-toggle__input'],
       callback: (): void => {
-        sortChecked();
+        this.sortChecked();
       },
     });
     const stringElement = new ElementCreator({
@@ -243,11 +250,12 @@ export default class CatalogPage extends View {
     const label = switchInput.createLabel('', 'secondary-menu__filter-button', [stringElement]);
     const button = new ElementCreator<HTMLButtonElement>({
       tag: 'button',
+      id: 'catalog-filter-button',
       classNames: ['btn-default'],
       textContent: 'filter',
       callback: (): void => {
         document.body.classList.remove('_lock');
-        filterChecked();
+        this.filterChecked();
         this.applyСhanges();
       },
     });
@@ -330,5 +338,61 @@ export default class CatalogPage extends View {
       filter.classList.remove('active');
     });
     this.applyСhanges();
+  }
+
+  private lockCheckedSortFilter = (e: Event): void => {
+    const element = e.target as HTMLElement;
+    const filterToggle = document.getElementById('filter-toggle') as HTMLInputElement;
+    const sortToggle = document.getElementById('sort-toggle') as HTMLInputElement;
+    if (element.className === '_lock') {
+      if (filterToggle.checked && !sortToggle.checked) {
+        this.applyСhanges();
+      }
+      filterToggle.checked = true;
+      if (filterToggle.checked) {
+        filterToggle.checked = false;
+      }
+      if (sortToggle.checked) {
+        sortToggle.checked = false;
+      }
+      document.body.classList.remove('_lock');
+      document.removeEventListener('click', this.lockCheckedSortFilter);
+    } else {
+      const parentElement = element.parentNode as HTMLElement;
+      const parentElementTwo = parentElement.parentNode as HTMLElement;
+      if (parentElementTwo.classList[0] === 'sort-item') {
+        document.body.classList.remove('_lock');
+        document.removeEventListener('click', this.lockCheckedSortFilter);
+      } else if (element.className === 'sort-toggle__input' || element.className === 'filter-toggle__input') {
+        if (!filterToggle.checked && !sortToggle.checked) {
+          document.body.classList.remove('_lock');
+          document.removeEventListener('click', this.lockCheckedSortFilter);
+        }
+      }
+    }
+  };
+
+  private sortChecked = (): void => {
+    const sortToggle = document.getElementById('sort-toggle') as HTMLInputElement;
+    if (sortToggle) {
+      if (sortToggle.checked) {
+        sortToggle.checked = false;
+      } else {
+        document.body.classList.add('_lock');
+        document.addEventListener('click', this.lockCheckedSortFilter);
+      }
+    }
+  };
+
+  private filterChecked(): void {
+    const filterToggle = document.getElementById('filter-toggle') as HTMLInputElement;
+    if (filterToggle) {
+      if (filterToggle.checked) {
+        filterToggle.checked = false;
+      } else {
+        document.body.classList.add('_lock');
+        document.addEventListener('click', this.lockCheckedSortFilter);
+      }
+    }
   }
 }

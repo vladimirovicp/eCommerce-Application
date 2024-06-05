@@ -29,7 +29,7 @@ const ctpClient = new ClientBuilder()
   .withProjectKey(CT_PROJECT_KEY)
   .withClientCredentialsFlow(authMiddlewareOptions)
   .withHttpMiddleware(httpMiddlewareOptions)
-  .withLoggerMiddleware()
+  // .withLoggerMiddleware()
   .build();
 
 const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });

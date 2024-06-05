@@ -8,7 +8,6 @@ export default class Router {
     this.routes = routes;
     document.addEventListener('DOMContentLoaded', () => {
       const path = this.getCurrentPath();
-      console.log(path);
       this.navigate(path);
     });
     window.addEventListener('popstate', () => {
