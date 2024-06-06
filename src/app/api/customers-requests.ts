@@ -2,12 +2,17 @@ import {
   CustomerDraft,
   MyCustomerSignin,
   Customer,
-  ByProjectKeyRequestBuilder,
   MyCustomerUpdate,
   MyCustomerChangePassword,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
-import { apiRoot, createApiRootRefreshTokenFlow, fetchAuthToken } from './build-client';
+import {
+  apiRoot,
+  apiRoots,
+  createApiRootAnonymousSessionFlow,
+  createApiRootRefreshTokenFlow,
+  fetchAuthToken,
+} from './build-client';
 
 enum ErrorMessages {
   authorize = 'Authorization failed:',
@@ -19,16 +24,15 @@ enum ErrorMessages {
 class CustomerService {
   // public customerInfo: Customer | undefined;
 
-  public apiRootRefreshToken: ByProjectKeyRequestBuilder | undefined = undefined;
+  // public apiRootRefreshToken: ByProjectKeyRequestBuilder | undefined = undefined;
 
   public async authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
     try {
       const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
       if (response && response.statusCode === 200) {
         // this.customerInfo = response.body.customer;
-        // localStorage.setItem('userId', id);
         const token = await fetchAuthToken(customerDraft.email, customerDraft.password);
-        this.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
+        createApiRootRefreshTokenFlow(token);
         return true;
       }
       modalWindowCreator.showModalWindow('error', 'Authorization failed. Please try again.');
@@ -56,8 +60,8 @@ class CustomerService {
 
   public async getCustomerInfo(): Promise<null | Customer> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken.me().get().execute();
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken.me().get().execute();
         const customerInfo = response.body;
         return customerInfo;
       }
@@ -70,8 +74,8 @@ class CustomerService {
 
   public async updateCustomer(updateData: MyCustomerUpdate): Promise<boolean> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken.me().post({ body: updateData }).execute();
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
           return true;
         }
@@ -86,8 +90,8 @@ class CustomerService {
 
   public async changePassword(updateData: MyCustomerChangePassword): Promise<boolean> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken
           .me()
           .password()
           .post({
@@ -97,7 +101,7 @@ class CustomerService {
         if (response.statusCode === 200) {
           // обновление апиРута и токенов (?)
           const refreshToken = await fetchAuthToken(response.body.email, updateData.newPassword);
-          this.apiRootRefreshToken = createApiRootRefreshTokenFlow(refreshToken);
+          createApiRootRefreshTokenFlow(refreshToken);
           return true;
         }
       }
@@ -112,7 +116,9 @@ class CustomerService {
 
   public clearCustomerInfo(): void {
     localStorage.removeItem('refresh_token');
-    // this.customerInfo = undefined;
+    const anonymousId = localStorage.getItem('anonymous_id') ?? `anonym${new Date().getTime().toString()}`;
+    localStorage.setItem('anonymous_id', anonymousId);
+    createApiRootAnonymousSessionFlow(anonymousId);
   }
 
   private handleError(message: ErrorMessages, error: unknown): void {

@@ -16,8 +16,7 @@ import CartPage from './app/pages/cart';
 import View from './app/common/view';
 import SecondaryMenu from './app/components/secondary-menu';
 import ProductPage from './app/pages/product';
-import { createApiRootRefreshTokenFlow } from './app/api/build-client';
-import customerService from './app/api/customers-requests';
+import { createApiRootAnonymousSessionFlow, createApiRootRefreshTokenFlow } from './app/api/build-client';
 
 class App {
   private header: HeaderView;
@@ -37,8 +36,12 @@ class App {
     this.main = new MainView();
     const token = localStorage.getItem('refresh_token');
     if (token) {
-      customerService.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
+      createApiRootRefreshTokenFlow(token);
       this.header.isLoggedIn();
+    } else {
+      const anonymousId = localStorage.getItem('anonymous_id') ?? `anonym${new Date().getTime().toString()}`;
+      localStorage.setItem('anonymous_id', anonymousId);
+      createApiRootAnonymousSessionFlow(anonymousId);
     }
     this.createView();
   }

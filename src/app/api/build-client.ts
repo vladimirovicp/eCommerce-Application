@@ -4,6 +4,7 @@ import {
   HttpMiddlewareOptions,
   PasswordAuthMiddlewareOptions,
   RefreshAuthMiddlewareOptions,
+  AnonymousAuthMiddlewareOptions,
 } from '@commercetools/sdk-client-v2';
 
 import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
@@ -29,11 +30,10 @@ const ctpClient = new ClientBuilder()
   .withProjectKey(CT_PROJECT_KEY)
   .withClientCredentialsFlow(authMiddlewareOptions)
   .withHttpMiddleware(httpMiddlewareOptions)
-  // .withLoggerMiddleware()
+  .withLoggerMiddleware()
   .build();
 
-const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
-// export let apiTokenRoot: ByProjectKeyRequestBuilder;
+export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
 
 export function createApiRootPasswordFlow(username: string, password: string): ByProjectKeyRequestBuilder {
   const passwordFlowOptions: PasswordAuthMiddlewareOptions = {
@@ -76,14 +76,19 @@ export async function fetchAuthToken(username: string, password: string): Promis
   const data = await response.json();
   const refreshToken = data.refresh_token;
   localStorage.setItem('refresh_token', refreshToken);
-  // createApiRootRefreshTokenFlow(refreshToken);
-  console.log(refreshToken);
   return refreshToken;
 }
 
 // withRefreshTokenFlow
+export const apiRoots: {
+  [key: string]: ByProjectKeyRequestBuilder | null;
+} = {
+  // byCredentialsFlow: createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY }),
+  byRefreshToken: null,
+  byAnonymousId: null,
+};
 
-export function createApiRootRefreshTokenFlow(refreshToken: string): ByProjectKeyRequestBuilder {
+export function createApiRootRefreshTokenFlow(refreshToken: string): void {
   const options: RefreshAuthMiddlewareOptions = {
     host: CT_AUTH_HOST,
     projectKey: CT_PROJECT_KEY,
@@ -92,7 +97,6 @@ export function createApiRootRefreshTokenFlow(refreshToken: string): ByProjectKe
       clientSecret: CT_CLIENT_SECRET,
     },
     refreshToken,
-    // tokenCache: TokenCache,
   };
 
   const client = new ClientBuilder()
@@ -102,7 +106,28 @@ export function createApiRootRefreshTokenFlow(refreshToken: string): ByProjectKe
     .withLoggerMiddleware()
     .build();
 
-  return createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
+  apiRoots.byRefreshToken = createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
 }
 
-export { apiRoot };
+export function createApiRootAnonymousSessionFlow(anonymousId: string): void {
+  const options: AnonymousAuthMiddlewareOptions = {
+    host: CT_AUTH_HOST,
+    projectKey: CT_PROJECT_KEY,
+    credentials: {
+      clientId: CT_CLIENT_ID,
+      clientSecret: CT_CLIENT_SECRET,
+      anonymousId,
+    },
+  };
+
+  const client = new ClientBuilder()
+    .withProjectKey(CT_PROJECT_KEY)
+    .withAnonymousSessionFlow(options)
+    .withHttpMiddleware(httpMiddlewareOptions)
+    .withLoggerMiddleware()
+    .build();
+
+  apiRoots.byAnonymousId = createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
+}
+
+// export { apiRoot };

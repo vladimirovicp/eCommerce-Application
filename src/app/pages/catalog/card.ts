@@ -1,7 +1,14 @@
+// import customerService from '../../api/customers-requests';
+import { apiRoots } from '../../api/build-client';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
 import { CatalogCardParams } from '../../util/types';
+
+interface Cart {
+  id: string;
+  version: number;
+}
 
 export default class CatalogCard extends ElementCreator {
   private router: Router;
@@ -96,9 +103,44 @@ export default class CatalogCard extends ElementCreator {
       classNames: ['btn-default'],
       textContent: 'Into a basket',
     });
-    button.setCallback(() => {}, 'click');
+    button.setCallback((event) => {
+      if (event) event.stopPropagation();
+      this.addProductToCart();
+      // показать модальное окно
+    }, 'click');
 
     buttonContainer.addInnerElements([button]);
     return buttonContainer.getElement();
+  }
+
+  private async addProductToCart(): Promise<void> {
+    let cart: Cart;
+    if (apiRoots.byRefreshToken) {
+      try {
+        const response = await apiRoots.byRefreshToken.me().activeCart().get().execute();
+        cart = { id: response.body.id, version: response.body.version };
+        console.log(cart);
+      } catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 404) {
+          // создаём новую корзину
+          try {
+            const response = await apiRoots.byRefreshToken
+              .me()
+              .carts()
+              .post({
+                body: {
+                  currency: 'USD',
+                },
+              })
+              .execute();
+            cart = { id: response.body.id, version: response.body.version };
+          } catch (createError) {
+            console.error('Error creating new cart:', createError);
+          }
+        } else {
+          console.error('Error retrieving active cart:', error);
+        }
+      }
+    }
   }
 }
