@@ -79,7 +79,6 @@ export async function fetchAuthToken(username: string, password: string): Promis
   return refreshToken;
 }
 
-// withRefreshTokenFlow
 export const apiRoots: {
   [key: string]: ByProjectKeyRequestBuilder | null;
 } = {
@@ -88,6 +87,7 @@ export const apiRoots: {
   byAnonymousId: null,
 };
 
+// withRefreshTokenFlow
 export function createApiRootRefreshTokenFlow(refreshToken: string): void {
   const options: RefreshAuthMiddlewareOptions = {
     host: CT_AUTH_HOST,

@@ -1,7 +1,7 @@
 import '../../../assets/scss/page/catalog.scss';
 import './index.scss';
 import { ProductProjection } from '@commercetools/platform-sdk';
-import updateProducts from '../../api/products';
+import { updateProducts } from '../../api/products';
 import View from '../../common/view';
 import SecondaryMenu from '../../components/secondary-menu';
 import ElementCreator from '../../util/element-creator';

@@ -116,9 +116,10 @@ class CustomerService {
 
   public clearCustomerInfo(): void {
     localStorage.removeItem('refresh_token');
-    const anonymousId = localStorage.getItem('anonymous_id') ?? `anonym${new Date().getTime().toString()}`;
-    localStorage.setItem('anonymous_id', anonymousId);
+    const anonymousId = `anonym${new Date().getTime().toString()}`;
+    // localStorage.setItem('anonymous_id', anonymousId);
     createApiRootAnonymousSessionFlow(anonymousId);
+    apiRoots.byRefreshToken = null;
   }
 
   private handleError(message: ErrorMessages, error: unknown): void {

@@ -30,20 +30,22 @@ class App {
   constructor() {
     const routes = this.createRoutes();
     this.router = new Router(routes);
-
     this.header = new HeaderView(this.router);
     this.secondaryMenu = new SecondaryMenu(this.router);
     this.main = new MainView();
+    this.saveUserToLocalStorage();
+    this.createView();
+  }
+
+  private saveUserToLocalStorage(): void {
     const token = localStorage.getItem('refresh_token');
     if (token) {
       createApiRootRefreshTokenFlow(token);
       this.header.isLoggedIn();
     } else {
-      const anonymousId = localStorage.getItem('anonymous_id') ?? `anonym${new Date().getTime().toString()}`;
-      localStorage.setItem('anonymous_id', anonymousId);
+      const anonymousId = `anonym${new Date().getTime().toString()}`;
       createApiRootAnonymousSessionFlow(anonymousId);
     }
-    this.createView();
   }
 
   private createView(): void {
