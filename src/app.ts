@@ -33,11 +33,11 @@ class App {
     this.header = new HeaderView(this.router);
     this.secondaryMenu = new SecondaryMenu(this.router);
     this.main = new MainView();
-    this.saveUserToLocalStorage();
+    this.createActualApiRoot();
     this.createView();
   }
 
-  private saveUserToLocalStorage(): void {
+  private createActualApiRoot(): void {
     const token = localStorage.getItem('refresh_token');
     if (token) {
       createApiRootRefreshTokenFlow(token);
