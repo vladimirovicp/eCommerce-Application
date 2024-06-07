@@ -1,3 +1,6 @@
+// import customerService from '../../api/customers-requests';
+import { apiRoots } from '../../api/build-client';
+import { getTheCart } from '../../api/products';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
@@ -6,7 +9,9 @@ import { CatalogCardParams } from '../../util/types';
 export default class CatalogCard extends ElementCreator {
   private router: Router;
 
-  constructor(cardParams: CatalogCardParams, router: Router) {
+  private productId: string;
+
+  constructor(cardParams: CatalogCardParams, router: Router, isInCart = false) {
     super({
       tag: 'div',
       classNames: ['catalog-card'],
@@ -15,16 +20,17 @@ export default class CatalogCard extends ElementCreator {
       },
     });
     this.router = router;
-    this.configureCard(cardParams);
+    this.productId = cardParams.id;
+    this.configureCard(cardParams, isInCart);
   }
 
-  private configureCard(params: CatalogCardParams): void {
+  private configureCard(params: CatalogCardParams, isInCart: boolean): void {
     this.addInnerElements([
       this.setImage(params.imageUrl, params.name),
       this.setPrices(params.price, params.discountPrice),
       this.setTitle(params.name),
       this.setDescription(params.description),
-      this.addButton(),
+      this.addButton(isInCart),
     ]);
   }
 
@@ -85,7 +91,7 @@ export default class CatalogCard extends ElementCreator {
     return description.getElement();
   }
 
-  private addButton(): HTMLElement {
+  private addButton(isInCart: boolean): HTMLElement {
     const buttonContainer = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__btn'],
@@ -93,12 +99,76 @@ export default class CatalogCard extends ElementCreator {
 
     const button = new ElementCreator({
       tag: 'button',
-      classNames: ['btn-default'],
-      textContent: 'Into a basket',
+      classNames: isInCart ? ['btn-default', 'remove-btn'] : ['btn-default'],
+      textContent: isInCart ? 'Remove from cart' : 'Add to cart',
     });
-    button.setCallback(() => {}, 'click');
+    button.setCallback((event) => {
+      if (event) event.stopPropagation();
+      const isRemoveButton = button.getElement().classList.toggle('remove-btn');
+      if (isRemoveButton) {
+        this.addProductToCart();
+        button.getElement().textContent = 'Remove from cart';
+        // показать модальное окно?
+      } else {
+        this.removeProductFromCart();
+        button.getElement().textContent = 'Add to cart';
+      }
+    }, 'click');
 
     buttonContainer.addInnerElements([button]);
     return buttonContainer.getElement();
+  }
+
+  private async addProductToCart(): Promise<void> {
+    const cart = await getTheCart();
+    const apiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+    if (cart && apiRoot) {
+      await apiRoot
+        .carts()
+        .withId({ ID: cart.id })
+        .post({
+          body: {
+            version: cart.version,
+            actions: [
+              {
+                action: 'addLineItem',
+                productId: this.productId,
+                quantity: 1,
+              },
+            ],
+          },
+        })
+        .execute();
+    }
+  }
+
+  private async removeProductFromCart(): Promise<void> {
+    const cart = await getTheCart();
+    const apiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+    if (cart && apiRoot) {
+      try {
+        // находим в корзине нужную строчку с искомым продуктом
+        const lineItem = cart.products.find((item) => item.productId === this.productId);
+        await apiRoot
+          .carts()
+          .withId({ ID: cart.id })
+          .post({
+            body: {
+              version: cart.version,
+              actions: [
+                {
+                  action: 'removeLineItem',
+                  lineItemId: lineItem?.id,
+                },
+              ],
+            },
+          })
+          .execute();
+      } catch (error) {
+        console.error('Error removing product from cart:', error);
+      }
+    }
   }
 }

@@ -1,7 +1,7 @@
 import '../../../assets/scss/page/catalog.scss';
 import './index.scss';
 import { ProductProjection } from '@commercetools/platform-sdk';
-import updateProducts from '../../api/products';
+import { getTheCart, updateProducts } from '../../api/products';
 import View from '../../common/view';
 import SecondaryMenu from '../../components/secondary-menu';
 import ElementCreator from '../../util/element-creator';
@@ -70,8 +70,15 @@ export default class CatalogPage extends View {
     }
   }
 
-  private showProductCards(products: ProductProjection[]): void {
+  private async showProductCards(products: ProductProjection[]): Promise<void> {
     this.catalogCards.getElement().innerHTML = '';
+
+    const cart = await getTheCart();
+    const productsInCart: string[] = [];
+    if (cart) {
+      cart.products.forEach((item) => productsInCart.push(item.productId));
+    }
+
     if (products.length === 0) {
       this.catalogCards.getElement().innerHTML = 'No products found matching your request';
     } else {
@@ -93,7 +100,8 @@ export default class CatalogPage extends View {
             discountPrice: prices?.[0]?.discounted?.value.centAmount || 0,
             key,
           },
-          this.router
+          this.router,
+          productsInCart.includes(id)
         );
 
         this.catalogCards.addInnerElements([card]);
@@ -143,6 +151,11 @@ export default class CatalogPage extends View {
         FilterParameters.forEach((parameter) => {
           this.currentFilter[parameter.name] = [];
         });
+        const filterBox = document.querySelector('.secondary-menu__filter-box');
+        if (filterBox) {
+          const filtersItems = filterBox.querySelectorAll('.active');
+          filtersItems.forEach((item) => item.classList.remove('active'));
+        }
         this.applyСhanges();
       },
     });
