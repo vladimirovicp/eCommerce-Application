@@ -93,7 +93,7 @@ export default class CartPage extends View {
 
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-price'] });
     const price = prices?.[0]?.discounted?.value.centAmount || 0;
-    priceContainer.getElement().innerHTML = `<div class="price__current">$ ${String(Math.ceil(price / 100))}</div>`;
+    priceContainer.getElement().innerHTML = `<div class="price__current">$ ${price / 100}</div>`;
 
     cardContainer.addInnerElements([imgContainer, nameContainer, deleteButton, counterContainer, priceContainer]);
     return cardContainer;
@@ -157,7 +157,7 @@ export default class CartPage extends View {
     });
     const priceValue = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__total-price'],
-      textContent: `$ ${String(Math.ceil(totalPrice / 100))}`,
+      textContent: `$ ${totalPrice / 100}`,
     });
     infoContainer.addInnerElements([priceText, priceValue]);
 
