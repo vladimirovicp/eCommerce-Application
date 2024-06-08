@@ -1,5 +1,5 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
-import '../../../assets/scss/page/home.scss';
+import '../../../assets/scss/page/basket.scss';
 import { getTheCart } from '../../api/products';
 import View from '../../common/view';
 import { Pages } from '../../router/pages';
