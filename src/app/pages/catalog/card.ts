@@ -150,7 +150,7 @@ export default class CatalogCard extends ElementCreator {
     if (cart && apiRoot) {
       try {
         // находим в корзине нужную строчку с искомым продуктом
-        const lineItem = cart.products.find((item) => item.productId === this.productId);
+        const lineItem = cart.lineItems.find((item) => item.productId === this.productId);
         await apiRoot
           .carts()
           .withId({ ID: cart.id })

@@ -76,7 +76,7 @@ export default class CatalogPage extends View {
     const cart = await getTheCart();
     const productsInCart: string[] = [];
     if (cart) {
-      cart.products.forEach((item) => productsInCart.push(item.productId));
+      cart.lineItems.forEach((item) => productsInCart.push(item.productId));
     }
 
     if (products.length === 0) {

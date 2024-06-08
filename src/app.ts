@@ -153,7 +153,7 @@ class App {
         path: `${Pages.CART}`,
         callback: (): void => {
           this.secondaryMenu.updateContent(['cart']);
-          this.updateMain(new CartPage(), 'not-found-page');
+          this.updateMain(new CartPage(this.router), 'basket');
         },
       },
     ];

@@ -1,11 +1,11 @@
-import { LineItem, ProductProjection } from '@commercetools/platform-sdk';
+import { Cart, ProductProjection } from '@commercetools/platform-sdk';
 import { apiRoot, apiRoots } from './build-client';
 
-interface Cart {
-  id: string;
-  version: number;
-  products: LineItem[];
-}
+// interface Cart {
+//   id: string;
+//   version: number;
+//   products: LineItem[];
+// }
 
 export async function updateProducts(
   limit: number,
@@ -48,14 +48,14 @@ export async function updateProducts(
 }
 
 export async function getTheCart(): Promise<Cart | undefined> {
-  let cart: Cart;
+  // let cart: Cart;
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
   // получить корзину
   if (currentApiRoot) {
     try {
       const response = await currentApiRoot.me().activeCart().get().execute();
-      cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
-      return cart;
+      // cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
+      return response.body;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 404) {
         // создаём новую корзину
@@ -69,8 +69,8 @@ export async function getTheCart(): Promise<Cart | undefined> {
               },
             })
             .execute();
-          cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
-          return cart;
+          // cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
+          return response.body;
         } catch (createError) {
           console.error('Error creating new cart:', createError);
         }
