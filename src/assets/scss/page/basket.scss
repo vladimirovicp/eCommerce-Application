@@ -3,7 +3,7 @@
     .container{
         padding-top: 2rem;
         padding-bottom: 2rem;
-        display: flex;
+        //display: flex;
     }
 
     &__wrapper{
@@ -17,42 +17,43 @@
         flex-grow: 1;
     }
 
-    &__aside{
-        width: 15rem;
-        
-        //width: 19rem;
-    }
-
     &__promo-code{
         padding-bottom: 3rem;
         .form__field{
             input[type=text]{
                 overflow: hidden;
-                background-color: #f4d9a5;
-                border: 1px solid #ffa800;
+                background-color: #fff;
+                border: 1px solid #D2D0CF;
                 border-radius: 2rem;
                 padding-left: 1rem;
                 color: #000;
+                border: 1px solid #D2D0CF;
                 &:focus{
                     outline: none;
+                    border: 1px solid #ffa800;
+                }
+                &::placeholder {
+                    text-transform: uppercase;
                 }
             }
         }
 
         .form__button{
             width: 12.5rem;
-            margin: 0 auto;
+           // margin: 0 auto;
         }
     }
 
     &__card{
         display: flex;
         align-items: center;
-        justify-content: space-around;
-        gap:1.5rem;
+        //padding-right: 5rem;
         &-img{
             width: 4.875rem;
             height: 6.5rem;
+            margin-right: 2rem;
+            border-radius: .8rem;
+            overflow: hidden;
         } 
 
         &-name{
@@ -62,6 +63,25 @@
         &-number{
             display: flex;
             gap: .5rem;
+            //padding-right: 7.25rem;
+            align-items: center;
+            .number__minus{
+                cursor: pointer;
+                background-image: url(../../img/svg/minus.svg);
+                height: 1.5rem;
+                width: 1.5rem;
+                background-size: cover;
+            }
+            .number__value{
+                font-size: 1.2rem;
+            }
+            .number__plus{
+                cursor: pointer;
+                background-image: url(../../img/svg/plus.svg);
+                height: 1.5rem;
+                width: 1.5rem;
+                background-size:cover
+            }
 
         }
 
@@ -90,9 +110,13 @@
 
         &-delete{
             background-image: url(../../img/svg/ico-delete.svg);
+            background-repeat: no-repeat;
+            background-size:contain;
             height: 1rem;
             width: 1rem;
             cursor: pointer;
+            //margin-left: auto;
+            //margin-right: 3.25rem;
         }
 
 
@@ -100,7 +124,7 @@
     }
 
     &__total{
-        width: 100%;
+        //width: 100%;
         padding: 3rem 1rem 1rem;
         border: 1px solid #d2c0cd;
         align-self: baseline;
@@ -119,4 +143,172 @@
             color: #ffa800;
         }
     }
+}
+
+@media(max-width: 48em){
+    .basket{
+
+        .container{
+            padding: 1rem;
+        }
+        
+
+        .basket{
+            &__wrapper-btn{
+                .btn-default{
+                    height: 3.5rem;
+                }
+            }
+            &__card{
+                justify-content: space-between;
+                &-content{
+                    width: 11.25rem;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                &-control{
+                    order: 2;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                &-img{
+                    margin: 0;
+                }
+
+                &-name{
+                    order: 1;
+                    height: 3.8rem;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                }
+
+                &-delete{
+
+                }
+
+                &-number{
+                    order: 0;
+                }
+
+                &-price{
+                    flex-direction: row;
+
+                    .price__current{
+                        order: 2;
+                        margin-left: auto;
+                    }
+    
+                    .price__old{
+                        order: 1;
+                    }
+                }
+
+
+            }
+
+        }
+    }
+}
+
+@media(min-width: 48em) and (max-width: 64em){
+    .basket{
+        &__total{
+            width: 19rem;
+        }
+    }
+}
+
+@media(min-width: 48em){
+    .basket{
+        &__card{
+            &-content{
+                display: flex;
+                align-items: center;
+                width: 100%;
+            }
+            &-control{
+                display: flex;
+                align-items: center;
+                margin-left: auto;
+            }
+
+            &-number{
+                padding-right: 7.25rem;
+            }
+            &-delete{
+                margin-right: 3.25rem;
+            }
+        }
+    }
+}
+
+@media(min-width: 64em){
+    .basket{
+        .container{
+            display: flex;
+        }
+
+        &__aside{
+            width: 15rem;
+        }
+
+        &__promo-code{
+            .form__button{
+                width: 12.5rem;
+                margin: 0 auto;
+            }
+        }
+
+        &__total{
+            width: 100%;
+        }
+
+        &__card{
+            padding-right: 5rem;
+        }
+
+    }
+}
+
+@media(max-width: 64em){
+    .basket{
+
+        .container{
+            display: block;
+        }
+
+        &__content{
+            padding-bottom: 3rem;
+        }
+
+        &__promo-code{
+            display: flex;
+
+            .form__field{
+                width: 19rem;
+                margin-right: 2.5rem;
+            }
+        }
+
+        &__card{
+            &-name{
+                width: 11rem;
+            }
+        }
+
+
+    }
+}
+
+
+
+@media(min-width: 90em){
+
+
 }
