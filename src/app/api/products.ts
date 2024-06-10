@@ -141,3 +141,44 @@ export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | unde
   }
   return undefined;
 }
+
+export async function updateProductQuantity(
+  cart: Cart,
+  productId: string,
+  increment: boolean
+): Promise<ClientResponse<Cart> | undefined> {
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+  if (currentApiRoot) {
+    try {
+      const lineItem = cart.lineItems.find((item) => item.productId === productId);
+      if (lineItem) {
+        const newQuantity = increment ? lineItem.quantity + 1 : lineItem.quantity - 1;
+        if (newQuantity > 0) {
+          const response = await currentApiRoot
+            .carts()
+            .withId({ ID: cart.id })
+            .post({
+              body: {
+                version: cart.version,
+                actions: [
+                  {
+                    action: 'changeLineItemQuantity',
+                    lineItemId: lineItem.id,
+                    quantity: newQuantity,
+                  },
+                ],
+              },
+            })
+            .execute();
+          return response;
+        }
+      }
+      return undefined;
+    } catch (error) {
+      console.error('Error updating product quantity in cart:', error);
+      return undefined;
+    }
+  }
+  return undefined;
+}

@@ -1,6 +1,6 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/basket.scss';
-import { clearCart, getTheCart, removeLineFromCart } from '../../api/products';
+import { clearCart, getTheCart, removeLineFromCart, updateProductQuantity } from '../../api/products';
 import View from '../../common/view';
 import modalWindowCreator from '../../components/modal-window';
 import { Pages } from '../../router/pages';
@@ -108,7 +108,7 @@ export default class CartPage extends View {
         this.removeProduct(productId, cardContainer);
       },
     });
-    cardControl.addInnerElements([deleteButton, this.createItemCounter(quantity)]);
+    cardControl.addInnerElements([deleteButton, this.createItemCounter(productId, quantity)]);
 
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-price'] });
     const price = prices?.[0]?.discounted?.value.centAmount || 0;
@@ -119,22 +119,26 @@ export default class CartPage extends View {
     return cardContainer;
   }
 
-  private createItemCounter(quantity: number): ElementCreator<HTMLDivElement> {
+  private createItemCounter(productId: string, quantity: number): ElementCreator<HTMLDivElement> {
     const counterContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-number'] });
 
-    const minusElement = new ElementCreator<HTMLDivElement>({
-      classNames: ['number__minus'],
-      textContent: '-',
-      callback: (): void => {},
-    });
     const valueElement = new ElementCreator<HTMLDivElement>({
       classNames: ['number__value'],
       textContent: `${quantity}`,
     });
+    const minusElement = new ElementCreator<HTMLDivElement>({
+      classNames: ['number__minus'],
+      textContent: '-',
+      callback: (): void => {
+        this.updateQuantity(productId, valueElement.getElement(), false);
+      },
+    });
     const plusElement = new ElementCreator<HTMLDivElement>({
       classNames: ['number__plus'],
       textContent: '+',
-      callback: (): void => {},
+      callback: (): void => {
+        this.updateQuantity(productId, valueElement.getElement(), true);
+      },
     });
 
     counterContainer.addInnerElements([minusElement, valueElement, plusElement]);
@@ -201,6 +205,21 @@ export default class CartPage extends View {
         }
       } else {
         modalWindowCreator.showModalWindow('error', 'Failed to remove product from cart. Please try again');
+      }
+    }
+  }
+
+  private async updateQuantity(productId: string, counter: HTMLDivElement, isPlusOne: boolean): Promise<void> {
+    if (this.cart) {
+      const currentCounter = counter;
+      const response = await updateProductQuantity(this.cart, productId, isPlusOne);
+      if (response?.statusCode === 200) {
+        this.cart = response.body;
+        const lineItem = this.cart.lineItems.find((item) => item.productId === productId);
+        currentCounter.textContent = String(lineItem?.quantity);
+        if (this.totalPriceElement) {
+          this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
+        }
       }
     }
   }
