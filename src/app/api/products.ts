@@ -1,4 +1,4 @@
-import { Cart, ProductProjection } from '@commercetools/platform-sdk';
+import { Cart, ClientResponse, ProductProjection } from '@commercetools/platform-sdk';
 import { apiRoot, apiRoots } from './build-client';
 
 // interface Cart {
@@ -48,13 +48,11 @@ export async function updateProducts(
 }
 
 export async function getTheCart(): Promise<Cart | undefined> {
-  // let cart: Cart;
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
   // получить корзину
   if (currentApiRoot) {
     try {
       const response = await currentApiRoot.me().activeCart().get().execute();
-      // cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
       return response.body;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 404) {
@@ -69,7 +67,6 @@ export async function getTheCart(): Promise<Cart | undefined> {
               },
             })
             .execute();
-          // cart = { id: response.body.id, version: response.body.version, products: response.body.lineItems };
           return response.body;
         } catch (createError) {
           console.error('Error creating new cart:', createError);
@@ -77,6 +74,37 @@ export async function getTheCart(): Promise<Cart | undefined> {
       } else {
         console.error('Error retrieving active cart:', error);
       }
+    }
+  }
+  return undefined;
+}
+
+export async function removeLineFromCart(cart: Cart, productId: string): Promise<ClientResponse<Cart> | undefined> {
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+  if (currentApiRoot) {
+    try {
+      // находим в корзине нужную строчку с искомым продуктом
+      const lineItem = cart.lineItems.find((item) => item.productId === productId);
+      const response = await currentApiRoot
+        .carts()
+        .withId({ ID: cart.id })
+        .post({
+          body: {
+            version: cart.version,
+            actions: [
+              {
+                action: 'removeLineItem',
+                lineItemId: lineItem?.id,
+              },
+            ],
+          },
+        })
+        .execute();
+      return response;
+    } catch (error) {
+      console.error('Error removing product from cart:', error);
+      return undefined;
     }
   }
   return undefined;

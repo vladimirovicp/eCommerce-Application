@@ -1,6 +1,6 @@
 // import customerService from '../../api/customers-requests';
 import { apiRoots } from '../../api/build-client';
-import { getTheCart } from '../../api/products';
+import { getTheCart, removeLineFromCart } from '../../api/products';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
@@ -145,30 +145,6 @@ export default class CatalogCard extends ElementCreator {
 
   private async removeProductFromCart(): Promise<void> {
     const cart = await getTheCart();
-    const apiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-    if (cart && apiRoot) {
-      try {
-        // находим в корзине нужную строчку с искомым продуктом
-        const lineItem = cart.lineItems.find((item) => item.productId === this.productId);
-        await apiRoot
-          .carts()
-          .withId({ ID: cart.id })
-          .post({
-            body: {
-              version: cart.version,
-              actions: [
-                {
-                  action: 'removeLineItem',
-                  lineItemId: lineItem?.id,
-                },
-              ],
-            },
-          })
-          .execute();
-      } catch (error) {
-        console.error('Error removing product from cart:', error);
-      }
-    }
+    if (cart) removeLineFromCart(cart, this.productId);
   }
 }

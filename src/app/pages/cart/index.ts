@@ -1,7 +1,8 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/basket.scss';
-import { getTheCart } from '../../api/products';
+import { getTheCart, removeLineFromCart } from '../../api/products';
 import View from '../../common/view';
+import modalWindowCreator from '../../components/modal-window';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
@@ -12,6 +13,8 @@ export default class CartPage extends View {
   private router: Router;
 
   private cart: Cart | undefined = undefined;
+
+  private totalPriceElement: ElementCreator | undefined = undefined;
 
   constructor(router: Router) {
     const params = {
@@ -27,7 +30,7 @@ export default class CartPage extends View {
     this.cart = await getTheCart();
 
     const basketMain = new ElementCreator({ classNames: ['basket__content'] });
-    basketMain.addInnerElements([this.createRemoveButton(), this.createItemList()]);
+    basketMain.addInnerElements([this.createRemoveAllButton(), this.createItemList()]);
 
     const basketAside = new ElementCreator({ classNames: ['basket__aside'] });
     basketAside.addInnerElements([this.createPromocode(), this.createTotalPrice()]);
@@ -35,7 +38,7 @@ export default class CartPage extends View {
     this.viewElementCreator.addInnerElements([basketMain, basketAside]);
   }
 
-  private createRemoveButton(): ElementCreator<HTMLDivElement> {
+  private createRemoveAllButton(): ElementCreator<HTMLDivElement> {
     const buttonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__wrapper-btn'] });
     const removeAllButton = new ElementCreator<HTMLButtonElement>({
       tag: 'button',
@@ -86,7 +89,9 @@ export default class CartPage extends View {
 
     const deleteButton = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__card-delete'],
-      callback: (): void => {},
+      callback: async (): Promise<void> => {
+        this.removeProduct(productId, cardContainer);
+      },
     });
 
     const counterContainer = this.createItemCounter(quantity);
@@ -155,11 +160,11 @@ export default class CartPage extends View {
       classNames: ['basket__total-text'],
       textContent: 'Total cost',
     });
-    const priceValue = new ElementCreator<HTMLDivElement>({
+    this.totalPriceElement = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__total-price'],
       textContent: `$ ${totalPrice / 100}`,
     });
-    infoContainer.addInnerElements([priceText, priceValue]);
+    infoContainer.addInnerElements([priceText, this.totalPriceElement]);
 
     const buttonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['form__button'] });
     // кнопка без колбэка, просто заглушка
@@ -167,5 +172,21 @@ export default class CartPage extends View {
 
     priceContainer.addInnerElements([infoContainer, buttonContainer]);
     return priceContainer;
+  }
+
+  private async removeProduct(productId: string, card: ElementCreator): Promise<void> {
+    if (this.cart) {
+      const response = await removeLineFromCart(this.cart, productId);
+      if (response?.statusCode === 200) {
+        card.getElement()?.remove();
+        this.cart = response.body;
+        // меняем финальную сумму
+        if (this.totalPriceElement) {
+          this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
+        }
+      } else {
+        modalWindowCreator.showModalWindow('error', 'Failed to remove product from cart. Please try again');
+      }
+    }
   }
 }
