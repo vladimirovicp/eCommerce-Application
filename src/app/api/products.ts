@@ -1,4 +1,4 @@
-import { Cart, ClientResponse, ProductProjection } from '@commercetools/platform-sdk';
+import { Cart, CartUpdateAction, ClientResponse, ProductProjection } from '@commercetools/platform-sdk';
 import { apiRoot, apiRoots } from './build-client';
 
 // interface Cart {
@@ -104,6 +104,38 @@ export async function removeLineFromCart(cart: Cart, productId: string): Promise
       return response;
     } catch (error) {
       console.error('Error removing product from cart:', error);
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | undefined> {
+  // добавить лоадер?
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+  if (currentApiRoot) {
+    try {
+      // формируем массив товаров, чтобы удаление всех строк было в одном обращени к серверу
+      const actions: CartUpdateAction[] = cart.lineItems.map((item) => ({
+        action: 'removeLineItem',
+        lineItemId: item.id,
+      }));
+
+      const response = await currentApiRoot
+        .carts()
+        .withId({ ID: cart.id })
+        .post({
+          body: {
+            version: cart.version,
+            actions,
+          },
+        })
+        .execute();
+
+      return response;
+    } catch (error) {
+      console.error('Error removing products from cart:', error);
       return undefined;
     }
   }

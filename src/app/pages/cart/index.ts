@@ -1,6 +1,6 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/basket.scss';
-import { getTheCart, removeLineFromCart } from '../../api/products';
+import { clearCart, getTheCart, removeLineFromCart } from '../../api/products';
 import View from '../../common/view';
 import modalWindowCreator from '../../components/modal-window';
 import { Pages } from '../../router/pages';
@@ -16,6 +16,8 @@ export default class CartPage extends View {
 
   private totalPriceElement: ElementCreator | undefined = undefined;
 
+  private listContainer: ElementCreator<HTMLDivElement>;
+
   constructor(router: Router) {
     const params = {
       tag: 'div',
@@ -23,6 +25,7 @@ export default class CartPage extends View {
     };
     super(params);
     this.router = router;
+    this.listContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__cards'] });
     this.setContent();
   }
 
@@ -44,7 +47,19 @@ export default class CartPage extends View {
       tag: 'button',
       classNames: ['btn-default'],
       textContent: 'Remove all',
-      callback: (): void => {},
+      callback: async (): Promise<void> => {
+        if (this.cart && this.cart.lineItems.length > 0) {
+          const response = await clearCart(this.cart);
+          if (response?.statusCode === 200) {
+            this.cart = response.body;
+            this.listContainer.getElement().innerHTML = '';
+            // TODO добавить "ваша корзина пуста" и ссылку на каталог
+            if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
+          } else {
+            modalWindowCreator.showModalWindow('error', 'Failed to remove products from cart. Please try again');
+          }
+        }
+      },
     });
 
     buttonContainer.addInnerElements([removeAllButton]);
@@ -52,17 +67,15 @@ export default class CartPage extends View {
   }
 
   private createItemList(): ElementCreator<HTMLDivElement> {
-    const listContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__cards'] });
-
     if (this.cart && this.cart.lineItems.length > 0) {
       this.cart.lineItems.forEach((item) => {
         const card = this.createBasketCard(item);
-        listContainer.addInnerElements([card]);
+        this.listContainer.addInnerElements([card]);
       });
     } else {
       // TODO добавить "ваша корзина пуста" и ссылку на каталог
     }
-    return listContainer;
+    return this.listContainer;
   }
 
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
@@ -78,6 +91,7 @@ export default class CartPage extends View {
     const imgContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-img'] });
     imgContainer.getElement().innerHTML = `<img class="img-full" src="${images?.[0]?.url || ''}" alt="${name['en-GB']}">`;
 
+    const cardContant = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-content'] });
     const nameContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-name'] });
     const nameElement = new LinkCreator({
       textContent: name['en-GB'],
@@ -87,20 +101,21 @@ export default class CartPage extends View {
     });
     nameContainer.addInnerElements([nameElement]);
 
+    const cardControl = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-control'] });
     const deleteButton = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__card-delete'],
       callback: async (): Promise<void> => {
         this.removeProduct(productId, cardContainer);
       },
     });
-
-    const counterContainer = this.createItemCounter(quantity);
+    cardControl.addInnerElements([deleteButton, this.createItemCounter(quantity)]);
 
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-price'] });
     const price = prices?.[0]?.discounted?.value.centAmount || 0;
     priceContainer.getElement().innerHTML = `<div class="price__current">$ ${price / 100}</div>`;
 
-    cardContainer.addInnerElements([imgContainer, nameContainer, deleteButton, counterContainer, priceContainer]);
+    cardContant.addInnerElements([nameContainer, cardControl, priceContainer]);
+    cardContainer.addInnerElements([imgContainer, cardContant]);
     return cardContainer;
   }
 
