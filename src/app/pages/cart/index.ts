@@ -1,6 +1,6 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/basket.scss';
-import { clearCart, getTheCart, removeLineFromCart, updateProductQuantity } from '../../api/products';
+import { applyPromoCode, clearCart, getTheCart, removeLineFromCart, updateProductQuantity } from '../../api/products';
 import View from '../../common/view';
 import modalWindowCreator from '../../components/modal-window';
 import { Pages } from '../../router/pages';
@@ -15,6 +15,8 @@ export default class CartPage extends View {
   private cart: Cart | undefined = undefined;
 
   private totalPriceElement: ElementCreator | undefined = undefined;
+
+  private oldPriceElement: ElementCreator | undefined = undefined;
 
   private listContainer: ElementCreator<HTMLDivElement>;
 
@@ -80,14 +82,12 @@ export default class CartPage extends View {
 
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
     const cardContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card'] });
-
     const {
       productId,
       name,
       variant: { images, prices },
       quantity,
     } = item;
-
     const imgContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-img'] });
     imgContainer.getElement().innerHTML = `<img class="img-full" src="${images?.[0]?.url || ''}" alt="${name['en-GB']}">`;
 
@@ -161,7 +161,22 @@ export default class CartPage extends View {
       tag: 'button',
       classNames: ['btn-default'],
       textContent: 'Apply',
-      callback: (): void => {},
+      callback: async (): Promise<void> => {
+        const promoCode = promoInput.getElement().value;
+        if (!promoCode) {
+          modalWindowCreator.showModalWindow('error', 'Promo code cannot be empty!');
+          return;
+        }
+        if (this.cart) {
+          const response = await applyPromoCode(this.cart, promoCode);
+          if (response) {
+            this.cart = response.body;
+            this.updateTotalCosts();
+          } else {
+            console.error('Failed to apply promo code');
+          }
+        }
+      },
     });
     buttonContainer.addInnerElements([applyButton]);
 
@@ -172,24 +187,35 @@ export default class CartPage extends View {
   private createTotalPrice(): ElementCreator<HTMLDivElement> {
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__total'] });
 
-    const totalPrice = this.cart ? this.cart.totalPrice.centAmount : 0;
+    // const totalPrice = this.cart ? this.cart.totalPrice.centAmount : 0;
 
     const infoContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__total-info'] });
+    // let originalPrice: number = 0;
+    // if (this.cart) {
+    //   this.cart.lineItems.forEach((item) => {
+    //     originalPrice += item.price.value.centAmount * item.quantity;
+    //   });
+    // }
+    this.oldPriceElement = new ElementCreator<HTMLDivElement>({
+      classNames: ['basket__total-price', 'price__old'],
+    });
+
     const priceText = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__total-text'],
       textContent: 'Total cost',
     });
     this.totalPriceElement = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__total-price'],
-      textContent: `$ ${totalPrice / 100}`,
     });
+
+    this.updateTotalCosts();
     infoContainer.addInnerElements([priceText, this.totalPriceElement]);
 
     const buttonContainer = new ElementCreator<HTMLDivElement>({ classNames: ['form__button'] });
     // кнопка без колбэка, просто заглушка
     buttonContainer.getElement().innerHTML = `<button class="btn-default">Place an order</button>`;
 
-    priceContainer.addInnerElements([infoContainer, buttonContainer]);
+    priceContainer.addInnerElements([this.oldPriceElement, infoContainer, buttonContainer]);
     return priceContainer;
   }
 
@@ -199,10 +225,7 @@ export default class CartPage extends View {
       if (response?.statusCode === 200) {
         card.getElement()?.remove();
         this.cart = response.body;
-        // меняем финальную сумму
-        if (this.totalPriceElement) {
-          this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
-        }
+        this.updateTotalCosts();
       } else {
         modalWindowCreator.showModalWindow('error', 'Failed to remove product from cart. Please try again');
       }
@@ -217,9 +240,30 @@ export default class CartPage extends View {
         this.cart = response.body;
         const lineItem = this.cart.lineItems.find((item) => item.productId === productId);
         currentCounter.textContent = String(lineItem?.quantity);
-        if (this.totalPriceElement) {
-          this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
-        }
+        this.updateTotalCosts();
+      }
+    }
+  }
+
+  private updateTotalCosts(): void {
+    if (this.cart) {
+      if (
+        this.cart.discountCodes.length > 0 &&
+        this.cart.discountCodes.find((item) => item.state === 'MatchesCart') &&
+        this.oldPriceElement
+      ) {
+        let originalPrice: number = 0;
+        this.cart.lineItems.forEach((item) => {
+          originalPrice += item.price.discounted
+            ? item.price.discounted.value.centAmount * item.quantity
+            : item.price.value.centAmount * item.quantity;
+        });
+        this.oldPriceElement.getElement().textContent = `$ ${originalPrice / 100}`;
+      }
+
+      if (this.totalPriceElement) {
+        this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
+        console.log(this.totalPriceElement.getElement().textContent);
       }
     }
   }

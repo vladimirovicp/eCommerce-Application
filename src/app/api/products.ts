@@ -1,11 +1,11 @@
-import { Cart, CartUpdateAction, ClientResponse, ProductProjection } from '@commercetools/platform-sdk';
+import {
+  // ByProjectKeyRequestBuilder,
+  Cart,
+  CartUpdateAction,
+  ClientResponse,
+  ProductProjection,
+} from '@commercetools/platform-sdk';
 import { apiRoot, apiRoots } from './build-client';
-
-// interface Cart {
-//   id: string;
-//   version: number;
-//   products: LineItem[];
-// }
 
 export async function updateProducts(
   limit: number,
@@ -177,6 +177,47 @@ export async function updateProductQuantity(
       return undefined;
     } catch (error) {
       console.error('Error updating product quantity in cart:', error);
+      return undefined;
+    }
+  }
+  return undefined;
+}
+
+// async function fetchAllDiscountCodes(apiRoott: ByProjectKeyRequestBuilder): Promise<void> {
+//   try {
+//     await apiRoott.discountCodes().get().execute();
+//     // предполагаем, что API возвращает массив всех промокодов
+//   } catch (error) {
+//     console.error('Error fetching discount codes:', error);
+//   }
+// }
+
+export async function applyPromoCode(cart: Cart, promoCode: string): Promise<ClientResponse<Cart> | undefined> {
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+  if (currentApiRoot) {
+    try {
+      const actions: CartUpdateAction[] = [
+        {
+          action: 'addDiscountCode',
+          code: promoCode,
+        },
+      ];
+
+      const response = await currentApiRoot
+        .carts()
+        .withId({ ID: cart.id })
+        .post({
+          body: {
+            version: cart.version,
+            actions,
+          },
+        })
+        .execute();
+      // fetchAllDiscountCodes(currentApiRoot);
+      return response;
+    } catch (error) {
+      console.error('Error applying promo code:', error);
       return undefined;
     }
   }
