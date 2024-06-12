@@ -34,13 +34,17 @@ export default class CartPage extends View {
   private async setContent(): Promise<void> {
     this.cart = await getTheCart();
 
-    const basketMain = new ElementCreator({ classNames: ['basket__content'] });
-    basketMain.addInnerElements([this.createRemoveAllButton(), this.createItemList()]);
+    if (this.cart?.lineItems.length === 0) {
+      this.createEmptyCartPage();
+    } else {
+      const basketMain = new ElementCreator({ classNames: ['basket__content'] });
+      basketMain.addInnerElements([this.createRemoveAllButton(), this.createItemList()]);
 
-    const basketAside = new ElementCreator({ classNames: ['basket__aside'] });
-    basketAside.addInnerElements([this.createPromocode(), this.createTotalPrice()]);
+      const basketAside = new ElementCreator({ classNames: ['basket__aside'] });
+      basketAside.addInnerElements([this.createPromocode(), this.createTotalPrice()]);
 
-    this.viewElementCreator.addInnerElements([basketMain, basketAside]);
+      this.viewElementCreator.addInnerElements([basketMain, basketAside]);
+    }
   }
 
   private createRemoveAllButton(): ElementCreator<HTMLDivElement> {
@@ -69,15 +73,29 @@ export default class CartPage extends View {
   }
 
   private createItemList(): ElementCreator<HTMLDivElement> {
-    if (this.cart && this.cart.lineItems.length > 0) {
+    if (this.cart) {
       this.cart.lineItems.forEach((item) => {
         const card = this.createBasketCard(item);
         this.listContainer.addInnerElements([card]);
       });
-    } else {
-      // TODO добавить "ваша корзина пуста" и ссылку на каталог
     }
     return this.listContainer;
+  }
+
+  private createEmptyCartPage(): void {
+    const message = new ElementCreator<HTMLDivElement>({
+      textContent: 'Your cart is still empty. Would you like to continue shopping?',
+    });
+    const catalogButton = new ElementCreator<HTMLDivElement>({
+      tag: 'button',
+      classNames: ['btn-default'],
+      textContent: 'Catalog',
+      callback: (): void => {
+        this.router.navigate(`${Pages.CATALOG}`);
+      },
+    });
+    this.viewElementCreator.getElement().innerHTML = '';
+    this.viewElementCreator.addInnerElements([message, catalogButton]);
   }
 
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
@@ -172,8 +190,6 @@ export default class CartPage extends View {
           if (response) {
             this.cart = response.body;
             this.updateTotalCosts();
-          } else {
-            console.error('Failed to apply promo code');
           }
         }
       },
@@ -187,15 +203,8 @@ export default class CartPage extends View {
   private createTotalPrice(): ElementCreator<HTMLDivElement> {
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__total'] });
 
-    // const totalPrice = this.cart ? this.cart.totalPrice.centAmount : 0;
-
     const infoContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__total-info'] });
-    // let originalPrice: number = 0;
-    // if (this.cart) {
-    //   this.cart.lineItems.forEach((item) => {
-    //     originalPrice += item.price.value.centAmount * item.quantity;
-    //   });
-    // }
+
     this.oldPriceElement = new ElementCreator<HTMLDivElement>({
       classNames: ['basket__total-price', 'price__old'],
     });
@@ -226,6 +235,9 @@ export default class CartPage extends View {
         card.getElement()?.remove();
         this.cart = response.body;
         this.updateTotalCosts();
+        if (this.cart.lineItems.length === 0) {
+          this.createEmptyCartPage();
+        }
       } else {
         modalWindowCreator.showModalWindow('error', 'Failed to remove product from cart. Please try again');
       }
@@ -258,7 +270,11 @@ export default class CartPage extends View {
             ? item.price.discounted.value.centAmount * item.quantity
             : item.price.value.centAmount * item.quantity;
         });
-        this.oldPriceElement.getElement().textContent = `$ ${originalPrice / 100}`;
+        if (originalPrice !== this.cart.totalPrice.centAmount) {
+          this.oldPriceElement.getElement().textContent = `$ ${originalPrice / 100}`;
+        } else {
+          this.oldPriceElement.getElement().textContent = ``;
+        }
       }
 
       if (this.totalPriceElement) {

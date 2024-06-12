@@ -185,14 +185,6 @@ export async function updateProductQuantity(
   return undefined;
 }
 
-// async function fetchAllDiscountCodes(apiRoott: ByProjectKeyRequestBuilder): Promise<void> {
-//   try {
-//     await apiRoott.discountCodes().get().execute();
-//   } catch (error) {
-//     console.error('Error fetching discount codes:', error);
-//   }
-// }
-
 async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<boolean> {
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
   if (currentApiRoot) {
@@ -239,7 +231,6 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
           },
         })
         .execute();
-      // fetchAllDiscountCodes(currentApiRoot);
       return response;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 400) {
