@@ -1,5 +1,6 @@
 import { Cart, LineItem } from '@commercetools/platform-sdk';
 import '../../../assets/scss/page/basket.scss';
+import './index.scss';
 import { applyPromoCode, clearCart, getTheCart, removeLineFromCart, updateProductQuantity } from '../../api/products';
 import View from '../../common/view';
 import modalWindowCreator from '../../components/modal-window';
@@ -83,7 +84,11 @@ export default class CartPage extends View {
   }
 
   private createEmptyCartPage(): void {
+    const wraper = new ElementCreator<HTMLDivElement>({
+      classNames: ['basket__empty'],
+    });
     const message = new ElementCreator<HTMLDivElement>({
+      classNames: ['basket__empty-text'],
       textContent: 'Your cart is still empty. Would you like to continue shopping?',
     });
     const catalogButton = new ElementCreator<HTMLDivElement>({
@@ -94,8 +99,11 @@ export default class CartPage extends View {
         this.router.navigate(`${Pages.CATALOG}`);
       },
     });
+
+    wraper.addInnerElements([message, catalogButton]);
+
     this.viewElementCreator.getElement().innerHTML = '';
-    this.viewElementCreator.addInnerElements([message, catalogButton]);
+    this.viewElementCreator.addInnerElements([wraper]);
   }
 
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {

@@ -1,0 +1,9 @@
+.basket{
+    &__empty{
+        width: 12.5rem;
+
+        &-text{
+            padding-bottom: 1rem;
+        }
+    }
+}
