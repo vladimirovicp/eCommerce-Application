@@ -146,14 +146,12 @@ export default class CartPage extends View {
     });
     const minusElement = new ElementCreator<HTMLDivElement>({
       classNames: ['number__minus'],
-      textContent: '-',
       callback: (): void => {
         this.updateQuantity(productId, valueElement.getElement(), false);
       },
     });
     const plusElement = new ElementCreator<HTMLDivElement>({
       classNames: ['number__plus'],
-      textContent: '+',
       callback: (): void => {
         this.updateQuantity(productId, valueElement.getElement(), true);
       },
