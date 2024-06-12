@@ -3,8 +3,10 @@ import {
   Cart,
   CartUpdateAction,
   ClientResponse,
+  DiscountCodePagedQueryResponse,
   ProductProjection,
 } from '@commercetools/platform-sdk';
+import modalWindowCreator from '../components/modal-window';
 import { apiRoot, apiRoots } from './build-client';
 
 export async function updateProducts(
@@ -186,39 +188,64 @@ export async function updateProductQuantity(
 // async function fetchAllDiscountCodes(apiRoott: ByProjectKeyRequestBuilder): Promise<void> {
 //   try {
 //     await apiRoott.discountCodes().get().execute();
-//     // предполагаем, что API возвращает массив всех промокодов
 //   } catch (error) {
 //     console.error('Error fetching discount codes:', error);
 //   }
 // }
+
+async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<boolean> {
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+  if (currentApiRoot) {
+    const codeResponse: ClientResponse<DiscountCodePagedQueryResponse> = await currentApiRoot
+      .discountCodes()
+      .get({
+        queryArgs: {
+          where: `code="${promoCode}"`,
+        },
+      })
+      .execute();
+    if (codeResponse.body.results.length > 0) {
+      const codeId = codeResponse.body.results[0].id;
+      const codeInCart = cart.discountCodes.find((item) => item.discountCode.id === codeId);
+      if (codeInCart && codeInCart.state === 'MatchesCart') {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 export async function applyPromoCode(cart: Cart, promoCode: string): Promise<ClientResponse<Cart> | undefined> {
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
 
   if (currentApiRoot) {
     try {
-      const actions: CartUpdateAction[] = [
-        {
-          action: 'addDiscountCode',
-          code: promoCode,
-        },
-      ];
-
+      if (await checkIsPromoCodeApplied(cart, promoCode)) {
+        modalWindowCreator.showModalWindow('error', `The discount code '${promoCode}' has already been applied`);
+        return undefined;
+      }
       const response = await currentApiRoot
         .carts()
         .withId({ ID: cart.id })
         .post({
           body: {
             version: cart.version,
-            actions,
+            actions: [
+              {
+                action: 'addDiscountCode',
+                code: promoCode,
+              },
+            ],
           },
         })
         .execute();
       // fetchAllDiscountCodes(currentApiRoot);
       return response;
     } catch (error) {
-      console.error('Error applying promo code:', error);
-      return undefined;
+      if (error instanceof Error && 'code' in error && error.code === 400) {
+        modalWindowCreator.showModalWindow('error', `The discount code '${promoCode}' was not found`);
+        return undefined;
+      }
     }
   }
   return undefined;
