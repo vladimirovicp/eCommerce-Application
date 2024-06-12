@@ -1,0 +1,257 @@
+.logo-rs__link{
+    width: 10rem;
+    height: 10rem;
+    display: block;
+
+    position: relative;
+
+    &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        left: 50%;
+        top: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        display: block;
+        width: 9rem;
+        height: 9rem;
+        background: #000;
+        border-radius: 50%;
+        animation: pulse-border 1500ms ease-out infinite;
+    }
+}
+
+@keyframes pulse-border {
+    0% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1);
+        opacity: 1;
+    }
+    
+    100% {
+        transform: translateX(-50%) translateY(-50%) translateZ(0) scale(1.5);
+        opacity: 0;
+    } 
+}
+
+
+
+.about{
+    .container{
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    &__logo{
+
+        &-link{
+            width: 10rem;
+            height: 6rem;
+            display: block;
+        }
+        p{
+            margin: 0;
+            text-transform: uppercase;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+    }
+
+
+
+    &-wrapper{
+        display: flex;
+        gap:4.5rem;
+        padding-bottom: 3rem;
+    }
+
+    &__info{
+        
+        .title{
+            padding-bottom: .5rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .text{
+            padding-bottom: 1rem;
+            color: #808080;
+            //opacity: 0.5;
+        }
+    }
+
+    &__person{
+        background: url('../../img/person/background.png');
+        background-repeat: no-repeat;
+        background-size: 75.5rem 13rem;
+        background-position: bottom left;
+        display: flex;
+        color: #fff;
+        margin-bottom: 2rem;
+        &-img{
+            width: 13rem;
+            height: 13rem;
+        }
+        .img{
+            &__ver-2{
+                height: 14rem;
+            }
+
+            &__ver-3{
+                height: 14rem;
+            }
+        }
+
+        &-content{
+            padding-top: 1.75rem;
+            padding-left: 5rem;
+            width: 55rem;
+        }
+
+        &-title{
+            padding-bottom: 0.5rem;
+            .name{
+                display: inline-block;
+                text-transform: uppercase;
+                margin-right: 1rem;
+            }
+            .role{
+                display: inline-block;
+                text-transform: uppercase;
+                opacity: 0.5;
+            }
+        }
+
+        &-github{
+            padding-bottom: 0.5rem;
+            a{
+                color: #fff;
+                text-decoration: underline;
+                text-transform: uppercase;
+            }
+        }
+
+        &-info{
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+    }
+}
+
+@media(max-width: 64em){
+    .about{
+        &__info{
+            width: 30rem;
+        }
+
+        &__logo-rs{
+            position: absolute;
+            top: 24rem;
+        }
+
+        &__person{
+            background-image: url("../../img/person/background-wraper.png");
+            background-color: #1c1403;
+            background-repeat: no-repeat;
+            background-position: top left;
+            background-size: 14rem 15.5rem;
+            border-radius: .3rem 0.5rem 0.5rem 0.5rem;
+
+            &-content{
+                padding: 1rem 1rem 1rem 2.5rem;
+            }
+
+            &-img{
+                flex: 0 0 auto;
+                margin-right: auto;
+                display: flex;
+                
+            }
+
+            .img__ver-1{
+                margin-top: 2.4rem;
+                img{
+                    border-radius: 0 0 5.5rem 0;
+                }
+            }
+
+            .img__ver-2{
+                margin-top: 1.5rem;
+                img{
+                    border-radius: 0 0 5.5rem 0;
+                }
+            }
+
+            
+        }
+    }
+}
+
+@media(min-width: 64em){
+
+}
+
+@media(max-width: 48em){
+    .about{
+        &-wrapper{
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2.5rem;
+            
+        }
+
+        &__logo-rs{
+            position: unset;
+            top: unset;
+        }
+
+        &__person{
+            flex-direction: column;
+            background-size: calc(100vw - 4rem) 13rem;
+
+            &-content{
+                width: 100%;
+                padding: 1rem;
+                box-sizing: border-box;
+
+            }
+
+            .img__ver-1{
+                margin-top: unset;
+                img{
+                    border-radius: 0 0 5rem 0; 
+                }
+            }
+
+            .img__ver-2{
+                height: 13rem;
+                margin-top: unset;
+                img{
+                    border-radius: 0 0 5.2rem 0;
+                }
+            }
+        }
+    }
+}
+
+
+@media(max-width: 20em){
+    .about{
+        &__person{
+            background-size: 260px 207px;
+        }
+    }
+}
+
+
+@media (hover: hover) {
+    .about{
+        &__person{
+            &-github{
+                a{
+                    &:hover{
+                        text-decoration: none;
+                    }  
+                }
+            }
+        }
+    }
+}

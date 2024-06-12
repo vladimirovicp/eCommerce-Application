@@ -1,0 +1,67 @@
+.load{
+    min-height: calc(100vh - 20rem);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &__wraper{
+        width: 10rem;
+        height: 10rem;
+        position: relative;
+
+        img{
+            animation-name: rotation;
+            animation-duration: 5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+        }
+
+        &:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 24px;
+            line-height: 32px;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: percentage 10s linear infinite;
+        }
+    }
+
+    
+}
+
+@keyframes percentage {
+    0% { content: "0%"}
+    5% { content: "5%"}
+    10% { content: "10%"}
+    20% { content: "20%"}
+    30% { content: "30%"}
+    40% { content: "40%"}
+    50% { content: "50%"}
+    60% { content: "60%"}
+    70% { content: "70%"}
+    80% { content: "80%"}
+    90% { content: "90%"}
+    95% { content: "95%"}
+    96% { content: "96%"}
+    97% { content: "97%"}
+    98% { content: "98%"}
+    99% { content: "99%"}
+    100% { content: "100%"}
+  }
+
+  @keyframes rotation {
+    0% {
+        transform:rotate(0deg);
+    }
+    100% {
+        transform:rotate(360deg);
+    }
+}

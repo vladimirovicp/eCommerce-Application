@@ -2,6 +2,7 @@ import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 import heroBgImg from '../../../assets/img/home-background-min.png';
 import '../../../assets/scss/page/home.scss';
+import './index.scss';
 
 const imageSrc = {
   HERO_BG_IMG: `${heroBgImg}`,
@@ -41,28 +42,38 @@ class Home extends View {
 
   private createHeroContainer(): ElementCreator<HTMLElement> {
     const container = new ElementCreator({
-      tag: 'div',
       classNames: ['container'],
     });
 
     const heroTitle = new ElementCreator({
-      tag: 'div',
       classNames: ['hero__title'],
     });
 
     const heroHeader = new ElementCreator({
-      tag: 'div',
       classNames: ['hero__title-header'],
       textContent: 'Welcome to Holy Grail',
     });
 
     const constheroSubheader = new ElementCreator({
-      tag: 'div',
       classNames: ['hero__title-subheader'],
       textContent: 'Bikes and Electric Bikes',
     });
 
-    heroTitle.addInnerElements([heroHeader, constheroSubheader]);
+    const codeText = new ElementCreator({
+      classNames: ['hero__title-code'],
+      textContent: 'Apply promo code',
+    });
+    const codePromo = new ElementCreator({
+      tag: 'span',
+      classNames: ['promo-code'],
+      textContent: 'APOLLO5',
+    });
+    const codeTextEnd = new ElementCreator({
+      tag: 'span',
+      textContent: 'to receive an extra 5% discount for all Apollo bikes.',
+    });
+    codeText.addInnerElements([codePromo, codeTextEnd]);
+    heroTitle.addInnerElements([heroHeader, constheroSubheader, codeText]);
     container.addInnerElements([heroTitle]);
     return container;
   }
