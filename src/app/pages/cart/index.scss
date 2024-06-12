@@ -7,3 +7,9 @@
         }
     }
 }
+
+@media (max-width: 48em) {
+    .basket .basket__card {
+        margin-bottom: 2rem;
+    }
+}
