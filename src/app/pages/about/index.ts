@@ -1,4 +1,4 @@
-import '../../../assets/scss/page/home.scss';
+import '../../../assets/scss/page/about.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 
