@@ -85,7 +85,11 @@ export async function updateCartCounter(): Promise<void> {
   const cart = await getTheCart();
   const counter = document.querySelector('#header-cart-counter');
   if (cart && counter) {
-    counter.textContent = String(cart.lineItems.length);
+    let totalQuantity = 0;
+    cart.lineItems.forEach((item) => {
+      totalQuantity += item.quantity;
+    });
+    counter.textContent = String(totalQuantity);
   }
 }
 
@@ -181,6 +185,7 @@ export async function updateProductQuantity(
               },
             })
             .execute();
+          updateCartCounter();
           return response;
         }
       }

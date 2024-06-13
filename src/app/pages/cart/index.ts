@@ -109,6 +109,7 @@ export default class CartPage extends View {
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
     const cardContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card'] });
     const {
+      productKey,
       productId,
       name,
       variant: { images, prices },
@@ -122,7 +123,7 @@ export default class CartPage extends View {
     const nameElement = new LinkCreator({
       textContent: name['en-GB'],
       callback: (): void => {
-        this.router.navigate(`${Pages.CATALOG}/${productId}`);
+        this.router.navigate(`${Pages.CATALOG}/${productKey}`);
       },
     });
     nameContainer.addInnerElements([nameElement]);
@@ -285,7 +286,6 @@ export default class CartPage extends View {
 
       if (this.totalPriceElement) {
         this.totalPriceElement.getElement().textContent = `$ ${this.cart.totalPrice.centAmount / 100}`;
-        console.log(this.totalPriceElement.getElement().textContent);
       }
     }
   }
