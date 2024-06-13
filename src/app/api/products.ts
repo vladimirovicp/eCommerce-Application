@@ -241,3 +241,52 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
   }
   return undefined;
 }
+
+export async function addProductToCart(productId: string): Promise<void> {
+  const cart = await getTheCart();
+  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
+
+  if (cart && currentApiRoot)
+    try {
+      await currentApiRoot
+        .carts()
+        .withId({ ID: cart.id })
+        .post({
+          body: {
+            version: cart.version,
+            actions: [
+              {
+                action: 'addLineItem',
+                productId,
+                quantity: 1,
+              },
+            ],
+          },
+        })
+        .execute();
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
+}
+
+export async function toggleAddToCartButton(button: HTMLElement, productId: string): Promise<void> {
+  const currentButton = button;
+  const isRemoveButton = button.classList.toggle('remove-btn');
+  if (isRemoveButton) {
+    addProductToCart(productId);
+    currentButton.textContent = 'Remove from cart';
+  } else {
+    const cart = await getTheCart();
+    if (cart) removeLineFromCart(cart, productId);
+    currentButton.textContent = 'Add to cart';
+  }
+}
+
+export async function checkIsProductInCart(productId: string): Promise<boolean> {
+  const cart = await getTheCart();
+  if (cart) {
+    const lineItem = cart.lineItems.find((item) => item.productId === productId);
+    return Boolean(lineItem);
+  }
+  return false;
+}
