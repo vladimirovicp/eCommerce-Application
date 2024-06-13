@@ -11,6 +11,7 @@ import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../modal-window';
 import customerService from '../../api/customers-requests';
+import { updateCartCounter } from '../../api/products';
 
 export default class HeaderView extends View {
   private router: Router;
@@ -154,6 +155,7 @@ export default class HeaderView extends View {
     headerContainer.addInnerElements([headerLogoElement, headerContentContainer]);
 
     this.viewElementCreator.addInnerElements([headerContainer]);
+    updateCartCounter();
   }
 
   private createHeaderMenu(): HTMLDivElement {
@@ -223,6 +225,11 @@ export default class HeaderView extends View {
       listClass: ['header__links-list'],
       itemClass: ['header__links-item'],
     });
+
+    const cartImage = linkListCreator.getHtmlElement().querySelector('.header__basket-img');
+    const productCounter = new ElementCreator<HTMLSpanElement>({ tag: 'span', id: 'header-cart-counter' });
+    cartImage?.insertAdjacentElement('afterend', productCounter.getElement());
+
     return linkListCreator.getHtmlElement();
   }
 }

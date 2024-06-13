@@ -81,6 +81,14 @@ export async function getTheCart(): Promise<Cart | undefined> {
   return undefined;
 }
 
+export async function updateCartCounter(): Promise<void> {
+  const cart = await getTheCart();
+  const counter = document.querySelector('#header-cart-counter');
+  if (cart && counter) {
+    counter.textContent = String(cart.lineItems.length);
+  }
+}
+
 export async function removeLineFromCart(cart: Cart, productId: string): Promise<ClientResponse<Cart> | undefined> {
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
 
@@ -103,6 +111,7 @@ export async function removeLineFromCart(cart: Cart, productId: string): Promise
           },
         })
         .execute();
+      updateCartCounter();
       return response;
     } catch (error) {
       console.error('Error removing product from cart:', error);
@@ -134,7 +143,7 @@ export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | unde
           },
         })
         .execute();
-
+      updateCartCounter();
       return response;
     } catch (error) {
       console.error('Error removing products from cart:', error);
@@ -150,7 +159,6 @@ export async function updateProductQuantity(
   increment: boolean
 ): Promise<ClientResponse<Cart> | undefined> {
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
   if (currentApiRoot) {
     try {
       const lineItem = cart.lineItems.find((item) => item.productId === productId);
@@ -264,6 +272,7 @@ export async function addProductToCart(productId: string): Promise<void> {
           },
         })
         .execute();
+      updateCartCounter();
     } catch (error) {
       console.error('Error adding product to cart:', error);
     }
