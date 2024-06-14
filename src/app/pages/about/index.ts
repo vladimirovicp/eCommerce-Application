@@ -13,9 +13,9 @@ export default class AboutPage extends View {
   }
 
   private setContent(): void {
-    const aboutWrapper = this.infoGeneral();
-
-    this.viewElementCreator.addInnerElements([aboutWrapper]);
+    const infoText = this.infoGeneral();
+    const persons = this.persons();
+    this.viewElementCreator.addInnerElements([infoText, persons]);
   }
 
   private infoGeneral(): ElementCreator<HTMLElement> {
@@ -23,16 +23,16 @@ export default class AboutPage extends View {
       classNames: ['about-wrapper'],
     });
 
-    const aboutLogoData = this.aboutLogo();
-    const aboutInfoData = this.aboutInfo();
-    const aboutLogoRSData = this.aboutLogoRS();
+    const aboutLogoData = this.logo();
+    const aboutInfoData = this.info();
+    const aboutLogoRSData = this.logoRS();
 
     aboutWrapper.addInnerElements([aboutLogoData, aboutInfoData, aboutLogoRSData]);
 
     return aboutWrapper;
   }
 
-  private aboutLogo(): ElementCreator<HTMLElement> {
+  private logo(): ElementCreator<HTMLElement> {
     const aboutLogo = new ElementCreator({
       classNames: ['about__logo'],
     });
@@ -62,7 +62,7 @@ export default class AboutPage extends View {
     return aboutLogo;
   }
 
-  private aboutInfo(): ElementCreator<HTMLElement> {
+  private info(): ElementCreator<HTMLElement> {
     const aboutInfo = new ElementCreator({
       classNames: ['about__info'],
     });
@@ -87,7 +87,7 @@ export default class AboutPage extends View {
     return aboutInfo;
   }
 
-  private aboutLogoRS(): ElementCreator<HTMLElement> {
+  private logoRS(): ElementCreator<HTMLElement> {
     const aboutLogoRS = new ElementCreator({
       classNames: ['about__logo-rs'],
     });
@@ -111,5 +111,108 @@ export default class AboutPage extends View {
     aboutLogoRS.addInnerElements([logoRsLink]);
 
     return aboutLogoRS;
+  }
+
+  private persons(): ElementCreator<HTMLElement> {
+    const persons = new ElementCreator({
+      classNames: ['about__persons'],
+    });
+
+    const rina = this.person(
+      'img__ver-1',
+      './assets/img/person/rina.png',
+      'Ekaterina Kovaleva',
+      'software developer',
+      'github.com/asimo-git',
+      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+    );
+
+    const petr = this.person(
+      'img__ver-2',
+      './assets/img/person/petr.png',
+      'Petr Fadeev',
+      'UI/UX Designer',
+      'github.com/vladimirovicp',
+      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+    );
+
+    const sveta = this.person(
+      'img__ver-3',
+      './assets/img/person/sveta.png',
+      'Svetlana Vorokhobina',
+      'Team Lead',
+      'github.com/svorokhobina',
+      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+    );
+
+    persons.addInnerElements([rina, petr, sveta]);
+    return persons;
+  }
+
+  private person(
+    classPersonImgWraper: string,
+    urlPhoto: string,
+    namePerson: string,
+    rolePerson: string,
+    urlGitHub: string,
+    text: string
+  ): ElementCreator<HTMLElement> {
+    const person = new ElementCreator({ classNames: ['about__person'] });
+    const personImgWraper = new ElementCreator({
+      classNames: ['about__person-img', classPersonImgWraper],
+    });
+    const personImg = new ElementCreator({
+      tag: 'img',
+      classNames: ['img-full'],
+      attributes: {
+        src: urlPhoto,
+        alt: '',
+      },
+    });
+    personImgWraper.addInnerElements([personImg]);
+    const content = new ElementCreator({
+      classNames: ['about__person-content'],
+    });
+    const title = this.personTitle(namePerson, rolePerson);
+    const github = this.personGit(urlGitHub);
+
+    const infoText = new ElementCreator({
+      classNames: ['about__person-info'],
+      textContent: text,
+    });
+    content.addInnerElements([title, github, infoText]);
+    person.addInnerElements([personImgWraper, content]);
+    return person;
+  }
+
+  private personTitle(namePerson: string, rolePerson: string): ElementCreator<HTMLElement> {
+    const title = new ElementCreator({
+      classNames: ['about__person-title'],
+    });
+    const name = new ElementCreator({
+      classNames: ['name'],
+      textContent: namePerson,
+    });
+
+    const role = new ElementCreator({
+      classNames: ['role'],
+      textContent: rolePerson,
+    });
+    title.addInnerElements([name, role]);
+
+    return title;
+  }
+
+  private personGit(urlGitHub: string): ElementCreator<HTMLElement> {
+    const github = new ElementCreator({
+      classNames: ['about__person-github'],
+    });
+    const githubLink = new ElementCreator({
+      tag: 'a',
+      attributes: { href: `https://${urlGitHub}` },
+      textContent: urlGitHub,
+    });
+    github.addInnerElements([githubLink]);
+    return github;
   }
 }
