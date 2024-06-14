@@ -105,7 +105,7 @@ export default class CartPage extends View {
     this.viewElementCreator.getElement().innerHTML = '';
     this.viewElementCreator.addInnerElements([wraper]);
   }
-  /* eslint-disable-next-line */
+
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
     const cardContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card'] });
     const {
@@ -116,18 +116,11 @@ export default class CartPage extends View {
       variant: { images, prices },
       quantity,
     } = item;
+
     const imgContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-img'] });
     imgContainer.getElement().innerHTML = `<img class="img-full" src="${images?.[0]?.url || ''}" alt="${name['en-GB']}">`;
 
     const cardContant = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-content'] });
-    const nameContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-name'] });
-    const nameElement = new LinkCreator({
-      textContent: name['en-GB'],
-      callback: (): void => {
-        this.router.navigate(`${Pages.CATALOG}/${productKey}`);
-      },
-    });
-    nameContainer.addInnerElements([nameElement]);
 
     const cardControl = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-control'] });
     const deleteButton = new ElementCreator<HTMLDivElement>({
@@ -148,9 +141,21 @@ export default class CartPage extends View {
       priceContainer.getElement().innerHTML = `<div class="price__current">$ ${price / 100}</div>`;
     }
 
-    cardContant.addInnerElements([nameContainer, cardControl, priceContainer]);
+    cardContant.addInnerElements([this.createProductName(name['en-GB'], productKey), cardControl, priceContainer]);
     cardContainer.addInnerElements([imgContainer, cardContant]);
     return cardContainer;
+  }
+
+  private createProductName(name: string, productKey: string | undefined): ElementCreator<HTMLDivElement> {
+    const nameContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-name'] });
+    const nameElement = new LinkCreator({
+      textContent: name,
+      callback: (): void => {
+        this.router.navigate(`${Pages.CATALOG}/${productKey}`);
+      },
+    });
+    nameContainer.addInnerElements([nameElement]);
+    return nameContainer;
   }
 
   private createItemCounter(productId: string, quantity: number): ElementCreator<HTMLDivElement> {

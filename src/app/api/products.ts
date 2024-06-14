@@ -244,6 +244,7 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
           },
         })
         .execute();
+      modalWindowCreator.showModalWindow('info', `The discount code '${promoCode}' applied successfully!`);
       return response;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 400) {
@@ -255,7 +256,7 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
   return undefined;
 }
 
-export async function addProductToCart(productId: string): Promise<void> {
+export async function addProductsToCart(actions: CartUpdateAction[]): Promise<void> {
   const cart = await getTheCart();
   const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
 
@@ -267,19 +268,13 @@ export async function addProductToCart(productId: string): Promise<void> {
         .post({
           body: {
             version: cart.version,
-            actions: [
-              {
-                action: 'addLineItem',
-                productId,
-                quantity: 1,
-              },
-            ],
+            actions,
           },
         })
         .execute();
       updateCartCounter();
     } catch (error) {
-      console.error('Error adding product to cart:', error);
+      console.error('Error adding products to cart:', error);
     }
 }
 
@@ -287,7 +282,13 @@ export async function toggleAddToCartButton(button: HTMLElement, productId: stri
   const currentButton = button;
   const isRemoveButton = button.classList.toggle('remove-btn');
   if (isRemoveButton) {
-    addProductToCart(productId);
+    addProductsToCart([
+      {
+        action: 'addLineItem',
+        productId,
+        quantity: 1,
+      },
+    ]);
     currentButton.textContent = 'Remove from cart';
   } else {
     const cart = await getTheCart();
