@@ -60,7 +60,7 @@ export default class CartPage extends View {
           if (response?.statusCode === 200) {
             this.cart = response.body;
             this.listContainer.getElement().innerHTML = '';
-            // TODO добавить "ваша корзина пуста" и ссылку на каталог
+            this.createEmptyCartPage();
             if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
           } else {
             modalWindowCreator.showModalWindow('error', 'Failed to remove products from cart. Please try again');
@@ -105,10 +105,11 @@ export default class CartPage extends View {
     this.viewElementCreator.getElement().innerHTML = '';
     this.viewElementCreator.addInnerElements([wraper]);
   }
-
+  /* eslint-disable-next-line */
   private createBasketCard(item: LineItem): ElementCreator<HTMLDivElement> {
     const cardContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card'] });
     const {
+      discountedPricePerQuantity,
       productKey,
       productId,
       name,
@@ -139,7 +140,13 @@ export default class CartPage extends View {
 
     const priceContainer = new ElementCreator<HTMLDivElement>({ classNames: ['basket__card-price'] });
     const price = prices?.[0]?.discounted?.value.centAmount || 0;
-    priceContainer.getElement().innerHTML = `<div class="price__current">$ ${price / 100}</div>`;
+    const newPrice = discountedPricePerQuantity[0]?.discountedPrice?.value.centAmount;
+    if (newPrice) {
+      priceContainer.getElement().innerHTML = `<div class="price__old">$ ${price / 100}</div>
+      <div class="price__current">$ ${newPrice / 100}</div>`;
+    } else {
+      priceContainer.getElement().innerHTML = `<div class="price__current">$ ${price / 100}</div>`;
+    }
 
     cardContant.addInnerElements([nameContainer, cardControl, priceContainer]);
     cardContainer.addInnerElements([imgContainer, cardContant]);
