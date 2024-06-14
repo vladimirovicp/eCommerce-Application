@@ -125,7 +125,7 @@ export default class CatalogPage extends View {
 
             this.secondaryMenu.updateContent(['catalog', category], false);
             this.currentCategory = value;
-            this.applyСhanges();
+            this.applyChanges();
           }
         },
       });
@@ -156,7 +156,7 @@ export default class CatalogPage extends View {
           const filtersItems = filterBox.querySelectorAll('.active');
           filtersItems.forEach((item) => item.classList.remove('active'));
         }
-        this.applyСhanges();
+        this.applyChanges();
       },
     });
     return button;
@@ -228,7 +228,7 @@ export default class CatalogPage extends View {
           sortMenuItem.getElement().classList.add('active');
 
           switchInput.getElement().dispatchEvent(new MouseEvent('click'));
-          this.applyСhanges();
+          this.applyChanges();
           // TODO закрыть меню
         },
       });
@@ -269,7 +269,7 @@ export default class CatalogPage extends View {
       callback: (): void => {
         document.body.classList.remove('_lock');
         this.filterChecked();
-        this.applyСhanges();
+        this.applyChanges();
       },
     });
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });
@@ -324,7 +324,7 @@ export default class CatalogPage extends View {
     return container;
   }
 
-  private async applyСhanges(): Promise<void> {
+  private async applyChanges(): Promise<void> {
     const response = await updateProducts(
       this.cardsPerPage,
       this.offset,
@@ -350,7 +350,7 @@ export default class CatalogPage extends View {
     document.querySelectorAll('.checkbox-with-text').forEach((filter) => {
       filter.classList.remove('active');
     });
-    this.applyСhanges();
+    this.applyChanges();
   }
 
   private lockCheckedSortFilter = (e: Event): void => {
@@ -359,7 +359,7 @@ export default class CatalogPage extends View {
     const sortToggle = document.getElementById('sort-toggle') as HTMLInputElement;
     if (element.className === '_lock') {
       if (filterToggle.checked && !sortToggle.checked) {
-        this.applyСhanges();
+        this.applyChanges();
       }
       filterToggle.checked = true;
       if (filterToggle.checked) {
