@@ -12,12 +12,20 @@ import ListCreator from '../../util/list-creator';
 import Router from '../../router/router';
 import { Categories, FilterParameter, FilterParameters, SortParameters } from './constants';
 
+const PRODUCT_AMOUNT_TO_SHOW = 15;
+
+const OBSERVER_OPTIONS = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.7,
+};
+
 export default class CatalogPage extends View {
   private router: Router;
 
   private secondaryMenu: SecondaryMenu;
 
-  private cardsPerPage: number = 50;
+  private cardsPerPage: number = 110;
 
   private offset: number = 0;
 
@@ -30,6 +38,16 @@ export default class CatalogPage extends View {
   private searchValue: string;
 
   private currentFilter: { [key: string]: string[] };
+
+  private observer: IntersectionObserver;
+
+  private footer: Element | null = document.querySelector('.footer');
+
+  private currentOffset: number = 1;
+
+  private cardsToShow: CatalogCard[] = [];
+
+  private handleObserver: IntersectionObserverCallback;
 
   constructor(secondaryMenu: SecondaryMenu, router: Router) {
     const params = {
@@ -45,7 +63,6 @@ export default class CatalogPage extends View {
       this.secondaryMenu.updateContent(['catalog', this.secondaryMenu.category], false);
       this.secondaryMenu.category = undefined;
     }
-
     this.catalogCards = new ElementCreator<HTMLDivElement>({
       classNames: ['catalog-cards'],
     });
@@ -58,19 +75,41 @@ export default class CatalogPage extends View {
     this.createSecondaryMenu();
     this.setContent();
     this.router = router;
+    this.handleObserver = (entries: IntersectionObserverEntry[]): void => {
+      if (entries[0].isIntersecting) {
+        this.displayProductCards(
+          this.cardsToShow,
+          this.currentOffset * PRODUCT_AMOUNT_TO_SHOW,
+          (this.currentOffset + 1) * PRODUCT_AMOUNT_TO_SHOW
+        );
+        this.currentOffset += 1;
+      }
+    };
+    this.observer = new IntersectionObserver(this.handleObserver, OBSERVER_OPTIONS);
   }
 
   private async setContent(): Promise<void> {
     const categoryContainer = this.createCategoriesMenu();
     this.viewElementCreator.addInnerElements([categoryContainer, this.catalogCards]);
-
     const response = await updateProducts(this.cardsPerPage, this.offset, this.currentCategory, this.currentSort);
-    if (response) {
-      this.showProductCards(response);
+    if (!response) {
+      return undefined;
     }
+
+    await this.getProductCards(response);
+    if (this.cardsToShow.length === 0) {
+      return undefined;
+    }
+
+    this.displayProductCards(this.cardsToShow, 0, PRODUCT_AMOUNT_TO_SHOW);
+
+    if (this.footer) {
+      this.observer.observe(this.footer);
+    }
+    return undefined;
   }
 
-  private async showProductCards(products: ProductProjection[]): Promise<void> {
+  private async getProductCards(products: ProductProjection[]): Promise<void> {
     this.catalogCards.getElement().innerHTML = '';
 
     const cart = await getTheCart();
@@ -103,9 +142,16 @@ export default class CatalogPage extends View {
           this.router,
           productsInCart.includes(id)
         );
-
-        this.catalogCards.addInnerElements([card]);
+        this.cardsToShow.push(card);
       });
+    }
+  }
+
+  private displayProductCards(cards: CatalogCard[], startPosition: number, lastPosition: number): void {
+    for (let i = startPosition; i < lastPosition; i += 1) {
+      if (cards[i] !== undefined) {
+        this.catalogCards.getElement().append(cards[i].getElement());
+      }
     }
   }
 
@@ -325,6 +371,8 @@ export default class CatalogPage extends View {
   }
 
   private async applyChanges(): Promise<void> {
+    this.cardsToShow.length = 0;
+    this.currentOffset = 1;
     const response = await updateProducts(
       this.cardsPerPage,
       this.offset,
@@ -333,9 +381,21 @@ export default class CatalogPage extends View {
       this.currentFilter,
       this.searchValue ? this.searchValue : undefined
     );
-    if (response) {
-      this.showProductCards(response);
+    if (!response) {
+      return undefined;
     }
+
+    await this.getProductCards(response);
+    if (this.cardsToShow.length === 0) {
+      return undefined;
+    }
+
+    this.displayProductCards(this.cardsToShow, 0, PRODUCT_AMOUNT_TO_SHOW);
+
+    if (this.footer) {
+      this.observer.observe(this.footer);
+    }
+    return undefined;
   }
 
   private async applySearch(input: HTMLInputElement): Promise<void> {
