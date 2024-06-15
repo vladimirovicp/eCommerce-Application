@@ -10,8 +10,10 @@ import SecondaryMenu from '../../components/secondary-menu';
 import { CategoriesReverse } from '../catalog/constants';
 import Router from '../../router/router';
 import { Pages } from '../../router/pages';
+import { checkIsProductInCart, toggleAddToCartButton } from '../../api/products';
 
 interface ProductResponse {
+  id: string;
   name: string;
   description: string;
   fullPrice: number;
@@ -34,6 +36,7 @@ export default class ProductPage extends View {
     };
     super(params);
     this.responseObject = {
+      id: '',
       name: '',
       description: '',
       fullPrice: 0,
@@ -55,6 +58,7 @@ export default class ProductPage extends View {
         .execute();
 
       this.responseObject = {
+        id: response.body.id,
         name: response.body.name['en-GB'],
         description: response?.body?.description?.['en-GB'] || '',
         fullPrice: response.body.masterVariant.prices?.[0].value.centAmount || 0,
@@ -114,11 +118,11 @@ export default class ProductPage extends View {
     });
   }
 
-  private configurePage(params: ProductResponse): void {
+  private async configurePage(params: ProductResponse): Promise<void> {
     this.viewElementCreator.addInnerElements([
       this.setSlider(params),
       this.setProductInfo(params),
-      this.setProductPrices(params),
+      await this.setProductPrices(params),
       this.createModalSlide(params),
     ]);
     this.configureSwiper();
@@ -274,7 +278,7 @@ export default class ProductPage extends View {
     return infoContainer.getElement();
   }
 
-  private setProductPrices(params: ProductResponse): HTMLElement {
+  private async setProductPrices(params: ProductResponse): Promise<HTMLElement> {
     const сontainer = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-product__price'],
@@ -301,10 +305,14 @@ export default class ProductPage extends View {
       tag: 'div',
       classNames: ['catalog-product__btn'],
     });
+    const isInCart = await checkIsProductInCart(this.responseObject.id);
     const button = new ElementCreator({
       tag: 'button',
-      classNames: ['btn-default'],
-      textContent: 'Into a basket',
+      classNames: isInCart ? ['btn-default', 'remove-btn'] : ['btn-default'],
+      textContent: isInCart ? 'Remove from cart' : 'Add to cart',
+      callback: () => {
+        toggleAddToCartButton(button.getElement(), this.responseObject.id);
+      },
     });
     buttonContainer.addInnerElements([button]);
 

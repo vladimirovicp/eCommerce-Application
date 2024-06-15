@@ -1,6 +1,5 @@
 // import customerService from '../../api/customers-requests';
-import { apiRoots } from '../../api/build-client';
-import { getTheCart, removeLineFromCart } from '../../api/products';
+import { toggleAddToCartButton } from '../../api/products';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
@@ -104,47 +103,10 @@ export default class CatalogCard extends ElementCreator {
     });
     button.setCallback((event) => {
       if (event) event.stopPropagation();
-      const isRemoveButton = button.getElement().classList.toggle('remove-btn');
-      if (isRemoveButton) {
-        this.addProductToCart();
-        button.getElement().textContent = 'Remove from cart';
-        // показать модальное окно?
-      } else {
-        this.removeProductFromCart();
-        button.getElement().textContent = 'Add to cart';
-      }
+      toggleAddToCartButton(button.getElement(), this.productId);
     }, 'click');
 
     buttonContainer.addInnerElements([button]);
     return buttonContainer.getElement();
-  }
-
-  private async addProductToCart(): Promise<void> {
-    const cart = await getTheCart();
-    const apiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-    if (cart && apiRoot) {
-      await apiRoot
-        .carts()
-        .withId({ ID: cart.id })
-        .post({
-          body: {
-            version: cart.version,
-            actions: [
-              {
-                action: 'addLineItem',
-                productId: this.productId,
-                quantity: 1,
-              },
-            ],
-          },
-        })
-        .execute();
-    }
-  }
-
-  private async removeProductFromCart(): Promise<void> {
-    const cart = await getTheCart();
-    if (cart) removeLineFromCart(cart, this.productId);
   }
 }
