@@ -108,7 +108,7 @@ class App {
         path: `${Pages.ABOUT}`,
         callback: (): void => {
           this.secondaryMenu.updateContent(['about']);
-          this.updateMain(new AboutPage(), 'not-found-page');
+          this.updateMain(new AboutPage(), 'about');
         },
       },
       {
