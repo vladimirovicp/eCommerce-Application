@@ -2,6 +2,20 @@ import '../../../assets/scss/page/about.scss';
 import View from '../../common/view';
 import ElementCreator from '../../util/element-creator';
 
+import imgLogoSrc from '../../../assets/img/svg/logo.svg';
+import imgLogoRsSrc from '../../../assets/img/svg/rs.svg';
+import imgRinaSrc from '../../../assets/img/person/rina.png';
+import imgPetrSrc from '../../../assets/img/person/petr.png';
+import imgSvetaSrc from '../../../assets/img/person/sveta.png';
+
+const imageSrc = {
+  LOGO: `${imgLogoSrc}`,
+  LOGORS: `${imgLogoRsSrc}`,
+  RINA: `${imgRinaSrc}`,
+  PETR: `${imgPetrSrc}`,
+  SVETA: `${imgSvetaSrc}`,
+};
+
 export default class AboutPage extends View {
   constructor() {
     const params = {
@@ -47,7 +61,7 @@ export default class AboutPage extends View {
       tag: 'img',
       classNames: ['img-full'],
       attributes: {
-        src: './assets/img/svg/logo.svg',
+        src: imageSrc.LOGO,
         alt: 'Логотип',
       },
     });
@@ -102,7 +116,7 @@ export default class AboutPage extends View {
       tag: 'img',
       classNames: ['img-full'],
       attributes: {
-        src: './assets/img/svg/rs.svg',
+        src: imageSrc.LOGORS,
         alt: 'logo rs',
       },
     });
@@ -120,7 +134,7 @@ export default class AboutPage extends View {
 
     const rina = this.person(
       'img__ver-1',
-      './assets/img/person/rina.png',
+      imageSrc.RINA,
       'Ekaterina Kovaleva',
       'software developer',
       'github.com/asimo-git',
@@ -129,7 +143,7 @@ export default class AboutPage extends View {
 
     const petr = this.person(
       'img__ver-2',
-      './assets/img/person/petr.png',
+      imageSrc.PETR,
       'Petr Fadeev',
       'UI/UX Designer',
       'github.com/vladimirovicp',
@@ -138,7 +152,7 @@ export default class AboutPage extends View {
 
     const sveta = this.person(
       'img__ver-3',
-      './assets/img/person/sveta.png',
+      imageSrc.SVETA,
       'Svetlana Vorokhobina',
       'Team Lead',
       'github.com/svorokhobina',
