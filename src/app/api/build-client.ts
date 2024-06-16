@@ -18,12 +18,12 @@ const authMiddlewareOptions: AuthMiddlewareOptions = {
     clientSecret: CT_CLIENT_SECRET,
   },
   scopes: CT_SCOPE,
-  fetch,
+  // fetch,
 };
 
 const httpMiddlewareOptions: HttpMiddlewareOptions = {
   host: CT_API_HOST,
-  fetch,
+  // fetch,
 };
 
 const ctpClient = new ClientBuilder()

@@ -59,9 +59,9 @@ export default class CartPage extends View {
           const response = await clearCart(this.cart);
           if (response?.statusCode === 200) {
             this.cart = response.body;
-            this.listContainer.getElement().innerHTML = '';
+            // this.listContainer.getElement().innerHTML = '';
             this.createEmptyCartPage();
-            if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
+            // if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
           } else {
             modalWindowCreator.showModalWindow('error', 'Failed to remove products from cart. Please try again');
           }
@@ -189,7 +189,6 @@ export default class CartPage extends View {
     const promoInput = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'promo code' },
-      callback: (): void => {},
     });
     inputContainer.addInnerElements([promoInput]);
 
