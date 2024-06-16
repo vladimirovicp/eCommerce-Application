@@ -279,7 +279,7 @@ export default class ProductPage extends View {
   }
 
   private async setProductPrices(params: ProductResponse): Promise<HTMLElement> {
-    const сontainer = new ElementCreator({
+    const container = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-product__price'],
     });
@@ -316,7 +316,7 @@ export default class ProductPage extends View {
     });
     buttonContainer.addInnerElements([button]);
 
-    сontainer.addInnerElements([pricesContainer, buttonContainer]);
-    return сontainer.getElement();
+    container.addInnerElements([pricesContainer, buttonContainer]);
+    return container.getElement();
   }
 }
