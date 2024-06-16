@@ -74,7 +74,6 @@ export default class CatalogPage extends View {
     });
     this.createSecondaryMenu();
     this.loading();
-    this.loadingStart();
     this.setContent();
     this.router = router;
     this.handleObserver = (entries: IntersectionObserverEntry[]): void => {
