@@ -6,7 +6,7 @@ import imgLogoSrc from '../../../assets/img/svg/logo.svg';
 import imgLogoRsSrc from '../../../assets/img/svg/rs.svg';
 import imgRinaSrc from '../../../assets/img/person/rina.png';
 import imgPetrSrc from '../../../assets/img/person/petr.png';
-import imgSvetaSrc from '../../../assets/img/person/sveta.png';
+import imgSvetaSrc from '../../../assets/img/person/sveta2.png';
 
 const imageSrc = {
   LOGO: `${imgLogoSrc}`,

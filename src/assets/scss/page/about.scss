@@ -93,10 +93,15 @@
         .img{
             &__ver-2{
                 height: 14rem;
+                img{
+                    object-position: bottom;
+                }
             }
 
             &__ver-3{
-                height: 14rem;
+                img{
+                    object-position: left;
+                }
             }
         }
 
@@ -180,7 +185,12 @@
                 }
             }
 
-            
+            .img__ver-3{
+                margin-top: 2.33rem;
+                img{
+                    border-radius: 0 0 5.5rem 0;
+                }
+            }
         }
     }
 }
@@ -226,6 +236,14 @@
                 margin-top: unset;
                 img{
                     border-radius: 0 0 5.2rem 0;
+                }
+            }
+
+            .img__ver-3{
+                margin-top: unset;
+                margin-left: .1rem;
+                img{
+                    border-radius: 0 0 5.3rem 0;
                 }
             }
         }
