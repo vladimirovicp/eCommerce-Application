@@ -73,6 +73,8 @@ export default class CatalogPage extends View {
       this.currentFilter[parameter.name] = [];
     });
     this.createSecondaryMenu();
+    this.loading();
+    this.loadingStart();
     this.setContent();
     this.router = router;
     this.handleObserver = (entries: IntersectionObserverEntry[]): void => {
@@ -106,6 +108,7 @@ export default class CatalogPage extends View {
     if (this.footer) {
       this.observer.observe(this.footer);
     }
+    this.loadingEnd();
     return undefined;
   }
 
