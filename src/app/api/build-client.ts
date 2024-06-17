@@ -2,13 +2,20 @@ import {
   ClientBuilder,
   AuthMiddlewareOptions,
   HttpMiddlewareOptions,
-  PasswordAuthMiddlewareOptions,
   RefreshAuthMiddlewareOptions,
-  AnonymousAuthMiddlewareOptions,
 } from '@commercetools/sdk-client-v2';
 
 import { ByProjectKeyRequestBuilder, createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
-import { CT_PROJECT_KEY, CT_CLIENT_ID, CT_CLIENT_SECRET, CT_SCOPE, CT_AUTH_HOST, CT_API_HOST } from './credentials';
+import {
+  CT_PROJECT_KEY,
+  CT_CLIENT_ID,
+  CT_CLIENT_SECRET,
+  CT_SCOPE,
+  CT_AUTH_HOST,
+  CT_API_HOST,
+  CT_CUSTOMER_TOKEN_URL,
+  CT_ANONYMOUS_TOKEN_URL,
+} from './credentials';
 
 const authMiddlewareOptions: AuthMiddlewareOptions = {
   host: CT_AUTH_HOST,
@@ -18,45 +25,21 @@ const authMiddlewareOptions: AuthMiddlewareOptions = {
     clientSecret: CT_CLIENT_SECRET,
   },
   scopes: CT_SCOPE,
-  // fetch,
 };
 
 const httpMiddlewareOptions: HttpMiddlewareOptions = {
   host: CT_API_HOST,
-  // fetch,
 };
 
 const ctpClient = new ClientBuilder()
   .withProjectKey(CT_PROJECT_KEY)
   .withClientCredentialsFlow(authMiddlewareOptions)
   .withHttpMiddleware(httpMiddlewareOptions)
-  .withLoggerMiddleware()
   .build();
 
 export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY });
 
-export function createApiRootPasswordFlow(username: string, password: string): ByProjectKeyRequestBuilder {
-  const passwordFlowOptions: PasswordAuthMiddlewareOptions = {
-    host: CT_AUTH_HOST,
-    projectKey: CT_PROJECT_KEY,
-    credentials: { clientId: CT_CLIENT_ID, clientSecret: CT_CLIENT_SECRET, user: { username, password } },
-    scopes: CT_SCOPE,
-    fetch,
-  };
-
-  const client = new ClientBuilder()
-    .withProjectKey(CT_PROJECT_KEY)
-    .withPasswordFlow(passwordFlowOptions)
-    .withHttpMiddleware(httpMiddlewareOptions)
-    .withLoggerMiddleware()
-    .build();
-
-  return createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
-}
-
 export async function fetchAuthToken(username: string, password: string): Promise<string> {
-  const url = `https://auth.europe-west1.gcp.commercetools.com/oauth/${CT_PROJECT_KEY}/customers/token`;
-
   const params = new URLSearchParams({
     grant_type: 'password',
     username,
@@ -65,7 +48,7 @@ export async function fetchAuthToken(username: string, password: string): Promis
 
   const credentials = btoa(`${CT_CLIENT_ID}:${CT_CLIENT_SECRET}`);
 
-  const response = await fetch(url, {
+  const response = await fetch(CT_CUSTOMER_TOKEN_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -82,9 +65,7 @@ export async function fetchAuthToken(username: string, password: string): Promis
 export const apiRoots: {
   [key: string]: ByProjectKeyRequestBuilder | null;
 } = {
-  // byCredentialsFlow: createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey: CT_PROJECT_KEY }),
   byRefreshToken: null,
-  byAnonymousId: null,
 };
 
 // withRefreshTokenFlow
@@ -103,31 +84,34 @@ export function createApiRootRefreshTokenFlow(refreshToken: string): void {
     .withProjectKey(CT_PROJECT_KEY)
     .withRefreshTokenFlow(options)
     .withHttpMiddleware(httpMiddlewareOptions)
-    .withLoggerMiddleware()
     .build();
 
   apiRoots.byRefreshToken = createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
 }
 
-export function createApiRootAnonymousSessionFlow(anonymousId: string): void {
-  const options: AnonymousAuthMiddlewareOptions = {
-    host: CT_AUTH_HOST,
-    projectKey: CT_PROJECT_KEY,
-    credentials: {
-      clientId: CT_CLIENT_ID,
-      clientSecret: CT_CLIENT_SECRET,
-      anonymousId,
-    },
-  };
+export async function fetchAnonymousToken(): Promise<string> {
+  const credentials = btoa(`${CT_CLIENT_ID}:${CT_CLIENT_SECRET}`);
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    scope: 'manage_project:bikesphere manage_api_clients:bikesphere view_api_clients:bikesphere',
+  });
 
-  const client = new ClientBuilder()
-    .withProjectKey(CT_PROJECT_KEY)
-    .withAnonymousSessionFlow(options)
-    .withHttpMiddleware(httpMiddlewareOptions)
-    .withLoggerMiddleware()
-    .build();
+  try {
+    const response = await fetch(CT_ANONYMOUS_TOKEN_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: body.toString(),
+    });
 
-  apiRoots.byAnonymousId = createApiBuilderFromCtpClient(client).withProjectKey({ projectKey: CT_PROJECT_KEY });
+    const data = await response.json();
+    localStorage.setItem('anonymous_token', data.refresh_token);
+    createApiRootRefreshTokenFlow(data.refresh_token);
+    return data.refresh_token;
+  } catch (error) {
+    console.error('Error fetching anonymous token:', error);
+    return '';
+  }
 }
-
-// export { apiRoot };

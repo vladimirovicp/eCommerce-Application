@@ -33,7 +33,6 @@ export default class RegistrationPage extends FormPageCreator {
       type: 'checkbox',
       id: 'check-address__shipping',
       attributes: { name: 'checkboxAddress', disabled: 'true' },
-      // classNames: ['address-field__billing'],
     });
     this.isBillingFieldsValid = false;
     this.setRegistrationContent();
@@ -61,13 +60,9 @@ export default class RegistrationPage extends FormPageCreator {
       this.createFieldsTitle('Address'),
       this.createFieldsSubTitle('Billing address'),
       this.createAddressGroup(true),
-      // this.createFields(this.createCountry('address-field__billing'), this.createCity('address-field__billing')),
-      // this.createFields(this.createPostalCode('address-field__billing'), this.createStreet('address-field__billing')),
       this.createCheckboxAddressShipping(),
       this.createFieldsSubTitle('Shipping address'),
       this.createAddressGroup(false),
-      // this.createFields(this.createCountry('address-field__shipping'), this.createCity('address-field__shipping')),
-      // this.createFields(this.createPostalCode('address-field__shipping'), this.createStreet('address-field__shipping')),
       this.createFieldsTitle('Choose password'),
       this.createFieldPassword(),
       this.createSubmitButton('Register', () => this.submitButtonCallback()),

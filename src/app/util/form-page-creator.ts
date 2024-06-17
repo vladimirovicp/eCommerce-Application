@@ -126,7 +126,6 @@ class FormPageCreator extends View {
     let error: ElementCreator<HTMLSpanElement>;
 
     if (!form) {
-      // корявенько конечно...
       error = this.addValidationErrorHandling(input, passwordValidation);
     } else {
       error = new ElementCreator({ tag: 'span' });

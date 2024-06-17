@@ -344,7 +344,7 @@ export default class ProfilePage extends FormPageCreator {
             break;
           }
           default: {
-            // hgf
+            // nothing
           }
         }
       } else {

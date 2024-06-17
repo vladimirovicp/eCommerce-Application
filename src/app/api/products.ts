@@ -1,5 +1,4 @@
 import {
-  // ByProjectKeyRequestBuilder,
   Cart,
   CartUpdateAction,
   ClientResponse,
@@ -49,18 +48,29 @@ export async function updateProducts(
   }
 }
 
+async function updateCartCounter(cart: Cart): Promise<void> {
+  const counter = document.querySelector('#header-cart-counter');
+  if (cart && counter) {
+    let totalQuantity = 0;
+    cart.lineItems.forEach((item) => {
+      totalQuantity += item.quantity;
+    });
+    counter.textContent = String(totalQuantity);
+  }
+}
+
 export async function getTheCart(): Promise<Cart | undefined> {
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-  // получить корзину
-  if (currentApiRoot) {
+  if (apiRoots.byRefreshToken) {
     try {
-      const response = await currentApiRoot.me().activeCart().get().execute();
+      // сначала пробуем получить корзину, если ее нет - ловим ошибку 404
+      const response = await apiRoots.byRefreshToken.me().activeCart().get().execute();
+      updateCartCounter(response.body);
       return response.body;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 404) {
         // создаём новую корзину
         try {
-          const response = await currentApiRoot
+          const response = await apiRoots.byRefreshToken
             .me()
             .carts()
             .post({
@@ -69,6 +79,7 @@ export async function getTheCart(): Promise<Cart | undefined> {
               },
             })
             .execute();
+          updateCartCounter(response.body);
           return response.body;
         } catch (createError) {
           console.error('Error creating new cart:', createError);
@@ -81,26 +92,12 @@ export async function getTheCart(): Promise<Cart | undefined> {
   return undefined;
 }
 
-export async function updateCartCounter(): Promise<void> {
-  const cart = await getTheCart();
-  const counter = document.querySelector('#header-cart-counter');
-  if (cart && counter) {
-    let totalQuantity = 0;
-    cart.lineItems.forEach((item) => {
-      totalQuantity += item.quantity;
-    });
-    counter.textContent = String(totalQuantity);
-  }
-}
-
 export async function removeLineFromCart(cart: Cart, productId: string): Promise<ClientResponse<Cart> | undefined> {
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-  if (currentApiRoot) {
+  if (apiRoots.byRefreshToken) {
     try {
       // находим в корзине нужную строчку с искомым продуктом
       const lineItem = cart.lineItems.find((item) => item.productId === productId);
-      const response = await currentApiRoot
+      const response = await apiRoots.byRefreshToken
         .carts()
         .withId({ ID: cart.id })
         .post({
@@ -115,7 +112,7 @@ export async function removeLineFromCart(cart: Cart, productId: string): Promise
           },
         })
         .execute();
-      updateCartCounter();
+      updateCartCounter(response.body);
       return response;
     } catch (error) {
       console.error('Error removing product from cart:', error);
@@ -126,10 +123,7 @@ export async function removeLineFromCart(cart: Cart, productId: string): Promise
 }
 
 export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | undefined> {
-  // добавить лоадер?
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-  if (currentApiRoot) {
+  if (apiRoots.byRefreshToken) {
     try {
       // формируем массив товаров, чтобы удаление всех строк было в одном обращени к серверу
       const actions: CartUpdateAction[] = cart.lineItems.map((item) => ({
@@ -137,7 +131,7 @@ export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | unde
         lineItemId: item.id,
       }));
 
-      const response = await currentApiRoot
+      const response = await apiRoots.byRefreshToken
         .carts()
         .withId({ ID: cart.id })
         .post({
@@ -147,7 +141,7 @@ export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | unde
           },
         })
         .execute();
-      updateCartCounter();
+      updateCartCounter(response.body);
       return response;
     } catch (error) {
       console.error('Error removing products from cart:', error);
@@ -162,14 +156,13 @@ export async function updateProductQuantity(
   productId: string,
   increment: boolean
 ): Promise<ClientResponse<Cart> | undefined> {
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-  if (currentApiRoot) {
+  if (apiRoots.byRefreshToken) {
     try {
       const lineItem = cart.lineItems.find((item) => item.productId === productId);
       if (lineItem) {
         const newQuantity = increment ? lineItem.quantity + 1 : lineItem.quantity - 1;
         if (newQuantity > 0) {
-          const response = await currentApiRoot
+          const response = await apiRoots.byRefreshToken
             .carts()
             .withId({ ID: cart.id })
             .post({
@@ -185,7 +178,7 @@ export async function updateProductQuantity(
               },
             })
             .execute();
-          updateCartCounter();
+          updateCartCounter(response.body);
           return response;
         }
       }
@@ -199,9 +192,8 @@ export async function updateProductQuantity(
 }
 
 async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<boolean> {
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-  if (currentApiRoot) {
-    const codeResponse: ClientResponse<DiscountCodePagedQueryResponse> = await currentApiRoot
+  if (apiRoots.byRefreshToken) {
+    const codeResponse: ClientResponse<DiscountCodePagedQueryResponse> = await apiRoots.byRefreshToken
       .discountCodes()
       .get({
         queryArgs: {
@@ -221,15 +213,13 @@ async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<b
 }
 
 export async function applyPromoCode(cart: Cart, promoCode: string): Promise<ClientResponse<Cart> | undefined> {
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-  if (currentApiRoot) {
+  if (apiRoots.byRefreshToken) {
     try {
       if (await checkIsPromoCodeApplied(cart, promoCode)) {
         modalWindowCreator.showModalWindow('error', `The discount code '${promoCode}' has already been applied`);
         return undefined;
       }
-      const response = await currentApiRoot
+      const response = await apiRoots.byRefreshToken
         .carts()
         .withId({ ID: cart.id })
         .post({
@@ -258,11 +248,9 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
 
 export async function addProductsToCart(actions: CartUpdateAction[]): Promise<void> {
   const cart = await getTheCart();
-  const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
-  if (cart && currentApiRoot)
+  if (cart && apiRoots.byRefreshToken)
     try {
-      await currentApiRoot
+      const response = await apiRoots.byRefreshToken
         .carts()
         .withId({ ID: cart.id })
         .post({
@@ -272,7 +260,7 @@ export async function addProductsToCart(actions: CartUpdateAction[]): Promise<vo
           },
         })
         .execute();
-      updateCartCounter();
+      updateCartCounter(response.body);
     } catch (error) {
       console.error('Error adding products to cart:', error);
     }

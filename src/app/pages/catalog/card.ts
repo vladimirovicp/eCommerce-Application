@@ -1,4 +1,3 @@
-// import customerService from '../../api/customers-requests';
 import { toggleAddToCartButton } from '../../api/products';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
