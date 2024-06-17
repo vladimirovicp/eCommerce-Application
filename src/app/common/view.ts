@@ -48,7 +48,6 @@ export default class View {
 
   protected loadingStart(): void {
     const load = document.querySelector('.load');
-    console.log('load', load);
     if (load) {
       load.classList.add('active');
     }
