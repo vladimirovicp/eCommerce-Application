@@ -33,6 +33,7 @@ export default class CartPage extends View {
   }
 
   private async setContent(): Promise<void> {
+    this.loading();
     this.cart = await getTheCart();
 
     if (this.cart?.lineItems.length === 0) {
@@ -46,6 +47,7 @@ export default class CartPage extends View {
 
       this.viewElementCreator.addInnerElements([basketMain, basketAside]);
     }
+    this.loadingEnd();
   }
 
   private createRemoveAllButton(): ElementCreator<HTMLDivElement> {
