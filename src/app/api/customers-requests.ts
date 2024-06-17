@@ -115,7 +115,7 @@ class CustomerService {
           })
           .execute();
         if (response.statusCode === 200) {
-          // обновление апиРута и токенов (?)
+          // обновление апиРута и токенов
           const refreshToken = await fetchAuthToken(response.body.email, updateData.newPassword);
           createApiRootRefreshTokenFlow(refreshToken);
           return true;
