@@ -68,18 +68,20 @@ export default class AboutPage extends View {
     });
 
     const title = new ElementCreator({
-      textContent: 'About the project',
+      textContent: 'Welcome to "Holy Grail"!',
       classNames: ['title'],
     });
 
     const text = new ElementCreator({
       classNames: ['text'],
-      textContent: `Holy Grail is created as a final studying assignment for the RSSchool JS/Front-end course, completed by asimo-git, vladimirovicp, and svorokhobina.`,
+      textContent:
+        'We are proud to present our application. Whether you are a novice or an experienced cyclist, you will be able to find your perfect bike and unlock the joy and freedom of riding.',
     });
 
     const text2 = new ElementCreator({
       classNames: ['text'],
-      textContent: `The project's primary purpose is to design a detailed, true-to-life imitation of real e-commerce applications, where visitors could quickly and effortlessly browse, select, and order preferred products from the available range. Among the implemented features, the application includes customer registration and authorisation forms and a shop catalogue with filtering, sorting, and searching functions. Customers are able to view the detailed item descriptions or move to the product pages for more information, add the chosen items to the cart, and proceed to checkout to finalise their orders. The application is designed using Commercetools, one of the leading cloud-based commerce platforms.`,
+      textContent:
+        '"Holy Grail" is a final studying assignment for the RSSchool JS/Front-end course, and its purpose is to design a detailed, true-to-life imitation of real e-commerce applications, where visitors could quickly and effortlessly browse, select, and order preferred products from the available range. Among the implemented features, the application includes customer registration and authorisation forms and a shop catalogue with filtering, sorting, and searching functions. Customers are able to view the detailed item descriptions or move to the product pages for more information, add the chosen items to the cart, and proceed to checkout to finalise their orders. The application is designed using Commercetools, one of the leading cloud-based commerce platforms.',
     });
 
     aboutInfo.addInnerElements([title, text, text2]);
@@ -122,9 +124,9 @@ export default class AboutPage extends View {
       'img__ver-1',
       './assets/img/person/rina.png',
       'Ekaterina Kovaleva',
-      'software developer',
+      'Software Developer',
       'github.com/asimo-git',
-      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+      "Formerly having a bachelor's degree in geology, at present Rina is a front-end wizard. A heart, a brain, common sense and steel nerves of the project, bringing a lot of determination and expertise to the team's work. A truly SDK goddess, ruling API integrations and interactions. The one with all the answers, who seems to not have the word 'impossible' in her vocabulary."
     );
 
     const petr = this.person(
@@ -133,16 +135,16 @@ export default class AboutPage extends View {
       'Petr Fadeev',
       'UI/UX Designer',
       'github.com/vladimirovicp',
-      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+      'Petr is a UX/UI designer with a Time-Turner in his pocket. Otherwise, we cannot explain his magical ability to be everywhere simultaneously with the project all these weeks. He filled it with colours, forms, and motion and drew every button and every line. Due to his tireless efforts, the design is responsive, and the interface is stylish and bike-able. And if you would like to know what real perfection is, just check out the "404" page!'
     );
 
     const sveta = this.person(
       'img__ver-3',
       './assets/img/person/sveta.png',
       'Svetlana Vorokhobina',
-      'Team Lead',
+      'Project Coordinator',
       'github.com/svorokhobina',
-      'Top performing IT professional with 10 years’ successful experience in Information Technology field.Proficient in hardware and software maintenance. Solid track record of providing the timely positive response to requests regarding computer-related assistance. A deep understanding of the general organizational confidentiality policies associated with IT specialist position.'
+      `A formal team leader and project's Jack of all trades: text writer, editor, and meticulous tester and cross-checker. A proud creator of the router ("One router to rule them all"). A crazy Tolkien fan, using LOTR quotes wherever possible, and one blessed to work with those two amazing people above in one team and study from them. Thank you for an incredible journey!`
     );
 
     persons.addInnerElements([rina, petr, sveta]);

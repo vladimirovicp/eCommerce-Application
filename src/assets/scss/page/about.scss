@@ -115,7 +115,7 @@
             }
             .role{
                 display: inline-block;
-                text-transform: uppercase;
+                // text-transform: uppercase;
                 opacity: 0.5;
             }
         }
@@ -125,13 +125,13 @@
             a{
                 color: #fff;
                 text-decoration: underline;
-                text-transform: uppercase;
+                // text-transform: uppercase;
             }
         }
 
         &-info{
             opacity: 0.5;
-            text-transform: uppercase;
+            // text-transform: uppercase;
         }
     }
 }
