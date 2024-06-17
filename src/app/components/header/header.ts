@@ -11,7 +11,6 @@ import Router from '../../router/router';
 import { Pages } from '../../router/pages';
 import modalWindowCreator from '../modal-window';
 import customerService from '../../api/customers-requests';
-import { updateCartCounter } from '../../api/products';
 
 export default class HeaderView extends View {
   private router: Router;
@@ -155,7 +154,6 @@ export default class HeaderView extends View {
     headerContainer.addInnerElements([headerLogoElement, headerContentContainer]);
 
     this.viewElementCreator.addInnerElements([headerContainer]);
-    updateCartCounter();
   }
 
   private createHeaderMenu(): HTMLDivElement {

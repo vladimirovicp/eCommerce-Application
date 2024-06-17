@@ -7,13 +7,7 @@ import {
   CartUpdateAction,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
-import {
-  apiRoot,
-  apiRoots,
-  createApiRootAnonymousSessionFlow,
-  createApiRootRefreshTokenFlow,
-  fetchAuthToken,
-} from './build-client';
+import { apiRoot, apiRoots, createApiRootRefreshTokenFlow, fetchAnonymousToken, fetchAuthToken } from './build-client';
 import { addProductsToCart, getTheCart } from './products';
 
 enum ErrorMessages {
@@ -24,10 +18,6 @@ enum ErrorMessages {
 }
 
 class CustomerService {
-  // public customerInfo: Customer | undefined;
-
-  // public apiRootRefreshToken: ByProjectKeyRequestBuilder | undefined = undefined;
-
   public async authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
     try {
       const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
@@ -130,12 +120,10 @@ class CustomerService {
     }
   }
 
-  public clearCustomerInfo(): void {
+  public async clearCustomerInfo(): Promise<void> {
     localStorage.removeItem('refresh_token');
-    const anonymousId = `anonym${new Date().getTime().toString()}`;
-    // localStorage.setItem('anonymous_id', anonymousId);
-    createApiRootAnonymousSessionFlow(anonymousId);
-    apiRoots.byRefreshToken = null;
+    await fetchAnonymousToken();
+    await getTheCart();
   }
 
   private handleError(message: ErrorMessages, error: unknown): void {
