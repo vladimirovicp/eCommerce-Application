@@ -1,8 +1,13 @@
 .load{
-    min-height: calc(100vh - 20rem);
-    display: flex;
+    //min-height: calc(100vh - 20rem);
+    display: none;
     justify-content: center;
     align-items: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
 
     &__wraper{
         width: 10rem;
@@ -30,8 +35,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: percentage 10s linear infinite;
+            animation: percentage 1s linear forwards;
+            content: "0%";
         }
+    }
+
+    &.active{
+        display: flex;
     }
 
     
