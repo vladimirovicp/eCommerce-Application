@@ -8,7 +8,6 @@ import ElementCreator from '../../util/element-creator';
 import CatalogCard from './card';
 import InputCreator from '../../util/input-creator';
 import ListCreator from '../../util/list-creator';
-// import { sortChecked, filterChecked } from '../../util/helper';
 import Router from '../../router/router';
 import { Categories, FilterParameter, FilterParameters, SortParameters } from './constants';
 
@@ -277,7 +276,6 @@ export default class CatalogPage extends View {
 
           switchInput.getElement().dispatchEvent(new MouseEvent('click'));
           this.applyChanges();
-          // TODO закрыть меню
         },
       });
       sortMenuItem.getElement().innerHTML = `<span class="filter__decor"></span><span class="filter__text">${value}</span>`;
@@ -292,7 +290,6 @@ export default class CatalogPage extends View {
     return sortList.getHtmlElement();
   }
 
-  /* eslint-disable max-lines-per-function */
   private createFilterMenu(): ElementCreator<HTMLDivElement> {
     const filterContainer = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter'] });
     const switchInput = new InputCreator({
@@ -309,17 +306,7 @@ export default class CatalogPage extends View {
       textContent: 'Filter',
     });
     const label = switchInput.createLabel('', 'secondary-menu__filter-button', [stringElement]);
-    const button = new ElementCreator<HTMLButtonElement>({
-      tag: 'button',
-      id: 'catalog-filter-button',
-      classNames: ['btn-default'],
-      textContent: 'filter',
-      callback: (): void => {
-        document.body.classList.remove('_lock');
-        this.filterChecked();
-        this.applyChanges();
-      },
-    });
+
     const filterMenuBox = new ElementCreator<HTMLDivElement>({ classNames: ['secondary-menu__filter-box'] });
     const filterTitle = new ElementCreator<HTMLDivElement>({
       classNames: ['secondary-menu__filter-title'],
@@ -332,9 +319,24 @@ export default class CatalogPage extends View {
       filterMenuBox.addInnerElements([category]);
     });
     // ////////////////////////
-    filterMenuBox.addInnerElements([button]);
+    filterMenuBox.addInnerElements([this.createFilterButton()]);
     filterContainer.addInnerElements([switchInput, label, filterMenuBox]);
     return filterContainer;
+  }
+
+  private createFilterButton(): ElementCreator<HTMLButtonElement> {
+    const button = new ElementCreator<HTMLButtonElement>({
+      tag: 'button',
+      id: 'catalog-filter-button',
+      classNames: ['btn-default'],
+      textContent: 'filter',
+      callback: (): void => {
+        document.body.classList.remove('_lock');
+        this.filterChecked();
+        this.applyChanges();
+      },
+    });
+    return button;
   }
 
   private createFilterParameter(options: FilterParameter): ElementCreator<HTMLDivElement> {
@@ -403,7 +405,7 @@ export default class CatalogPage extends View {
   private async applySearch(input: HTMLInputElement): Promise<void> {
     this.searchValue = input.value;
     // введенное значение остается в инпуте, показывая по чему мы сейчас фильтруем
-    // введенное в поиске значение СОХРАНЯЕТСЯ при переходе по категориям (?)
+    // введенное в поиске значение СОХРАНЯЕТСЯ при переходе по категориям
 
     // сбрасываем все фильтры
     FilterParameters.forEach((parameter) => {

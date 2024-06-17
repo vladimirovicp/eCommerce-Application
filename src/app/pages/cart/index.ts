@@ -62,9 +62,7 @@ export default class CartPage extends View {
           const response = await clearCart(this.cart);
           if (response?.statusCode === 200) {
             this.cart = response.body;
-            // this.listContainer.getElement().innerHTML = '';
             this.createEmptyCartPage();
-            // if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
           } else {
             modalWindowCreator.showModalWindow('error', 'Failed to remove products from cart. Please try again');
           }
@@ -210,8 +208,6 @@ export default class CartPage extends View {
         if (this.cart) {
           const response = await applyPromoCode(this.cart, promoCode);
           if (response) {
-            // this.cart = response.body;
-            // this.updateTotalCosts();
             this.setContent();
           }
         }

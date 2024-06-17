@@ -39,7 +39,6 @@ export default class SecondaryMenu extends View {
       this.container.addInnerElements([this.breadcrumbs]);
     }
     this.breadcrumbs.getElement().innerHTML = '';
-    // this.category = undefined;
 
     const homeLink = new ElementCreator<HTMLSpanElement>({
       tag: 'span',
@@ -56,7 +55,6 @@ export default class SecondaryMenu extends View {
       if (link === 'catalog') {
         callback = (): void => this.router.navigate(`${Pages.CATALOG}`);
       } else if (index === 1 && arr.length === 3) {
-        // вот в этом случае надо как-то открыть каталог на нужной категории
         this.category = link;
         callback = (): void => this.router.navigate(`${Pages.CATALOG}`);
       }

@@ -50,7 +50,6 @@ export async function updateProducts(
 
 async function updateCartCounter(cart: Cart): Promise<void> {
   const counter = document.querySelector('#header-cart-counter');
-  console.log('counter', counter);
   if (cart && counter) {
     let totalQuantity = 0;
     cart.lineItems.forEach((item) => {
@@ -61,10 +60,9 @@ async function updateCartCounter(cart: Cart): Promise<void> {
 }
 
 export async function getTheCart(): Promise<Cart | undefined> {
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-  // получить корзину
   if (apiRoots.byRefreshToken) {
     try {
+      // сначала пробуем получить корзину, если ее нет - ловим ошибку 404
       const response = await apiRoots.byRefreshToken.me().activeCart().get().execute();
       updateCartCounter(response.body);
       return response.body;
@@ -95,8 +93,6 @@ export async function getTheCart(): Promise<Cart | undefined> {
 }
 
 export async function removeLineFromCart(cart: Cart, productId: string): Promise<ClientResponse<Cart> | undefined> {
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
   if (apiRoots.byRefreshToken) {
     try {
       // находим в корзине нужную строчку с искомым продуктом
@@ -127,9 +123,6 @@ export async function removeLineFromCart(cart: Cart, productId: string): Promise
 }
 
 export async function clearCart(cart: Cart): Promise<ClientResponse<Cart> | undefined> {
-  // добавить лоадер?
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
   if (apiRoots.byRefreshToken) {
     try {
       // формируем массив товаров, чтобы удаление всех строк было в одном обращени к серверу
@@ -163,7 +156,6 @@ export async function updateProductQuantity(
   productId: string,
   increment: boolean
 ): Promise<ClientResponse<Cart> | undefined> {
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
   if (apiRoots.byRefreshToken) {
     try {
       const lineItem = cart.lineItems.find((item) => item.productId === productId);
@@ -200,7 +192,6 @@ export async function updateProductQuantity(
 }
 
 async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<boolean> {
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
   if (apiRoots.byRefreshToken) {
     const codeResponse: ClientResponse<DiscountCodePagedQueryResponse> = await apiRoots.byRefreshToken
       .discountCodes()
@@ -222,8 +213,6 @@ async function checkIsPromoCodeApplied(cart: Cart, promoCode: string): Promise<b
 }
 
 export async function applyPromoCode(cart: Cart, promoCode: string): Promise<ClientResponse<Cart> | undefined> {
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
   if (apiRoots.byRefreshToken) {
     try {
       if (await checkIsPromoCodeApplied(cart, promoCode)) {
@@ -259,8 +248,6 @@ export async function applyPromoCode(cart: Cart, promoCode: string): Promise<Cli
 
 export async function addProductsToCart(actions: CartUpdateAction[]): Promise<void> {
   const cart = await getTheCart();
-  // const currentApiRoot = apiRoots.byRefreshToken ? apiRoots.byRefreshToken : apiRoots.byAnonymousId;
-
   if (cart && apiRoots.byRefreshToken)
     try {
       const response = await apiRoots.byRefreshToken

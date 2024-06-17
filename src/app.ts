@@ -122,8 +122,6 @@ class App {
           if (localStorage.refresh_token === undefined) {
             this.updateMain(new LoginPage(this.router, this.header), 'login-page');
           } else {
-            // this.updateMain(new HomePage(), 'home-page');
-            // this.header.isLoggedIn();
             this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
