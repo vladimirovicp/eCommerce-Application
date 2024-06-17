@@ -9,7 +9,6 @@ import ElementCreator from '../../util/element-creator';
 import SecondaryMenu from '../../components/secondary-menu';
 import { CategoriesReverse } from '../catalog/constants';
 import Router from '../../router/router';
-import { Pages } from '../../router/pages';
 import { checkIsProductInCart, toggleAddToCartButton } from '../../api/products';
 
 interface ProductResponse {
@@ -74,7 +73,7 @@ export default class ProductPage extends View {
       }
       this.configurePage(this.responseObject);
     } catch (error) {
-      this.router.navigate(`${Pages.NOT_FOUND}`);
+      this.getHtmlElement().innerText = 'Requested product is not found';
     }
   }
 
