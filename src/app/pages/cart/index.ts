@@ -35,6 +35,7 @@ export default class CartPage extends View {
   private async setContent(): Promise<void> {
     this.loading();
     this.cart = await getTheCart();
+    this.viewElementCreator.getElement().innerHTML = '';
 
     if (this.cart?.lineItems.length === 0) {
       this.createEmptyCartPage();
@@ -61,9 +62,9 @@ export default class CartPage extends View {
           const response = await clearCart(this.cart);
           if (response?.statusCode === 200) {
             this.cart = response.body;
-            this.listContainer.getElement().innerHTML = '';
+            // this.listContainer.getElement().innerHTML = '';
             this.createEmptyCartPage();
-            if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
+            // if (this.totalPriceElement) this.totalPriceElement.getElement().textContent = '$ 0';
           } else {
             modalWindowCreator.showModalWindow('error', 'Failed to remove products from cart. Please try again');
           }
@@ -77,6 +78,7 @@ export default class CartPage extends View {
 
   private createItemList(): ElementCreator<HTMLDivElement> {
     if (this.cart) {
+      this.listContainer.getElement().innerHTML = '';
       this.cart.lineItems.forEach((item) => {
         const card = this.createBasketCard(item);
         this.listContainer.addInnerElements([card]);
@@ -191,7 +193,6 @@ export default class CartPage extends View {
     const promoInput = new InputCreator({
       type: 'text',
       attributes: { placeholder: 'promo code' },
-      callback: (): void => {},
     });
     inputContainer.addInnerElements([promoInput]);
 
@@ -209,16 +210,29 @@ export default class CartPage extends View {
         if (this.cart) {
           const response = await applyPromoCode(this.cart, promoCode);
           if (response) {
-            this.cart = response.body;
-            this.updateTotalCosts();
+            // this.cart = response.body;
+            // this.updateTotalCosts();
+            this.setContent();
           }
         }
       },
     });
     buttonContainer.addInnerElements([applyButton]);
-
     promocodeContainer.addInnerElements([inputContainer, buttonContainer]);
+    this.createAppliedCodesMessage(promocodeContainer);
     return promocodeContainer;
+  }
+
+  private createAppliedCodesMessage(container: ElementCreator): void {
+    if (this.cart) {
+      const actualCodes = this.cart.discountCodes.filter((item) => item.state === 'MatchesCart');
+      if (actualCodes.length > 0) {
+        const message = new ElementCreator<HTMLDivElement>({
+          textContent: `promo codes applied: ${actualCodes.length}`,
+        });
+        container.addInnerElements([message]);
+      }
+    }
   }
 
   private createTotalPrice(): ElementCreator<HTMLDivElement> {
