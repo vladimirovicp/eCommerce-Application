@@ -111,6 +111,7 @@ export default class CatalogPage extends View {
   }
 
   private async getProductCards(products: ProductProjection[]): Promise<void> {
+    this.loadingStart();
     this.catalogCards.getElement().innerHTML = '';
 
     const cart = await getTheCart();
@@ -146,6 +147,7 @@ export default class CatalogPage extends View {
         this.cardsToShow.push(card);
       });
     }
+    this.loadingEnd();
   }
 
   private displayProductCards(cards: CatalogCard[], startPosition: number, lastPosition: number): void {

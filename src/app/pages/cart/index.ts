@@ -224,6 +224,7 @@ export default class CartPage extends View {
       const actualCodes = this.cart.discountCodes.filter((item) => item.state === 'MatchesCart');
       if (actualCodes.length > 0) {
         const message = new ElementCreator<HTMLDivElement>({
+          classNames: ['promo-code__info'],
           textContent: `promo codes applied: ${actualCodes.length}`,
         });
         container.addInnerElements([message]);
