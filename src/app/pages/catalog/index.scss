@@ -1,0 +1,30 @@
+.secondary-menu__filter-btn {
+  margin-right: 1rem;
+}
+
+.remove-btn {
+  background-color: #fdad11;
+
+  &:hover {
+    background-color: #f1cf8e;
+  }
+}
+
+@media (max-width: 64em) {
+  .catalog-page {
+    .category-container {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem 2rem;
+      padding: 1rem 1rem;
+    }
+  }
+}
+
+@media (max-width: 48em) {
+  .catalog-page {
+    .category-container {
+      display: none;
+    }
+  }
+}
