@@ -16,8 +16,8 @@ import CartPage from './app/pages/cart';
 import View from './app/common/view';
 import SecondaryMenu from './app/components/secondary-menu';
 import ProductPage from './app/pages/product';
-import { createApiRootRefreshTokenFlow } from './app/api/build-client';
-import customerService from './app/api/customers-requests';
+import { createApiRootRefreshTokenFlow, fetchAnonymousToken } from './app/api/build-client';
+import { getTheCart } from './app/api/products';
 
 class App {
   private header: HeaderView;
@@ -31,16 +31,25 @@ class App {
   constructor() {
     const routes = this.createRoutes();
     this.router = new Router(routes);
-
     this.header = new HeaderView(this.router);
     this.secondaryMenu = new SecondaryMenu(this.router);
     this.main = new MainView();
-    const token = localStorage.getItem('refresh_token');
-    if (token) {
-      customerService.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
-      this.header.isLoggedIn();
-    }
+    this.createActualApiRoot();
     this.createView();
+  }
+
+  private async createActualApiRoot(): Promise<void> {
+    const token = localStorage.getItem('refresh_token');
+    const anonymousToken = localStorage.getItem('anonymous_token');
+    if (token) {
+      createApiRootRefreshTokenFlow(token);
+      this.header.isLoggedIn();
+    } else if (anonymousToken) {
+      createApiRootRefreshTokenFlow(anonymousToken);
+    } else {
+      await fetchAnonymousToken();
+    }
+    await getTheCart();
   }
 
   private createView(): void {
@@ -103,7 +112,7 @@ class App {
         path: `${Pages.ABOUT}`,
         callback: (): void => {
           this.secondaryMenu.updateContent(['about']);
-          this.updateMain(new AboutPage(), 'not-found-page');
+          this.updateMain(new AboutPage(), 'about');
         },
       },
       {
@@ -113,8 +122,6 @@ class App {
           if (localStorage.refresh_token === undefined) {
             this.updateMain(new LoginPage(this.router, this.header), 'login-page');
           } else {
-            // this.updateMain(new HomePage(), 'home-page');
-            // this.header.isLoggedIn();
             this.router.navigate(`${Pages.HOME}`);
             this.header.isLoggedIn();
           }
@@ -148,7 +155,7 @@ class App {
         path: `${Pages.CART}`,
         callback: (): void => {
           this.secondaryMenu.updateContent(['cart']);
-          this.updateMain(new CartPage(), 'not-found-page');
+          this.updateMain(new CartPage(this.router), 'basket');
         },
       },
     ];

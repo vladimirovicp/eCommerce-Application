@@ -1,19 +1,24 @@
-import HeaderView from '../app/components/header/header';
-import LoginPage from '../app/pages/login';
-import { Pages } from '../app/router/pages';
-import Router from '../app/router/router';
-import customerService from '../app/api/customers-requests';
-import modalWindowCreator from '../app/components/modal-window';
+import HeaderView from '../../app/components/header/header';
+import LoginPage from '../../app/pages/login';
+import { Pages } from '../../app/router/pages';
+import Router from '../../app/router/router';
+import customerService from '../../app/api/customers-requests';
+import modalWindowCreator from '../../app/components/modal-window';
 
-jest.mock('../app/components/modal-window', () => ({
+jest.mock('../../app/components/modal-window', () => ({
   showModalWindow: jest.fn(),
 }));
 
-jest.mock('../app/api/customers-requests', () => ({
-  default: {
-    authorizeCustomer: jest.fn(() => Promise.resolve(true)),
-  },
-}));
+jest.mock('../../app/api/customers-requests', () => {
+  const actualModule = jest.requireActual('../../app/api/customers-requests');
+  return {
+    __esModule: true,
+    default: {
+      ...actualModule.default,
+      authorizeCustomer: jest.fn(() => Promise.resolve(true)),
+    },
+  };
+});
 
 describe('LoginPage testing', () => {
   let router: Router;
@@ -58,7 +63,7 @@ describe('LoginPage testing', () => {
   it('should create a login form with elements', () => {
     const form = loginPage['createForm']();
     expect(form).toBeDefined();
-    expect(form.getElement().querySelector('input[type="email"]')).not.toBeNull();
+    expect(form.getElement().querySelector('input[type="text"]')).not.toBeNull();
     expect(form.getElement().querySelector('input[type="password"]')).not.toBeNull();
     expect(form.getElement().querySelector('input[type="button"]')).not.toBeNull();
   });

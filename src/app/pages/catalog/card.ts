@@ -1,3 +1,4 @@
+import { toggleAddToCartButton } from '../../api/products';
 import { Pages } from '../../router/pages';
 import Router from '../../router/router';
 import ElementCreator from '../../util/element-creator';
@@ -6,7 +7,9 @@ import { CatalogCardParams } from '../../util/types';
 export default class CatalogCard extends ElementCreator {
   private router: Router;
 
-  constructor(cardParams: CatalogCardParams, router: Router) {
+  private productId: string;
+
+  constructor(cardParams: CatalogCardParams, router: Router, isInCart = false) {
     super({
       tag: 'div',
       classNames: ['catalog-card'],
@@ -15,16 +18,17 @@ export default class CatalogCard extends ElementCreator {
       },
     });
     this.router = router;
-    this.configureCard(cardParams);
+    this.productId = cardParams.id;
+    this.configureCard(cardParams, isInCart);
   }
 
-  private configureCard(params: CatalogCardParams): void {
+  private configureCard(params: CatalogCardParams, isInCart: boolean): void {
     this.addInnerElements([
       this.setImage(params.imageUrl, params.name),
       this.setPrices(params.price, params.discountPrice),
       this.setTitle(params.name),
       this.setDescription(params.description),
-      this.addButton(),
+      this.addButton(isInCart),
     ]);
   }
 
@@ -85,7 +89,7 @@ export default class CatalogCard extends ElementCreator {
     return description.getElement();
   }
 
-  private addButton(): HTMLElement {
+  private addButton(isInCart: boolean): HTMLElement {
     const buttonContainer = new ElementCreator({
       tag: 'div',
       classNames: ['catalog-card__btn'],
@@ -93,10 +97,13 @@ export default class CatalogCard extends ElementCreator {
 
     const button = new ElementCreator({
       tag: 'button',
-      classNames: ['btn-default'],
-      textContent: 'Into a basket',
+      classNames: isInCart ? ['btn-default', 'remove-btn'] : ['btn-default'],
+      textContent: isInCart ? 'Remove from cart' : 'Add to cart',
     });
-    button.setCallback(() => {}, 'click');
+    button.setCallback((event) => {
+      if (event) event.stopPropagation();
+      toggleAddToCartButton(button.getElement(), this.productId);
+    }, 'click');
 
     buttonContainer.addInnerElements([button]);
     return buttonContainer.getElement();

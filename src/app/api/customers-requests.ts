@@ -2,12 +2,13 @@ import {
   CustomerDraft,
   MyCustomerSignin,
   Customer,
-  ByProjectKeyRequestBuilder,
   MyCustomerUpdate,
   MyCustomerChangePassword,
+  CartUpdateAction,
 } from '@commercetools/platform-sdk';
 import modalWindowCreator from '../components/modal-window';
-import { apiRoot, createApiRootRefreshTokenFlow, fetchAuthToken } from './build-client';
+import { apiRoot, apiRoots, createApiRootRefreshTokenFlow, fetchAnonymousToken, fetchAuthToken } from './build-client';
+import { addProductsToCart, getTheCart } from './products';
 
 enum ErrorMessages {
   authorize = 'Authorization failed:',
@@ -17,18 +18,14 @@ enum ErrorMessages {
 }
 
 class CustomerService {
-  // public customerInfo: Customer | undefined;
-
-  public apiRootRefreshToken: ByProjectKeyRequestBuilder | undefined = undefined;
-
   public async authorizeCustomer(customerDraft: MyCustomerSignin): Promise<boolean> {
     try {
       const response = await apiRoot.me().login().post({ body: customerDraft }).execute();
       if (response && response.statusCode === 200) {
-        // this.customerInfo = response.body.customer;
-        // localStorage.setItem('userId', id);
+        const actions = await this.copyCart();
         const token = await fetchAuthToken(customerDraft.email, customerDraft.password);
-        this.apiRootRefreshToken = createApiRootRefreshTokenFlow(token);
+        createApiRootRefreshTokenFlow(token);
+        if (actions) addProductsToCart(actions);
         return true;
       }
       modalWindowCreator.showModalWindow('error', 'Authorization failed. Please try again.');
@@ -37,6 +34,19 @@ class CustomerService {
       this.handleError(ErrorMessages.authorize, error);
       return false;
     }
+  }
+
+  private async copyCart(): Promise<CartUpdateAction[] | undefined> {
+    const cart = await getTheCart();
+    if (cart && cart.lineItems.length > 0) {
+      const actions: CartUpdateAction[] = cart.lineItems.map((item) => ({
+        action: 'addLineItem',
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
+      return actions;
+    }
+    return undefined;
   }
 
   public async registerNewCustomer(customerDraft: CustomerDraft): Promise<boolean> {
@@ -56,8 +66,8 @@ class CustomerService {
 
   public async getCustomerInfo(): Promise<null | Customer> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken.me().get().execute();
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken.me().get().execute();
         const customerInfo = response.body;
         return customerInfo;
       }
@@ -70,8 +80,8 @@ class CustomerService {
 
   public async updateCustomer(updateData: MyCustomerUpdate): Promise<boolean> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken.me().post({ body: updateData }).execute();
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken.me().post({ body: updateData }).execute();
         if (response.statusCode === 200) {
           return true;
         }
@@ -86,8 +96,8 @@ class CustomerService {
 
   public async changePassword(updateData: MyCustomerChangePassword): Promise<boolean> {
     try {
-      if (this.apiRootRefreshToken) {
-        const response = await this.apiRootRefreshToken
+      if (apiRoots.byRefreshToken) {
+        const response = await apiRoots.byRefreshToken
           .me()
           .password()
           .post({
@@ -95,9 +105,9 @@ class CustomerService {
           })
           .execute();
         if (response.statusCode === 200) {
-          // обновление апиРута и токенов (?)
+          // обновление апиРута и токенов
           const refreshToken = await fetchAuthToken(response.body.email, updateData.newPassword);
-          this.apiRootRefreshToken = createApiRootRefreshTokenFlow(refreshToken);
+          createApiRootRefreshTokenFlow(refreshToken);
           return true;
         }
       }
@@ -110,9 +120,10 @@ class CustomerService {
     }
   }
 
-  public clearCustomerInfo(): void {
+  public async clearCustomerInfo(): Promise<void> {
     localStorage.removeItem('refresh_token');
-    // this.customerInfo = undefined;
+    await fetchAnonymousToken();
+    await getTheCart();
   }
 
   private handleError(message: ErrorMessages, error: unknown): void {

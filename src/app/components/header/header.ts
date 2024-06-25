@@ -223,6 +223,11 @@ export default class HeaderView extends View {
       listClass: ['header__links-list'],
       itemClass: ['header__links-item'],
     });
+
+    const cartImage = linkListCreator.getHtmlElement().querySelector('.header__basket-img');
+    const productCounter = new ElementCreator<HTMLSpanElement>({ tag: 'span', id: 'header-cart-counter' });
+    cartImage?.insertAdjacentElement('afterend', productCounter.getElement());
+
     return linkListCreator.getHtmlElement();
   }
 }
